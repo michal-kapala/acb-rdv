@@ -1,0 +1,100 @@
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Drawing;
+
+namespace QuazalWV
+{
+    public static class AuthenticationService
+    {
+        public static void ProcessRequest(Stream s, RMCP rmc)
+        {
+            switch (rmc.methodID)
+            {
+                case 1:
+                    rmc.request = new RMCPacketRequestAuthenticationService_Login(s);
+                    break;
+                case 2:
+                    rmc.request = new RMCPacketRequestLoginCustomData(s);
+                    break;
+                case 3:
+                    rmc.request = new RMCPacketRequestRequestTicket(s);
+                    break;
+                default:
+                    Log.WriteLine(1, "[RMC Authentication] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    break;
+            }
+        }
+
+
+        public static void HandleRequest(QPacket p, RMCP rmc, ClientInfo client)
+        {
+            RMCPResponse reply;
+            switch (rmc.methodID)
+            {
+                case 1:
+                    RMCPacketRequestAuthenticationService_Login loginReq = (RMCPacketRequestAuthenticationService_Login)rmc.request;
+                    ClientInfo u = DBHelper.GetUserByName(loginReq.username);
+                    // 'Tracking' account (telemetry) needs to exist, users call LoginCustomData
+                    if (u != null)
+                    {
+                        client.PID = u.PID;
+                        client.Name = u.Name;
+                        client.Pass = u.Pass;
+                    }
+                    else 
+                    {
+                        Log.WriteLine(1, $"[Authentication Service] Login called for a non-existent user {loginReq.username}", Color.Red);
+                    }
+
+                    reply = new RMCPacketResponseAuthenticationService_Login(client);
+                    client.sessionKey = ((RMCPacketResponseAuthenticationService_Login)reply).ticket.sessionKey;
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, useCompression: false);
+                    break;
+                case 2:
+                    RMCPacketRequestLoginCustomData h = (RMCPacketRequestLoginCustomData)rmc.request;
+                    switch (h.className)
+                    {
+                        case "UbiAuthenticationLoginCustomData":
+                            reply = new RMCPResponseEmpty();
+                            ClientInfo user = DBHelper.GetUserByName(h.username);
+                            if (user != null)
+                            {
+                                if (user.Pass == h.password)
+                                {
+                                    reply = new RMCPacketResponseLoginCustomData(client.PID, client.sPID, client.sPort);
+                                    client.Name = h.username;
+                                    client.Pass = h.password;
+                                    client.sessionKey = ((RMCPacketResponseLoginCustomData)reply).ticket.sessionKey;
+                                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                                }
+                                else
+                                {
+                                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, 0x80030065);
+                                }
+                            }
+                            else
+                            {
+                                Log.WriteLine(1, $"[Authentication Service] LoginCustomData called for a non-existent user {h.username}", Color.Red);
+                                RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, 0x80030064);
+                            }
+                            break;
+                        default:
+                            Log.WriteLine(1, "[RMC Authentication] Error: Unknown Custom Data class " + h.className);
+                            break;
+                    }
+                    break;
+                case 3:
+                    reply = new RMCPacketResponseRequestTicket(client.PID, client.sPID);
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                default:
+                    Log.WriteLine(1, "[RMC Authentication] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    break;
+            }
+        }
+    }
+}

@@ -1,0 +1,50 @@
+﻿*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
+nupkg/
+
+# Visual Studio Code
+.vscode
+
+# Rider
+.idea
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.pdb
+*.txt
+*.bin
+*.config
+*.ipch
+*.cache
+*.resources
+# Be.Windows.Forms.HexBox/*
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/*
+[Rr]eleases/
+x64/
+x86/*
+build/
+bld/
+[Bb]in/*
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
+
+# Visual Studio 2015
+.vs/*
+
+# very important not to track the db (ubi prod credentials are needed)
+*.sqlite
+ACB RDV/bin/x86/Release/ACBRDV.exe
+ACB RDV/bin/x86/Release/QuazalWV.dll

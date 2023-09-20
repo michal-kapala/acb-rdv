@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8330545E-0887-434A-A0DE-343B90AEA2CE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>QuazalWV</RootNamespace>
+    <AssemblyName>QuazalWV</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotNetZip">
+      <HintPath>dll\DotNetZip.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.ConfigurationManager, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Configuration.ConfigurationManager.7.0.0\lib\net462\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>dll\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.AccessControl, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.AccessControl.6.0.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Permissions, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Permissions.7.0.0\lib\net462\System.Security.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Principal.Windows.5.0.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BitBuffer.cs" />
+    <Compile Include="BitFieldU32.cs" />
+    <Compile Include="ClientInfo.cs" />
+    <Compile Include="DBHelper.cs" />
+    <Compile Include="Global.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="Kerberos\KerberosTicket.cs" />
+    <Compile Include="Log.cs" />
+    <Compile Include="RMC\AuthenticationService\Request\RMCPacketRequestAuthenticationService_Login.cs" />
+    <Compile Include="RMC\AuthenticationService\Response\RMCPacketResponseAuthenticationService_Login.cs" />
+    <Compile Include="RMC\LocalizationService\LocalizationService.cs" />
+    <Compile Include="RMC\LocalizationService\Request\RMCPacketRequestLocalizationService_SetLocaleCode.cs" />
+    <Compile Include="RMC\NATTraversalService\NATTraversalService.cs" />
+    <Compile Include="NotificationQuene.cs" />
+    <Compile Include="NotificationQueneEntry.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QPacket.cs" />
+    <Compile Include="QPacketHandler.cs" />
+    <Compile Include="RMC\AuthenticationService\AuthenticationService.cs" />
+    <Compile Include="RMC\AuthenticationService\Request\RMCPacketRequestLoginCustomData.cs" />
+    <Compile Include="RMC\AuthenticationService\Request\RMCPacketRequestRequestTicket.cs" />
+    <Compile Include="RMC\AuthenticationService\Response\RMCPacketResponseLoginCustomData.cs" />
+    <Compile Include="RMC\AuthenticationService\Response\RMCPacketResponseRequestTicket.cs" />
+    <Compile Include="RMC\MatchMakingService\MatchMakingService.cs" />
+    <Compile Include="RMC\MatchMakingService\Response\RMCPacketResponseMatchMakingService_Method10.cs" />
+    <Compile Include="RMC\RMC.cs" />
+    <Compile Include="RMC\RMCP.cs" />
+    <Compile Include="RMC\RMCPCustom.cs" />
+    <Compile Include="RMC\RMCPRequest.cs" />
+    <Compile Include="RMC\RMCPResponse.cs" />
+    <Compile Include="RMC\RMCPResponseEmpty.cs" />
+    <Compile Include="RMC\SecureService\Request\RMCPacketRequestRegisterEx.cs" />
+    <Compile Include="RMC\SecureService\Response\RMCPacketResponseRegisterEx.cs" />
+    <Compile Include="RMC\SecureService\SecureService.cs" />
+    <Compile Include="RMC\TrackingService\Request\RMCPacketRequestTelemetry_Method1.cs" />
+    <Compile Include="RMC\TrackingService\Response\RMCPacketResponseTelemetry_TrackGameSession.cs" />
+    <Compile Include="RMC\TrackingService\TelemetryService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Classes\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
