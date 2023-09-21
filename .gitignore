@@ -48,3 +48,4 @@ msbuild.wrn
 *.sqlite
 ACB RDV/bin/x86/Release/ACBRDV.exe
 ACB RDV/bin/x86/Release/QuazalWV.dll
+QuazalWV/bin/x86/Release/QuazalWV.dll

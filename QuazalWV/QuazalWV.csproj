@@ -101,9 +101,9 @@
     <Compile Include="RMC\SecureService\Request\RMCPacketRequestRegisterEx.cs" />
     <Compile Include="RMC\SecureService\Response\RMCPacketResponseRegisterEx.cs" />
     <Compile Include="RMC\SecureService\SecureService.cs" />
-    <Compile Include="RMC\TrackingService\Request\RMCPacketRequestTelemetry_Method1.cs" />
-    <Compile Include="RMC\TrackingService\Response\RMCPacketResponseTelemetry_TrackGameSession.cs" />
-    <Compile Include="RMC\TrackingService\TelemetryService.cs" />
+    <Compile Include="RMC\TrackingService\Request\RMCPacketRequestTrackingService_TrackGameSession.cs" />
+    <Compile Include="RMC\TrackingService\Response\RMCPacketResponseTrackingService_TrackGameSession.cs" />
+    <Compile Include="RMC\TrackingService\TrackingService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
