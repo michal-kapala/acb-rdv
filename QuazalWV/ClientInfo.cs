@@ -27,6 +27,7 @@ namespace QuazalWV
         public IPEndPoint ep;
         public UdpClient udp;
         public bool isLocal = true;
-        public string localeCode;
+        public string LocaleCode { get; set; }
+        public User User { get; set; }
     }
 }

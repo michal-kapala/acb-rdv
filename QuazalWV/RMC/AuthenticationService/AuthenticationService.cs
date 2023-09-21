@@ -37,13 +37,12 @@ namespace QuazalWV
             {
                 case 1:
                     RMCPacketRequestAuthenticationService_Login loginReq = (RMCPacketRequestAuthenticationService_Login)rmc.request;
-                    ClientInfo u = DBHelper.GetUserByName(loginReq.username);
+                    User u = DBHelper.GetUserByName(loginReq.username);
                     // 'Tracking' account (telemetry) needs to exist, users call LoginCustomData
                     if (u != null)
                     {
-                        client.PID = u.PID;
-                        client.Name = u.Name;
-                        client.Pass = u.Pass;
+                        client.PID = u.Pid;
+                        client.User = u;
                     }
                     else 
                     {
@@ -60,14 +59,14 @@ namespace QuazalWV
                     {
                         case "UbiAuthenticationLoginCustomData":
                             reply = new RMCPResponseEmpty();
-                            ClientInfo user = DBHelper.GetUserByName(h.username);
+                            User user = DBHelper.GetUserByName(h.username);
                             if (user != null)
                             {
-                                if (user.Pass == h.password)
+                                if (user.Password == h.password)
                                 {
                                     reply = new RMCPacketResponseLoginCustomData(client.PID, client.sPID, client.sPort);
-                                    client.Name = h.username;
-                                    client.Pass = h.password;
+                                    client.PID = user.Pid;
+                                    client.User = user;
                                     client.sessionKey = ((RMCPacketResponseLoginCustomData)reply).ticket.sessionKey;
                                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                                 }

@@ -77,12 +77,16 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.MatchMakingService:
                     MatchMakingService.HandleRequest(p, rmc, client);
                     break;
+                case RMCP.PROTOCOL.UbiAccountMgmtService:
+                    UbiAccountMgmtService.HandleRequest(p, rmc, client);
+                    break;
                 case RMCP.PROTOCOL.TrackingService:
                     TrackingService.HandleRequest(p, rmc, client);
                     break;
                 case RMCP.PROTOCOL.LocalizationService:
                     LocalizationService.HandleRequest(p, rmc, client);
                     break;
+                
                 default:
                     WriteLog(1, $"Error: No handler implemented for packet protocol {rmc.proto}");
                     break;
@@ -102,6 +106,9 @@ namespace QuazalWV
                     break;
                 case RMCP.PROTOCOL.SecureService:
                     SecureService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.UbiAccountMgmtService:
+                    UbiAccountMgmtService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.TrackingService:
                     TrackingService.ProcessRequest(m, rmc);

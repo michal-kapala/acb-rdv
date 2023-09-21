@@ -15,7 +15,7 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 0x10:
-                    reply = new RMCPacketResponseMatchMakingService_Method10();
+                    reply = new RMCPacketResponseMatchMakingService_GetParticipantsURLs();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:

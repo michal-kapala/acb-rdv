@@ -28,7 +28,7 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 2:
-                    client.localeCode = ((RMCPacketRequestLocalizationService_SetLocaleCode)rmc.request).LocalCode;
+                    client.LocaleCode = ((RMCPacketRequestLocalizationService_SetLocaleCode)rmc.request).LocalCode;
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

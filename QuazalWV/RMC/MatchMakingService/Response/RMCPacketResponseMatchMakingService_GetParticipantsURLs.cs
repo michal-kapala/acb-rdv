@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace QuazalWV
 {
-    public class RMCPacketResponseMatchMakingService_Method10 : RMCPResponse
+    public class RMCPacketResponseMatchMakingService_GetParticipantsURLs : RMCPResponse
     {
 
         public List<string> stationURLs = new List<string>();
 
-        public RMCPacketResponseMatchMakingService_Method10()
+        public RMCPacketResponseMatchMakingService_GetParticipantsURLs()
         {
             stationURLs.Add(Global.sessionURL);
         }
@@ -26,7 +26,7 @@ namespace QuazalWV
 
         public override string ToString()
         {
-            return "[RMCPacketResponseMatchMakingService_Method10]";
+            return "[RMCPacketResponseMatchMakingService_GetParticipantsURLs]";
         }
 
         public override string PayloadToString()

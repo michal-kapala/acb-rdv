@@ -36,17 +36,21 @@ namespace QuazalWV
             return result;
         }
 
-        public static ClientInfo GetUserByName(string name)
+        public static User GetUserByName(string name)
         {
-            ClientInfo result = null;
+            User result = null;
             List<List<string>> results = GetQueryResults("SELECT * FROM users WHERE name='" + name + "'");
             foreach(List<string> entry in results)
             {
-                result = new ClientInfo
+                result = new User
                 {
-                    PID = Convert.ToUInt32(entry[1]),
-                    Pass = entry[3],
-                    Name = name
+                    Pid = Convert.ToUInt32(entry[1]),
+                    Name = name,
+                    Password = entry[3],
+                    UbiId = entry[4],
+                    Email = entry[5],
+                    CountryCode = entry[6],
+                    PrefLang = entry[7],
                 };
             }
             return result;
