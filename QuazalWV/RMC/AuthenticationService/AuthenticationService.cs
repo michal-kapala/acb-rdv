@@ -36,21 +36,16 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 1:
-                    RMCPacketRequestAuthenticationService_Login loginReq = (RMCPacketRequestAuthenticationService_Login)rmc.request;
+                    var loginReq = (RMCPacketRequestAuthenticationService_Login)rmc.request;
                     User u = DBHelper.GetUserByName(loginReq.username);
                     // 'Tracking' account (telemetry) needs to exist, users call LoginCustomData
-                    if (u != null)
-                    {
-                        client.PID = u.Pid;
-                        client.User = u;
-                    }
+                    if (u != null && loginReq.username == "Tracking")
+                        client.TrackingUser = u;
                     else 
-                    {
-                        Log.WriteLine(1, $"[Authentication Service] Login called for a non-existent user {loginReq.username}", Color.Red);
-                    }
+                        Log.WriteLine(1, $"[RMC Authentication] Login called for a non-existent user {loginReq.username}", Color.Red);
 
                     reply = new RMCPacketResponseAuthenticationService_Login(client);
-                    client.sessionKey = ((RMCPacketResponseAuthenticationService_Login)reply).ticket.sessionKey;
+                    //client.sessionKey = ((RMCPacketResponseAuthenticationService_Login)reply).ticket.sessionKey;
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, useCompression: false);
                     break;
                 case 2:
@@ -77,7 +72,7 @@ namespace QuazalWV
                             }
                             else
                             {
-                                Log.WriteLine(1, $"[Authentication Service] LoginCustomData called for a non-existent user {h.username}", Color.Red);
+                                Log.WriteLine(1, $"[RMC Authentication] LoginCustomData called for a non-existent user {h.username}", Color.Red);
                                 RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, 0x80030064);
                             }
                             break;

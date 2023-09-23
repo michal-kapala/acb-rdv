@@ -24,7 +24,7 @@ namespace QuazalWV
         {
             StringBuilder sb = new StringBuilder();
             foreach(UplayReward reward in Rewards)
-            sb.AppendLine($"\t[Reward: {reward.Name}]");
+                sb.AppendLine($"\t[Reward: {reward.Name}]");
             return sb.ToString();
         }
 
@@ -34,6 +34,7 @@ namespace QuazalWV
             Helper.WriteU32(m, (uint)Rewards.Count);
             foreach (UplayReward reward in Rewards)
                 reward.ToBuffer(m);
+                
             return m.ToArray();
         }
     }

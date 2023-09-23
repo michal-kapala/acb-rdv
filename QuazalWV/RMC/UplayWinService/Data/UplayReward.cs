@@ -15,9 +15,9 @@ namespace QuazalWV
 
         public UplayReward(string platform)
         {
-            Platforms = new List<UplayRewardPlatform>() { new UplayRewardPlatform(platform) };
             RewardTypeName = "Unlockable";
             GameCode = "ACB";
+            Platforms = new List<UplayRewardPlatform>() { new UplayRewardPlatform(platform) };
         }
 
         public UplayReward(Stream s)

@@ -29,5 +29,6 @@ namespace QuazalWV
         public bool isLocal = true;
         public string LocaleCode { get; set; }
         public User User { get; set; }
+        public User TrackingUser { get; set; }
     }
 }

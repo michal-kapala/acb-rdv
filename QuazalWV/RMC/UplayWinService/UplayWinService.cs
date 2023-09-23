@@ -24,7 +24,7 @@ namespace QuazalWV
             {
                 case 5:
                     var getRewards = (RMCPacketRequestUplayWinService_GetRewards)rmc.request;
-                    var rewards = DBHelper.GetRewards(getRewards.PlatformCode);
+                    var rewards = DBHelper.GetRewards("PC");
                     reply = new RMCPacketResponseUplayWinService_GetRewards(rewards);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
