@@ -10,7 +10,7 @@ namespace QuazalWV
         public string Password { get; set; }
         public UbiAccountStatus Status { get; set; }
         public string Email { get; set; }
-        public ulong DateOfBirth { get; set; }
+        public QDateTime DateOfBirth { get; set; }
         public uint Gender { get; set; }
         public string CountryCode { get; set; }
         public bool OptIn { get; set; }
@@ -26,8 +26,8 @@ namespace QuazalWV
             Password = "";
             // default account status
             Status = new UbiAccountStatus();
-            // September 27th, 2000
-            DateOfBirth = 0x1F42760000;
+            // September 27th, 2001
+            DateOfBirth = new QDateTime(new System.DateTime(2001, 9, 27));
             // unspecified
             Gender = 0;
             OptIn = false;
@@ -51,7 +51,7 @@ namespace QuazalWV
             Password = Helper.ReadString(s);
             Status = new UbiAccountStatus(s);
             Email = Helper.ReadString(s);
-            DateOfBirth = Helper.ReadU64(s);
+            DateOfBirth = new QDateTime(s);
             Gender = Helper.ReadU32(s);
             CountryCode = Helper.ReadString(s);
             OptIn = Helper.ReadBool(s);
@@ -72,7 +72,7 @@ namespace QuazalWV
             Helper.WriteString(s, Password);
             Status.ToBuffer(s);
             Helper.WriteString(s, Email);
-            Helper.WriteU64(s, DateOfBirth);
+            Helper.WriteU64(s, DateOfBirth.RawTime);
             Helper.WriteU32(s, Gender);
             Helper.WriteString(s, CountryCode);
             Helper.WriteBool(s, OptIn);

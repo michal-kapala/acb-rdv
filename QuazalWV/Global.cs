@@ -16,6 +16,7 @@ namespace QuazalWV
         public static uint idCounter = 0x12345678;
         public static uint pidCounter = 0x1234;
         public static uint dummyFriendPidCounter = 0x1235;
+        public static uint GathIdCounter { get; set; } = 0x34;
         public static string sessionURL = "prudp:/address=127.0.0.1;port=21032;RVCID=4660";
         public static List<ClientInfo> clients = new List<ClientInfo>();
         public static Stopwatch uptime = new Stopwatch();

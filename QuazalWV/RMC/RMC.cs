@@ -74,11 +74,20 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.SecureService:
                     SecureService.HandleRequest(p, rmc, client);
                     break;
+                case RMCP.PROTOCOL.FriendsService:
+                    FriendsService.HandleRequest(p, rmc, client);
+                    break;
                 case RMCP.PROTOCOL.MatchMakingService:
                     MatchMakingService.HandleRequest(p, rmc, client);
                     break;
                 case RMCP.PROTOCOL.UbiAccountMgmtService:
                     UbiAccountMgmtService.HandleRequest(p, rmc, client);
+                    break;
+                case RMCP.PROTOCOL.NewsService:
+                    NewsService.HandleRequest(p, rmc, client);
+                    break;
+                case RMCP.PROTOCOL.PrivilegesService:
+                    PrivilegesService.HandleRequest(p, rmc, client);
                     break;
                 case RMCP.PROTOCOL.TrackingService:
                     TrackingService.HandleRequest(p, rmc, client);
@@ -86,7 +95,15 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.LocalizationService:
                     LocalizationService.HandleRequest(p, rmc, client);
                     break;
-                
+                case RMCP.PROTOCOL.GameSessionService:
+                    GameSessionService.HandleRequest(p, rmc, client);
+                    break;
+                case RMCP.PROTOCOL.TrackingExtService:
+                    TrackingExtService.HandleRequest(p, rmc, client);
+                    break;
+                case RMCP.PROTOCOL.UplayWinService:
+                    UplayWinService.HandleRequest(p, rmc, client);
+                    break;
                 default:
                     WriteLog(1, $"Error: No handler implemented for packet protocol {rmc.proto}");
                     break;
@@ -107,14 +124,32 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.SecureService:
                     SecureService.ProcessRequest(m, rmc);
                     break;
+                case RMCP.PROTOCOL.FriendsService:
+                    FriendsService.ProcessRequest(m, rmc);
+                    break;
                 case RMCP.PROTOCOL.UbiAccountMgmtService:
                     UbiAccountMgmtService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.NewsService:
+                    NewsService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.PrivilegesService:
+                    PrivilegesService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.TrackingService:
                     TrackingService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.LocalizationService:
                     LocalizationService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.GameSessionService:
+                    GameSessionService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.TrackingExtService:
+                    TrackingExtService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.UplayWinService:
+                    UplayWinService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.MatchMakingService:
                 case RMCP.PROTOCOL.NATTraversalRelayService:

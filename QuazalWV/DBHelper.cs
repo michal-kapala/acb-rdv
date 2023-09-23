@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SQLite;
+using System.Drawing;
 
 namespace QuazalWV
 {
@@ -54,6 +55,46 @@ namespace QuazalWV
                 };
             }
             return result;
+        }
+
+        public static List<Privilege> GetPrivileges(string locale)
+        {
+            List<Privilege> privileges = new List<Privilege>();
+            List<List<string>> results = GetQueryResults($"SELECT * FROM privileges WHERE locale='{locale}'");
+            if (results.Count == 0)
+                Log.WriteLine(1, $"[RMC Privileges] Unknown locale: {locale}", Color.Red);
+
+            foreach (List<string> entry in results)
+            {
+                privileges.Add(new Privilege()
+                    {
+                        Id = Convert.ToUInt32(entry[0]),
+                        Description = entry[1]
+                    }
+                );
+            }
+            return privileges;
+        }
+
+        public static List<UplayReward> GetRewards(string platform)
+        {
+            List<UplayReward> rewards = new List<UplayReward>();
+            List<List<string>> results = GetQueryResults($"SELECT * FROM rewards");
+            if (results.Count < 6)
+                Log.WriteLine(1, $"[RMC UplayWin] Rewards missing", Color.Red);
+
+            foreach (List<string> entry in results)
+            {
+                rewards.Add(new UplayReward(platform)
+                    {
+                        Code = entry[0],
+                        Name = entry[1],
+                        Description = entry[2],
+                        Value = Convert.ToUInt32(entry[3]),
+                    }
+                );
+            }
+            return rewards;
         }
     }
 }

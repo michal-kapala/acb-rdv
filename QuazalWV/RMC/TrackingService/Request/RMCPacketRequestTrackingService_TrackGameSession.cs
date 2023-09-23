@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace QuazalWV
 {
@@ -34,7 +30,7 @@ namespace QuazalWV
 
         public override string ToString()
         {
-            return "[RMC Packet Request Telemetry_Method1]";
+            return "[RMC Packet Request Telemetry_TrackGameSession]";
         }
 
         public override string PayloadToString()
