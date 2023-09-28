@@ -70,6 +70,18 @@ namespace QuazalWV
             uint pid = Helper.ReadU32(m); //user pid
             uint cid = Helper.ReadU32(m); //connection id
             uint responseCode = Helper.ReadU32(m);
+            
+            // Tracking user connection
+            if (p.m_oSourceVPort.port == 0xE)
+            {
+                // response code dumped from the original traffic
+                responseCode = 0xF94C56FB;
+                Log.WriteLine(1, $"[UDP Secure] CONNECT for Tracking user, response code 0x{responseCode:X8}");
+                m = new MemoryStream();
+                Helper.WriteU32(m, 4);
+                Helper.WriteU32(m, responseCode);
+                return m.ToArray();
+            }
             Log.WriteLine(1, $"[UDP Secure] CONNECT: PID: 0x{pid:X8}, CID: {cid}, response code 0x{responseCode:X8}");
             m = new MemoryStream();
             Helper.WriteU32(m, 4);
