@@ -71,6 +71,7 @@
     <Compile Include="Classes\CommonData\QDateTime.cs" />
     <Compile Include="Classes\CommonData\ResultRange.cs" />
     <Compile Include="Classes\CommonData\StationUrl.cs" />
+    <Compile Include="Classes\Models\TelemetryTag.cs" />
     <Compile Include="RMC\FriendsService\Data\RelationshipData.cs" />
     <Compile Include="RMC\FriendsService\FriendsService.cs" />
     <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_GetRelationships.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="RMC\TrackingExtService\Request\RMCPacketRequestTrackingExtService_IsTrackingSessionActive.cs" />
     <Compile Include="RMC\TrackingExtService\Response\RMCPacketResponseTrackingExtService_IsTrackingSessionActive.cs" />
     <Compile Include="RMC\TrackingExtService\TrackingExtService.cs" />
+    <Compile Include="RMC\TrackingService\Response\RMCPacketResponseTrackingService_GetConfiguration.cs" />
     <Compile Include="RMC\UbiAccountMgmtService\Data\ExternalAccount.cs" />
     <Compile Include="RMC\UbiAccountMgmtService\Data\UbiAccount.cs" />
     <Compile Include="RMC\UbiAccountMgmtService\Data\UbiAccountStatus.cs" />
@@ -134,8 +136,7 @@
     <Compile Include="RMC\SecureService\Request\RMCPacketRequestRegisterEx.cs" />
     <Compile Include="RMC\SecureService\Response\RMCPacketResponseRegisterEx.cs" />
     <Compile Include="RMC\SecureService\SecureService.cs" />
-    <Compile Include="RMC\TrackingService\Request\RMCPacketRequestTrackingService_TrackGameSession.cs" />
-    <Compile Include="RMC\TrackingService\Response\RMCPacketResponseTrackingService_TrackGameSession.cs" />
+    <Compile Include="RMC\TrackingService\Request\RMCPacketRequestTrackingService_SendTag.cs" />
     <Compile Include="RMC\TrackingService\TrackingService.cs" />
     <Compile Include="RMC\UbiAccountMgmtService\Response\RMCPacketResponseUbiAccountMgmtService_GetAccount.cs" />
     <Compile Include="RMC\UbiAccountMgmtService\UbiAccountMgmtService.cs" />

@@ -10,7 +10,10 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 1:
-                    rmc.request = new RMCPacketRequestTrackingService_TrackGameSession(s);
+                    rmc.request = new RMCPacketRequestTrackingService_SendTag(s);
+                    break;
+                case 4:
+                    // Empty GetConfiguration request
                     break;
                 default:
                     Log.WriteLine(1, $"[RMC Tracking] Error: Unknown Method {rmc.methodID}", Color.Red);
@@ -24,7 +27,21 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 1:
-                    reply = new RMCPacketResponseTrackingService_TrackGameSession();
+                    var rSendTag = (RMCPacketRequestTrackingService_SendTag)rmc.request;
+                    var tag = new TelemetryTag()
+                    {
+                        TrackingId = rSendTag.TrackingId,
+                        Tag = rSendTag.Tag,
+                        Attributes = rSendTag.Attributes,
+                        DeltaTime = rSendTag.DeltaTime
+                    };
+                    DBHelper.SaveTag(tag);
+                    reply = new RMCPResponseEmpty();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 4:
+                    var tags = DBHelper.GetTags();
+                    reply = new RMCPacketResponseTrackingService_GetConfiguration(tags);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:

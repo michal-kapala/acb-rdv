@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.Drawing;
 
@@ -95,6 +94,36 @@ namespace QuazalWV
                 );
             }
             return rewards;
+        }
+
+        /// <summary>
+        /// Returns all available telemetry event types (tags).
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetTags()
+        {
+            var tags = new List<string>();
+            var results = GetQueryResults("SELECT * FROM tags");
+            foreach(var entry in results)
+                tags.Add(entry[0]);            
+
+            return tags;
+        }
+
+        public static bool SaveTag(TelemetryTag tag)
+        {
+            string sql = $"INSERT INTO telemetry_tags (tracking_id, tag, attr, dtime)" +
+                         $"VALUES ({tag.TrackingId},'{tag.Tag}','{tag.Attributes}',{tag.DeltaTime})";
+
+            SQLiteCommand cmd = new SQLiteCommand(sql);
+            try
+            {
+                return cmd.ExecuteNonQuery() > 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
