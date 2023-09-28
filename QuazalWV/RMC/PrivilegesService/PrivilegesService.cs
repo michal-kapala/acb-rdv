@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 
 namespace QuazalWV
@@ -13,7 +14,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestPrivilegesService_GetPrivileges(s);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC Privileges] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC Privileges] Error: Unknown Method {rmc.methodID}", Color.Red);
                     break;
             }
         }
@@ -30,7 +31,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC Privileges] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC Privileges] Error: Unknown Method {rmc.methodID}", Color.Red, client);
                     break;
             }
         }

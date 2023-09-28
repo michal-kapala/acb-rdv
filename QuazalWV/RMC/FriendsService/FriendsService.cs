@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Drawing;
+using System.IO;
 
 namespace QuazalWV
 {
@@ -12,7 +13,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestFriendsService_GetRelationships(s);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC Friends] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC Friends] Error: Unknown Method {rmc.methodID}", Color.Red);
                     break;
             }
         }
@@ -23,12 +24,12 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 13:
-                    var getRelations = (RMCPacketRequestFriendsService_GetRelationships)rmc.request;
+                    var rGetRelations = (RMCPacketRequestFriendsService_GetRelationships)rmc.request;
                     reply = new RMCPacketResponseFriendsService_GetRelationships();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC Friends] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC Friends] Error: Unknown Method {rmc.methodID}", client);
                     break;
             }
         }

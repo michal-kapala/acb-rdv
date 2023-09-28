@@ -22,7 +22,7 @@ namespace QuazalWV
                 client.ep = ep;
                 client.IDrecv = Global.idCounter++;
                 client.PID = Global.pidCounter++;
-                Global.clients.Add(client);
+                Global.Clients.Add(client);
             }
             QPacket reply = new QPacket();
             reply.m_oSourceVPort = p.m_oDestinationVPort;

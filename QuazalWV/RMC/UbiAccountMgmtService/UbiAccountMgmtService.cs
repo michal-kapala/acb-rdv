@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Drawing;
+using System.IO;
 
 namespace QuazalWV
 {
@@ -12,7 +13,7 @@ namespace QuazalWV
                     // Empty GetAccount request
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC UbiAccountMgmt] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC UbiAccountMgmt] Error: Unknown Method {rmc.methodID}", Color.Red);
                     break;
             }
         }
@@ -27,7 +28,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC UbiAccountMgmt] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC UbiAccountMgmt] Error: Unknown Method {rmc.methodID}", Color.Red, client);
                     break;
             }
         }

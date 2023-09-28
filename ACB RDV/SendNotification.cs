@@ -23,7 +23,7 @@ namespace AcbRdv
         {
             try
             {
-                foreach (ClientInfo client in Global.clients)
+                foreach (ClientInfo client in Global.Clients)
                 {
                     NotificationQuene.AddNotification(
                         new NotificationQueneEntry(client, 

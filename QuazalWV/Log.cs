@@ -34,7 +34,7 @@ namespace QuazalWV
             }
         }
 
-        public static void WriteLine(int priority, string s, object color = null)
+        public static void WriteLine(int priority, string s, object color = null, ClientInfo client = null)
         {
             if (box == null) return;
             try
@@ -42,6 +42,8 @@ namespace QuazalWV
                 box.Invoke(new Action(delegate
                 {
                     string stamp = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + " : [" + priority.ToString("D2") + "]";
+                    if (client != null && client.User != null && client.User.Name != null)
+                        stamp += $"[{client.User.Name}]";
                     if (priority <= MinPriority)
                     {
                         Color c;

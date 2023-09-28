@@ -18,12 +18,12 @@ namespace QuazalWV
         public static uint dummyFriendPidCounter = 0x1235;
         public static uint GathIdCounter { get; set; } = 0x34;
         public static string sessionURL = "prudp:/address=127.0.0.1;port=21032;RVCID=4660";
-        public static List<ClientInfo> clients = new List<ClientInfo>();
+        public static List<ClientInfo> Clients { get; set; } = new List<ClientInfo>();
         public static Stopwatch uptime = new Stopwatch();
 
         public static ClientInfo GetClientByEndPoint(IPEndPoint ep)
         {
-            foreach (ClientInfo c in clients)
+            foreach (ClientInfo c in Clients)
                 if (c.ep.Address.ToString() == ep.Address.ToString() && c.ep.Port == ep.Port)
                     return c;
             WriteLog(1, "Error : Cant find client for end point : " + ep.ToString());
@@ -32,7 +32,7 @@ namespace QuazalWV
 
         public static ClientInfo GetClientByIDsend(uint id)
         {
-            foreach (ClientInfo c in clients)
+            foreach (ClientInfo c in Clients)
                 if (c.IDsend == id)
                     return c;
             WriteLog(1, "Error : Cant find client for id : 0x" + id.ToString("X8"));
@@ -41,7 +41,7 @@ namespace QuazalWV
 
         public static ClientInfo GetClientByIDrecv(uint id)
         {
-            foreach (ClientInfo c in clients)
+            foreach (ClientInfo c in Clients)
                 if (c.IDrecv == id)
                     return c;
             WriteLog(1, "Error : Cant find client for id : 0x" + id.ToString("X8"));

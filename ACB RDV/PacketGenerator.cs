@@ -59,7 +59,7 @@ namespace AcbRdv
             for (long i = 0; i < hb1.ByteProvider.Length; i++)
                 m.WriteByte(hb1.ByteProvider.ReadByte(i));
             byte[] payload = m.ToArray();
-            foreach (ClientInfo client in Global.clients)
+            foreach (ClientInfo client in Global.Clients)
             {
                 QPacket q = new QPacket();
                 q.m_oSourceVPort = new QPacket.VPort(0x31);

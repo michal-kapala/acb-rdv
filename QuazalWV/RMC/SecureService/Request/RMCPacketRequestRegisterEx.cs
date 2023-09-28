@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuazalWV
 {
-    public class RMCPacketRequestRegisterEx : RMCPRequest
+    public class RMCPacketRequestSecureService_RegisterEx : RMCPRequest
     {
         public List<string> stationUrls;
         public string className;
@@ -15,7 +15,7 @@ namespace QuazalWV
         public string onlineKey;
         public string password;
 
-        public RMCPacketRequestRegisterEx(Stream s)
+        public RMCPacketRequestSecureService_RegisterEx(Stream s)
         {
             stationUrls = Helper.ReadStringList(s);
             className = Helper.ReadString(s);

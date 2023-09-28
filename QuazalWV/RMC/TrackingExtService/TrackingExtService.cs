@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace QuazalWV
 {
@@ -17,7 +16,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestTrackingExtService_IsTrackingSessionActive(s);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC TrackingExt] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC Tracking Ext] Error: Unknown Method {rmc.methodID}", Color.Red);
                     break;
             }
         }
@@ -32,7 +31,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC TrackingExt] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC Tracking Ext] Error: Unknown Method {rmc.methodID}", Color.Red, client);
                     break;
             }
         }

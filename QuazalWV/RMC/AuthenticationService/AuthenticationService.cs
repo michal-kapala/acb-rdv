@@ -24,7 +24,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestRequestTicket(s);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC Authentication] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Method {rmc.methodID}", Color.Red);
                     break;
             }
         }
@@ -72,12 +72,12 @@ namespace QuazalWV
                             }
                             else
                             {
-                                Log.WriteLine(1, $"[RMC Authentication] LoginCustomData called for a non-existent user {h.username}", Color.Red);
+                                Log.WriteLine(1, $"[RMC Authentication] LoginCustomData called for a non-existent user {h.username}", Color.Red, client);
                                 RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, 0x80030064);
                             }
                             break;
                         default:
-                            Log.WriteLine(1, "[RMC Authentication] Error: Unknown Custom Data class " + h.className);
+                            Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Custom Data class {h.className}", Color.Red, client);
                             break;
                     }
                     break;
@@ -87,7 +87,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC Authentication] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Method {rmc.methodID}", Color.Red, client);
                     break;
             }
         }

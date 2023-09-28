@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Drawing;
 
 namespace QuazalWV
 {
@@ -17,7 +18,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, "[RMC NATTraversalService] Error: Unknown Method 0x" + rmc.methodID.ToString("X"));
+                    Log.WriteLine(1, $"[RMC NAT] Error: Unknown Method {rmc.methodID}", Color.Red, client);
                     break;
             }
         }
