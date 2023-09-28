@@ -101,6 +101,9 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.TrackingExtService:
                     TrackingExtService.HandleRequest(p, rmc, client);
                     break;
+                case RMCP.PROTOCOL.GameInfoService:
+                    GameInfoService.HandleRequest(p, rmc, client);
+                    break;
                 case RMCP.PROTOCOL.UplayWinService:
                     UplayWinService.HandleRequest(p, rmc, client);
                     break;
@@ -147,6 +150,9 @@ namespace QuazalWV
                     break;
                 case RMCP.PROTOCOL.TrackingExtService:
                     TrackingExtService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.GameInfoService:
+                    GameInfoService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.UplayWinService:
                     UplayWinService.ProcessRequest(m, rmc);

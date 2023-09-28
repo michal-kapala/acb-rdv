@@ -76,6 +76,10 @@
     <Compile Include="RMC\FriendsService\FriendsService.cs" />
     <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_GetRelationships.cs" />
     <Compile Include="RMC\FriendsService\Response\RMCPacketResponseFriendsService_GetRelationships.cs" />
+    <Compile Include="RMC\GameInfoService\Data\QFile.cs" />
+    <Compile Include="RMC\GameInfoService\GameInfoService.cs" />
+    <Compile Include="RMC\GameInfoService\Request\RMCPacketRequestGameInfoService_GetFileListOnGameStorage.cs" />
+    <Compile Include="RMC\GameInfoService\Response\RMCPacketResponseGameInfoService_GetFileListOnGameStorage.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionInvitationReceived.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionKey.cs" />
     <Compile Include="RMC\GameSessionService\GameSessionService.cs" />
