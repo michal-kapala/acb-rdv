@@ -92,6 +92,9 @@
     <Compile Include="RMC\NewsService\Request\RMCPacketRequestNewsService_GetNumberOfNews.cs" />
     <Compile Include="RMC\NewsService\Response\RMCPacketResponseNewsService_GetNumberOfNews.cs" />
     <Compile Include="RMC\NewsService\Response\RMCPacketResponseNewsService_GetChannelsByTypes.cs" />
+    <Compile Include="RMC\PersistentStoreService\PersistentStoreService.cs" />
+    <Compile Include="RMC\PersistentStoreService\Request\RMCPacketRequestPersistentStoreService_GetItem.cs" />
+    <Compile Include="RMC\PersistentStoreService\Response\RMCPacketResponsePersistentStoreService_GetItem.cs" />
     <Compile Include="RMC\PrivilegesService\Data\Privilege.cs" />
     <Compile Include="RMC\PrivilegesService\PrivilegesService.cs" />
     <Compile Include="RMC\PrivilegesService\Request\RMCPacketRequestPrivilegesService_GetPrivileges.cs" />
@@ -101,7 +104,10 @@
     <Compile Include="RMC\TrackingExtService\Request\RMCPacketRequestTrackingExtService_IsTrackingSessionActive.cs" />
     <Compile Include="RMC\TrackingExtService\Response\RMCPacketResponseTrackingExtService_IsTrackingSessionActive.cs" />
     <Compile Include="RMC\TrackingExtService\TrackingExtService.cs" />
+    <Compile Include="RMC\TrackingService\Data\TrackingInformation.cs" />
+    <Compile Include="RMC\TrackingService\Request\RMCPacketRequestTrackingService_SendUserInfo.cs" />
     <Compile Include="RMC\TrackingService\Response\RMCPacketResponseTrackingService_GetConfiguration.cs" />
+    <Compile Include="RMC\TrackingService\Response\RMCPacketResponseTrackingService_SendUserInfo.cs" />
     <Compile Include="RMC\UbiAccountMgmtService\Data\ExternalAccount.cs" />
     <Compile Include="RMC\UbiAccountMgmtService\Data\UbiAccount.cs" />
     <Compile Include="RMC\UbiAccountMgmtService\Data\UbiAccountStatus.cs" />

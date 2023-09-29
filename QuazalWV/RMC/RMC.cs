@@ -52,6 +52,8 @@ namespace QuazalWV
                 rmc.callID = Helper.ReadU32(m);
             }
             WriteLog(1, "Got response for Protocol " + rmc.proto + " = " + (rmc.success ? "Success" : "Fail"));
+            if (p.flags.Contains(QPacket.PACKETFLAG.FLAG_NEED_ACK))
+                SendACK(client.udp, p, client);
         }
 
         public static void HandleRequest(ClientInfo client, QPacket p, RMCP rmc)
@@ -79,6 +81,9 @@ namespace QuazalWV
                     break;
                 case RMCP.PROTOCOL.MatchMakingService:
                     MatchMakingService.HandleRequest(p, rmc, client);
+                    break;
+                case RMCP.PROTOCOL.PersistentStoreService:
+                    PersistentStoreService.HandleRequest(p, rmc, client);
                     break;
                 case RMCP.PROTOCOL.UbiAccountMgmtService:
                     UbiAccountMgmtService.HandleRequest(p, rmc, client);
@@ -129,6 +134,9 @@ namespace QuazalWV
                     break;
                 case RMCP.PROTOCOL.FriendsService:
                     FriendsService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.PersistentStoreService:
+                    PersistentStoreService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.UbiAccountMgmtService:
                     UbiAccountMgmtService.ProcessRequest(m, rmc);
@@ -275,7 +283,7 @@ namespace QuazalWV
             }
             else
             {
-                np.flags.Add(QPacket.PACKETFLAG.FLAG_HAS_SIZE);
+                //np.flags.Add(QPacket.PACKETFLAG.FLAG_HAS_SIZE);
                 int pos = 0;
                 m.Seek(0, 0);
                 np.m_byPartNumber = 0;
@@ -300,7 +308,7 @@ namespace QuazalWV
                     Send(client.udp, np, client);
                     pos += len;
                 }
-                WriteLog(10, "sent packets");
+                WriteLog(1, "[Debug] All packet fragments sent");
             }
         }
 

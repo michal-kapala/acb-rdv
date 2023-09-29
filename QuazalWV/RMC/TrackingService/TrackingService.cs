@@ -12,6 +12,9 @@ namespace QuazalWV
                 case 1:
                     rmc.request = new RMCPacketRequestTrackingService_SendTag(s);
                     break;
+                case 3:
+                    rmc.request = new RMCPacketRequestTrackingService_SendUserInfo(s);
+                    break;
                 case 4:
                     // Empty GetConfiguration request
                     break;
@@ -37,6 +40,10 @@ namespace QuazalWV
                     };
                     DBHelper.SaveTag(tag);
                     reply = new RMCPResponseEmpty();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 3:
+                    reply = new RMCPacketResponseTrackingService_SendUserInfo(client);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 4:

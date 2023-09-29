@@ -14,7 +14,6 @@ namespace QuazalWV
             {
                 case 1:
                     rmc.request = new RMCPacketRequestSecureService_Register(s);
-
                     break;
                 case 4:
                     rmc.request = new RMCPacketRequestSecureService_RegisterEx(s);
