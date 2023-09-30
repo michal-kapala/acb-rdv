@@ -3,10 +3,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Net;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
 
 namespace QuazalWV
 {
@@ -40,15 +37,17 @@ namespace QuazalWV
         public static QPacket ProcessCONNECT(ClientInfo client, QPacket p)
         {
             client.IDsend = p.m_uiConnectionSignature;
-            QPacket reply = new QPacket();
-            reply.m_oSourceVPort = p.m_oDestinationVPort;
-            reply.m_oDestinationVPort = p.m_oSourceVPort;
-            reply.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK };
-            reply.type = QPacket.PACKETTYPE.CONNECT;
-            reply.m_bySessionID = p.m_bySessionID;
-            reply.m_uiSignature = client.IDsend;
-            reply.uiSeqId = p.uiSeqId;
-            reply.m_uiConnectionSignature = client.IDrecv;
+            QPacket reply = new QPacket
+            {
+                m_oSourceVPort = p.m_oDestinationVPort,
+                m_oDestinationVPort = p.m_oSourceVPort,
+                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
+                type = QPacket.PACKETTYPE.CONNECT,
+                m_bySessionID = p.m_bySessionID,
+                m_uiSignature = client.IDsend,
+                uiSeqId = p.uiSeqId,
+                m_uiConnectionSignature = client.IDrecv
+            };
             if (p.payload != null && p.payload.Length > 0)
                 reply.payload = MakeConnectPayload(client,p);
             else

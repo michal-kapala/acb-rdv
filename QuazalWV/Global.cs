@@ -48,6 +48,14 @@ namespace QuazalWV
             return null;
         }
 
+        public static bool MultiplayerEndpoint(IPEndPoint ep)
+        {
+            foreach (ClientInfo c in Clients)
+                if (c.ep.Address == ep.Address && c.ep.Port != ep.Port)
+                    return true;
+            return false;
+        }
+
         private static void WriteLog(int priority, string s)
         {
             Log.WriteLine(priority, "[Global] " + s);

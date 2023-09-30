@@ -83,7 +83,7 @@ namespace QuazalWV
                     break;
                 case 3:
                     var reqTicket = (RMCPacketRequestRequestTicket)rmc.request;
-                    reply = new RMCPacketResponseRequestTicket(reqTicket.sourcePID, client.sPID);
+                    reply = new RMCPacketResponseRequestTicket(reqTicket.sourcePID, client);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
