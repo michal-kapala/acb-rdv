@@ -82,6 +82,9 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.MatchMakingService:
                     MatchMakingService.HandleRequest(p, rmc, client);
                     break;
+                case RMCP.PROTOCOL.MessagingService:
+                    MessagingService.HandleRequest(p, rmc, client);
+                    break;
                 case RMCP.PROTOCOL.PersistentStoreService:
                     PersistentStoreService.HandleRequest(p, rmc, client);
                     break;
@@ -134,6 +137,9 @@ namespace QuazalWV
                     break;
                 case RMCP.PROTOCOL.FriendsService:
                     FriendsService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.MessagingService:
+                    MessagingService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.PersistentStoreService:
                     PersistentStoreService.ProcessRequest(m, rmc);

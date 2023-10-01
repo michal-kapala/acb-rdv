@@ -85,6 +85,11 @@
     <Compile Include="RMC\GameSessionService\GameSessionService.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_GetInvitationsReceived.cs" />
     <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_GetInvitationsReceived.cs" />
+    <Compile Include="RMC\MessagingService\Data\MessageRecipient.cs" />
+    <Compile Include="RMC\MessagingService\Data\UserMessage.cs" />
+    <Compile Include="RMC\MessagingService\MessagingService.cs" />
+    <Compile Include="RMC\MessagingService\Request\RMCPacketRequestMessagingService_GetMessagesHeaders.cs" />
+    <Compile Include="RMC\MessagingService\Response\RMCPacketResponseMessagingService_GetMessagesHeaders.cs" />
     <Compile Include="RMC\NewsService\Data\NewsChannel.cs" />
     <Compile Include="RMC\NewsService\Data\NewsRecipient.cs" />
     <Compile Include="RMC\NewsService\NewsService.cs" />
