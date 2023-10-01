@@ -283,7 +283,7 @@ namespace QuazalWV
             }
             else
             {
-                //np.flags.Add(QPacket.PACKETFLAG.FLAG_HAS_SIZE);
+                np.flags.Add(QPacket.PACKETFLAG.FLAG_RELIABLE);
                 int pos = 0;
                 m.Seek(0, 0);
                 np.m_byPartNumber = 0;

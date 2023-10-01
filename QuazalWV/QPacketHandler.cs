@@ -15,22 +15,26 @@ namespace QuazalWV
             if (client == null)
             {
                 Log.WriteLine(2, "[QUAZAL] Creating new client data...");
-                client = new ClientInfo();
-                client.ep = ep;
-                client.IDrecv = Global.idCounter++;
+                client = new ClientInfo
+                {
+                    ep = ep,
+                    IDrecv = Global.idCounter++
+                };
                 client.PID = Global.pidCounter++;
                 Global.Clients.Add(client);
             }
-            QPacket reply = new QPacket();
-            reply.m_oSourceVPort = p.m_oDestinationVPort;
-            reply.m_oDestinationVPort = p.m_oSourceVPort;
-            reply.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK };
-            reply.type = QPacket.PACKETTYPE.SYN;
-            reply.m_bySessionID = p.m_bySessionID;
-            reply.m_uiSignature = p.m_uiSignature;
-            reply.uiSeqId = p.uiSeqId;
-            reply.m_uiConnectionSignature = client.IDrecv;
-            reply.payload = new byte[0];
+            QPacket reply = new QPacket
+            {
+                m_oSourceVPort = p.m_oDestinationVPort,
+                m_oDestinationVPort = p.m_oSourceVPort,
+                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
+                type = QPacket.PACKETTYPE.SYN,
+                m_bySessionID = p.m_bySessionID,
+                m_uiSignature = p.m_uiSignature,
+                uiSeqId = p.uiSeqId,
+                m_uiConnectionSignature = client.IDrecv,
+                payload = new byte[0]
+            };
             return reply;
         }
 
