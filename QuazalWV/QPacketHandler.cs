@@ -18,9 +18,9 @@ namespace QuazalWV
                 client = new ClientInfo
                 {
                     ep = ep,
-                    IDrecv = Global.idCounter++
+                    IDrecv = Global.idCounter++,
+                    PID = Global.pidCounter++
                 };
-                client.PID = Global.pidCounter++;
                 Global.Clients.Add(client);
             }
             QPacket reply = new QPacket

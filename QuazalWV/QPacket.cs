@@ -147,11 +147,20 @@ namespace QuazalWV
             Helper.WriteU8(m, m_bySessionID);
             Helper.WriteU32(m, m_uiSignature);
             Helper.WriteU16(m, uiSeqId);
-            if (type == PACKETTYPE.SYN || type == PACKETTYPE.CONNECT)
+            byte[] tmpPayload = payload;
+            // auth CONNECTs
+            if (type == PACKETTYPE.CONNECT && payload.Length == 0)
+            {
+                m_uiConnectionSignature = 0;
+                Helper.WriteU32(m, m_uiConnectionSignature);
+                // unknown byte, always 15
+                Helper.WriteU8(m, 0xF);
+            }
+            if (type == PACKETTYPE.SYN || (type == PACKETTYPE.CONNECT && payload.Length > 0))
                 Helper.WriteU32(m, m_uiConnectionSignature);
             if(type == PACKETTYPE.DATA)
                 Helper.WriteU8(m, m_byPartNumber);
-            byte[] tmpPayload = payload;
+            
             if (tmpPayload != null && tmpPayload.Length > 0 && type != PACKETTYPE.SYN && m_oSourceVPort.type != STREAMTYPE.NAT)
             {
                 if (usesCompression)

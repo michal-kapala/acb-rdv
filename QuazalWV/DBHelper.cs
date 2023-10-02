@@ -115,13 +115,14 @@ namespace QuazalWV
             string sql = $"INSERT INTO telemetry_tags (tracking_id, tag, attr, dtime)" +
                          $"VALUES ({tag.TrackingId},'{tag.Tag}','{tag.Attributes}',{tag.DeltaTime})";
 
-            SQLiteCommand cmd = new SQLiteCommand(sql);
+            SQLiteCommand cmd = new SQLiteCommand(sql, connection);
             try
             {
                 return cmd.ExecuteNonQuery() > 0;
             }
-            catch
+            catch (Exception e)
             {
+                Log.WriteLine(1, $"[DB] {e}", Color.Red);
                 return false;
             }
         }

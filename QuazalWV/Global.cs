@@ -51,7 +51,7 @@ namespace QuazalWV
         public static bool MultiplayerEndpoint(IPEndPoint ep)
         {
             foreach (ClientInfo c in Clients)
-                if (c.ep.Address == ep.Address && c.ep.Port != ep.Port)
+                if (c.ep.Address.ToString() == ep.Address.ToString() && c.ep.Port != ep.Port)
                     return true;
             return false;
         }
