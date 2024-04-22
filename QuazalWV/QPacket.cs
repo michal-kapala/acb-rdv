@@ -135,7 +135,7 @@ namespace QuazalWV
             realSize = (uint)m.Position;
         }
 
-        public byte[] toBuffer()
+        public byte[] ToBuffer()
         {
             MemoryStream m = new MemoryStream();
             Helper.WriteU8(m, m_oSourceVPort.toByte());

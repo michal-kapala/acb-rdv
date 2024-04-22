@@ -11,6 +11,7 @@ namespace QuazalWV
 {
     public static class RMC
     {
+        public const uint MaxRmcPayloadSize = 963;
         public static void HandlePacket(UdpClient udp, QPacket p)
         {
             ClientInfo client = Global.GetClientByIDrecv(p.m_uiSignature);
@@ -193,7 +194,7 @@ namespace QuazalWV
 
         private static void SendACK(UdpClient udp, QPacket p, ClientInfo client)
         {
-            QPacket np = new QPacket(p.toBuffer());
+            QPacket np = new QPacket(p.ToBuffer());
             np.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK };
             np.m_oSourceVPort = p.m_oDestinationVPort;
             np.m_oDestinationVPort = p.m_oSourceVPort;
@@ -235,11 +236,13 @@ namespace QuazalWV
             m = new MemoryStream();
             Helper.WriteU32(m, (uint)buff.Length);
             m.Write(buff, 0, buff.Length);
-            QPacket np = new QPacket(p.toBuffer());
-            np.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_NEED_ACK };
-            np.m_oSourceVPort = p.m_oDestinationVPort;
-            np.m_oDestinationVPort = p.m_oSourceVPort;
-            np.m_uiSignature = client.IDsend;
+            QPacket np = new QPacket(p.ToBuffer())
+            {
+                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_NEED_ACK },
+                m_oSourceVPort = p.m_oDestinationVPort,
+                m_oDestinationVPort = p.m_oSourceVPort,
+                m_uiSignature = client.IDsend
+            };
             MakeAndSend(client, np, m.ToArray());
         }
         
@@ -270,7 +273,7 @@ namespace QuazalWV
             m = new MemoryStream();
             Helper.WriteU32(m, (uint)buff.Length);
             m.Write(buff, 0, buff.Length);
-            QPacket np = new QPacket(p.toBuffer());
+            QPacket np = new QPacket(p.ToBuffer());
             np.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_NEED_ACK };
             np.m_uiSignature = client.IDsend;
             MakeAndSend(client, np, m.ToArray());
@@ -279,7 +282,7 @@ namespace QuazalWV
         public static void MakeAndSend(ClientInfo client, QPacket np, byte[] data)
         {
             MemoryStream m = new MemoryStream(data);
-            if (data.Length < 0x3C3)
+            if (data.Length < MaxRmcPayloadSize)
             {
                 np.uiSeqId++;
                 np.payload = data;
@@ -295,9 +298,9 @@ namespace QuazalWV
                 np.m_byPartNumber = 0;
                 while (pos < data.Length)
                 {
-                    np.uiSeqId++;
+                    np.uiSeqId = client.seqCounterReliable++;
                     bool isLast = false;
-                    int len = 0x3C3;
+                    int len = (int)MaxRmcPayloadSize;
                     if (len + pos >= data.Length)
                     {
                         len = data.Length - pos;
@@ -320,7 +323,7 @@ namespace QuazalWV
 
         public static void Send(UdpClient udp, QPacket p, ClientInfo client)
         {
-            byte[] data = p.toBuffer();
+            byte[] data = p.ToBuffer();
             StringBuilder sb = new StringBuilder();
             foreach (byte b in data)
                 sb.Append(b.ToString("X2") + " ");

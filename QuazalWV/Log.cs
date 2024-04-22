@@ -121,7 +121,7 @@ namespace QuazalWV
                             break;
                     }
                 }
-                int size2 = qp.toBuffer().Length;
+                int size2 = qp.ToBuffer().Length;
                 if (size2 == data.Length || isSinglePacket)
                     break;
                 MemoryStream m2 = new MemoryStream(data);

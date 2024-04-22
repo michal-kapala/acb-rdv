@@ -94,30 +94,34 @@ namespace QuazalWV
 
         public static QPacket ProcessDISCONNECT(ClientInfo client, QPacket p)
         {
-            QPacket reply = new QPacket();
-            reply.m_oSourceVPort = p.m_oDestinationVPort;
-            reply.m_oDestinationVPort = p.m_oSourceVPort;
-            reply.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK };
-            reply.type = QPacket.PACKETTYPE.DISCONNECT;
-            reply.m_bySessionID = p.m_bySessionID;
-            reply.m_uiSignature = client.IDsend - 0x10000;
-            reply.uiSeqId = p.uiSeqId;
-            reply.payload = new byte[0];
+            QPacket reply = new QPacket
+            {
+                m_oSourceVPort = p.m_oDestinationVPort,
+                m_oDestinationVPort = p.m_oSourceVPort,
+                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
+                type = QPacket.PACKETTYPE.DISCONNECT,
+                m_bySessionID = p.m_bySessionID,
+                m_uiSignature = client.IDsend - 0x10000,
+                uiSeqId = p.uiSeqId,
+                payload = new byte[0]
+            };
             return reply;
         }
 
         public static QPacket ProcessPING(ClientInfo client, QPacket p)
         {
-            QPacket reply = new QPacket();
-            reply.m_oSourceVPort = p.m_oDestinationVPort;
-            reply.m_oDestinationVPort = p.m_oSourceVPort;
-            reply.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK };
-            reply.type = QPacket.PACKETTYPE.PING;
-            reply.m_bySessionID = p.m_bySessionID;
-            reply.m_uiSignature = client.IDsend;
-            reply.uiSeqId = p.uiSeqId;
-            reply.m_uiConnectionSignature = client.IDrecv;
-            reply.payload = new byte[0];
+            QPacket reply = new QPacket
+            {
+                m_oSourceVPort = p.m_oDestinationVPort,
+                m_oDestinationVPort = p.m_oSourceVPort,
+                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
+                type = QPacket.PACKETTYPE.PING,
+                m_bySessionID = p.m_bySessionID,
+                m_uiSignature = client.IDsend,
+                uiSeqId = p.uiSeqId,
+                m_uiConnectionSignature = client.IDrecv,
+                payload = new byte[0]
+            };
             return reply;
         }
 
@@ -217,7 +221,7 @@ namespace QuazalWV
 
         public static void Send(string source, QPacket p, IPEndPoint ep, UdpClient listener)
         {
-            byte[] data = p.toBuffer();
+            byte[] data = p.ToBuffer();
             StringBuilder sb = new StringBuilder();
             foreach (byte b in data)
                 sb.Append(b.ToString("X2") + " ");
