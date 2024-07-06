@@ -66,7 +66,7 @@ You might also need an app.config file in some folders (the compile errors will 
 
 The database file should be in `SQLite` binary format (you can use sqlite dbbrowser to create it). It should also have the field `pid` filled in (with a random integer). It should be placed in the release build folder after building it. (you can take the schema from the top of the readme page). 
 
-![](DocResources\2024-07-06-13-35-39-image.png)
+![](DocResources/2024-07-06-13-35-39-image.png)
 
 The database should be named `database.sqlite` and placed in the Release folder that contains the tool we built during the previous step.
 
