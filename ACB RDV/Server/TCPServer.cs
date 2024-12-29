@@ -1,9 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using QuazalWV;

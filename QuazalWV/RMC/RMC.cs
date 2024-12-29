@@ -1,11 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Net;
-using System.Linq;
 using System.Text;
-using System.Threading;
 
 namespace QuazalWV
 {
@@ -317,7 +313,7 @@ namespace QuazalWV
                     Send(client.udp, np, client);
                     pos += len;
                 }
-                WriteLog(1, "[Debug] All packet fragments sent");
+                WriteLog(10, "sent packets");
             }
         }
 
