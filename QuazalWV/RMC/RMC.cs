@@ -91,6 +91,9 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.NewsService:
                     NewsService.HandleRequest(p, rmc, client);
                     break;
+                case RMCP.PROTOCOL.UbiNewsService:
+                    UbiNewsService.HandleRequest(p, rmc, client);
+                    break;
                 case RMCP.PROTOCOL.PrivilegesService:
                     PrivilegesService.HandleRequest(p, rmc, client);
                     break;
@@ -146,6 +149,9 @@ namespace QuazalWV
                     break;
                 case RMCP.PROTOCOL.NewsService:
                     NewsService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.UbiNewsService:
+                    UbiNewsService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.PrivilegesService:
                     PrivilegesService.ProcessRequest(m, rmc);
