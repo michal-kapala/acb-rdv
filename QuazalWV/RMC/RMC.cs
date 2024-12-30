@@ -106,7 +106,10 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.GameSessionService:
                     GameSessionService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.TrackingExtService:
+                case RMCP.PROTOCOL.RichPresenceService:
+                    RichPresenceService.HandleRequest(p, rmc, client);
+					break;
+				case RMCP.PROTOCOL.TrackingExtService:
                     TrackingExtService.HandleRequest(p, rmc, client);
                     break;
                 case RMCP.PROTOCOL.GameInfoService:
@@ -165,7 +168,10 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.GameSessionService:
                     GameSessionService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.TrackingExtService:
+				case RMCP.PROTOCOL.RichPresenceService:
+                    RichPresenceService.ProcessRequest(m, rmc);
+                    break;
+				case RMCP.PROTOCOL.TrackingExtService:
                     TrackingExtService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.GameInfoService:

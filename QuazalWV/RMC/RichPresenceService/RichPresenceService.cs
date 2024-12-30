@@ -3,17 +3,17 @@ using System.IO;
 
 namespace QuazalWV
 {
-	public static class UbiNewsService
+	public static class RichPresenceService
 	{
 		public static void ProcessRequest(Stream s, RMCP rmc)
 		{
 			switch (rmc.methodID)
 			{
 				case 1:
-					// Empty GetNewsChannel request
+					rmc.request = new RMCPacketRequestRichPresenceService_SetPresence(s);
 					break;
 				default:
-					Log.WriteLine(1, $"[RMC UbiNews] Error: Unknown Method {rmc.methodID}", Color.Red);
+					Log.WriteLine(1, $"[RMC RichPresence] Error: Unknown Method {rmc.methodID}", Color.Red);
 					break;
 			}
 		}
@@ -24,11 +24,11 @@ namespace QuazalWV
 			switch (rmc.methodID)
 			{
 				case 1:
-					reply = new RMCPacketResponseUbiNewsService_GetNewsChannel(client.PID);
+					reply = new RMCPResponseEmpty();
 					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
 					break;
 				default:
-					Log.WriteLine(1, $"[RMC UbiNews] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+					Log.WriteLine(1, $"[RMC RichPresence] Error: Unknown Method {rmc.methodID}", Color.Red, client);
 					break;
 			}
 		}

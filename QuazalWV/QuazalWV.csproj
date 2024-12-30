@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\CommonData\Gathering.cs" />
+    <Compile Include="Classes\CommonData\QBuffer.cs" />
     <Compile Include="Classes\CommonData\QDateTime.cs" />
     <Compile Include="Classes\CommonData\ResultRange.cs" />
     <Compile Include="Classes\CommonData\StationUrl.cs" />
@@ -104,6 +105,8 @@
     <Compile Include="RMC\PrivilegesService\PrivilegesService.cs" />
     <Compile Include="RMC\PrivilegesService\Request\RMCPacketRequestPrivilegesService_GetPrivileges.cs" />
     <Compile Include="RMC\PrivilegesService\Response\RMCPacketResponsePrivilegesService_GetPrivileges.cs" />
+    <Compile Include="RMC\RichPresenceService\Request\RMCPacketRequestRichPresenceService_SetPresence.cs" />
+    <Compile Include="RMC\RichPresenceService\RichPresenceService.cs" />
     <Compile Include="RMC\SecureService\Request\RMCPacketRequestSecureService_Register.cs" />
     <Compile Include="RMC\SecureService\Response\RMCPacketResponseSecureService_Register.cs" />
     <Compile Include="RMC\TrackingExtService\Request\RMCPacketRequestTrackingExtService_IsTrackingSessionActive.cs" />
