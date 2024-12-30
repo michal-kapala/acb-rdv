@@ -28,7 +28,7 @@ namespace QuazalWV
             {
                 case 2:
                     var getChannels = (RMCPacketRequestNewsService_GetChannelsByTypes)rmc.request;
-                    reply = new RMCPacketResponseNewsService_GetChannelsByTypes(client);
+                    reply = new RMCPacketResponseNewsService_GetChannelsByTypes();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 10:

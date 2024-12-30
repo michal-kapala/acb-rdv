@@ -8,11 +8,9 @@ namespace QuazalWV
     {
         public List<NewsChannel> Channels { get; set; }
 
-        public RMCPacketResponseNewsService_GetChannelsByTypes(ClientInfo client)
+        public RMCPacketResponseNewsService_GetChannelsByTypes()
         {
-            NewsChannel soloChannel = new NewsChannel("Solo", client.LocaleCode);
-            soloChannel.Gath.m_pidHost = client.User.Pid;
-            Channels = new List<NewsChannel>{ soloChannel };
+            Channels = new List<NewsChannel>();
         }
 
         public override string PayloadToString()
