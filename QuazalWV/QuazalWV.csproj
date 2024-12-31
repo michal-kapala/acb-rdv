@@ -86,6 +86,11 @@
     <Compile Include="RMC\GameSessionService\GameSessionService.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_GetInvitationsReceived.cs" />
     <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_GetInvitationsReceived.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatContainer.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticExt.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticInfoExt.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticValues.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadPlayerStats.cs" />
     <Compile Include="RMC\MessagingService\Data\MessageRecipient.cs" />
     <Compile Include="RMC\MessagingService\Data\UserMessage.cs" />
     <Compile Include="RMC\MessagingService\MessagingService.cs" />
@@ -101,6 +106,9 @@
     <Compile Include="RMC\PersistentStoreService\PersistentStoreService.cs" />
     <Compile Include="RMC\PersistentStoreService\Request\RMCPacketRequestPersistentStoreService_GetItem.cs" />
     <Compile Include="RMC\PersistentStoreService\Response\RMCPacketResponsePersistentStoreService_GetItem.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Data\StatQuery.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\HermesPlayerStatisticsService.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Request\RMCPacketRequestHermesPlayerStatisticsService_ReadPlayerStats.cs" />
     <Compile Include="RMC\PrivilegesService\Data\Privilege.cs" />
     <Compile Include="RMC\PrivilegesService\PrivilegesService.cs" />
     <Compile Include="RMC\PrivilegesService\Request\RMCPacketRequestPrivilegesService_GetPrivileges.cs" />
