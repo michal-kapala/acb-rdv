@@ -29,7 +29,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Friends] Error: Unknown Method {rmc.methodID}", client);
+                    Log.WriteLine(1, $"[RMC Friends] Error: Unknown Method {rmc.methodID}", Color.Red, client);
                     break;
             }
         }

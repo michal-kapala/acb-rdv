@@ -12,6 +12,9 @@ namespace QuazalWV
                 case 2:
                     rmc.request = new RMCPacketRequestNewsService_GetChannelsByTypes(s);
                     break;
+                case 8:
+                    rmc.request = new RMCPacketRequestNewsService_GetNewsHeaders(s);
+                    break;
                 case 10:
                     rmc.request = new RMCPacketRequestNewsService_GetNumberOfNews(s);
                     break;
@@ -27,10 +30,13 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 2:
-                    var getChannels = (RMCPacketRequestNewsService_GetChannelsByTypes)rmc.request;
                     reply = new RMCPacketResponseNewsService_GetChannelsByTypes();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
+                case 8:
+                    reply = new RMCPacketResponseNewsService_GetNewsHeaders();
+					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+					break;
                 case 10:
                     var getNewsNumber = (RMCPacketRequestNewsService_GetNumberOfNews)rmc.request;
                     reply = new RMCPacketResponseNewsService_GetNumberOfNews();
