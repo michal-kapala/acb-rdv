@@ -119,7 +119,10 @@
     <Compile Include="RMC\PrivilegesService\PrivilegesService.cs" />
     <Compile Include="RMC\PrivilegesService\Request\RMCPacketRequestPrivilegesService_GetPrivileges.cs" />
     <Compile Include="RMC\PrivilegesService\Response\RMCPacketResponsePrivilegesService_GetPrivileges.cs" />
+    <Compile Include="RMC\RichPresenceService\Data\PresenceElement.cs" />
+    <Compile Include="RMC\RichPresenceService\Request\RMCPacketRequestRichPresenceService_GetPresence.cs" />
     <Compile Include="RMC\RichPresenceService\Request\RMCPacketRequestRichPresenceService_SetPresence.cs" />
+    <Compile Include="RMC\RichPresenceService\Response\RMCPacketResponseRichPresenceService_GetPresence.cs" />
     <Compile Include="RMC\RichPresenceService\RichPresenceService.cs" />
     <Compile Include="RMC\SecureService\Request\RMCPacketRequestSecureService_Register.cs" />
     <Compile Include="RMC\SecureService\Response\RMCPacketResponseSecureService_Register.cs" />

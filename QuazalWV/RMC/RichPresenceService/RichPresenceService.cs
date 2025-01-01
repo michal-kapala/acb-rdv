@@ -12,6 +12,9 @@ namespace QuazalWV
 				case 1:
 					rmc.request = new RMCPacketRequestRichPresenceService_SetPresence(s);
 					break;
+				case 2:
+					rmc.request = new RMCPacketRequestRichPresenceService_GetPresence(s);
+					break;
 				default:
 					Log.WriteLine(1, $"[RMC RichPresence] Error: Unknown Method {rmc.methodID}", Color.Red);
 					break;
@@ -25,6 +28,10 @@ namespace QuazalWV
 			{
 				case 1:
 					reply = new RMCPResponseEmpty();
+					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+					break;
+				case 2:
+					reply = new RMCPacketResponseRichPresenceService_GetPresence();
 					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
 					break;
 				default:
