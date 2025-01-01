@@ -9,6 +9,9 @@ namespace QuazalWV
         {
             switch (rmc.methodID)
             {
+                case 12:
+                    rmc.request = new RMCPacketRequestFriendsService_GetDetailedList(s);
+                    break;
                 case 13:
                     rmc.request = new RMCPacketRequestFriendsService_GetRelationships(s);
                     break;
@@ -23,8 +26,11 @@ namespace QuazalWV
             RMCPResponse reply;
             switch (rmc.methodID)
             {
+                case 12:
+                    reply = new RMCPacketResponseFriendsService_GetDetailedList();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
                 case 13:
-                    var rGetRelations = (RMCPacketRequestFriendsService_GetRelationships)rmc.request;
                     reply = new RMCPacketResponseFriendsService_GetRelationships();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

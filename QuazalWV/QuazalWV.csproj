@@ -73,9 +73,12 @@
     <Compile Include="Classes\CommonData\ResultRange.cs" />
     <Compile Include="Classes\CommonData\StationUrl.cs" />
     <Compile Include="Classes\Models\TelemetryTag.cs" />
+    <Compile Include="RMC\FriendsService\Data\FriendData.cs" />
     <Compile Include="RMC\FriendsService\Data\RelationshipData.cs" />
     <Compile Include="RMC\FriendsService\FriendsService.cs" />
+    <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_GetDetailedList.cs" />
     <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_GetRelationships.cs" />
+    <Compile Include="RMC\FriendsService\Response\RMCPacketResponseFriendsService_GetDetailedList.cs" />
     <Compile Include="RMC\FriendsService\Response\RMCPacketResponseFriendsService_GetRelationships.cs" />
     <Compile Include="RMC\GameInfoService\Data\QFile.cs" />
     <Compile Include="RMC\GameInfoService\GameInfoService.cs" />
