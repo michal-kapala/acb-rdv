@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
-using System.Text;
 
 namespace QuazalWV
 {
@@ -12,6 +9,9 @@ namespace QuazalWV
         {
             switch (rmc.methodID)
             {
+                case 1:
+                    rmc.request = new RMCPacketRequestGameSessionService_CreateSession(s);
+                    break;
                 case 14:
                     rmc.request = new RMCPacketRequestGameSessionService_GetInvitationsReceived(s);
                     break;
@@ -26,6 +26,13 @@ namespace QuazalWV
             RMCPResponse reply;
             switch (rmc.methodID)
             {
+                case 1:
+                    var reqCreateSes = (RMCPacketRequestGameSessionService_CreateSession)rmc.request;
+                    uint sesId = Global.NextGameSessionId++;
+					Global.GameSessions.Add(sesId, reqCreateSes.Session);
+					reply = new RMCPacketResponseGameSessionService_CreateSession(reqCreateSes.Session.TypeId, sesId);
+					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+					break;
                 case 14:
                     var getRecvInvites = (RMCPacketRequestGameSessionService_GetInvitationsReceived)rmc.request;
                     reply = new RMCPacketResponseGameSessionService_GetInvitationsReceived();

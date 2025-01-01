@@ -84,10 +84,14 @@
     <Compile Include="RMC\GameInfoService\GameInfoService.cs" />
     <Compile Include="RMC\GameInfoService\Request\RMCPacketRequestGameInfoService_GetFileListOnGameStorage.cs" />
     <Compile Include="RMC\GameInfoService\Response\RMCPacketResponseGameInfoService_GetFileListOnGameStorage.cs" />
+    <Compile Include="RMC\GameSessionService\Data\GameSession.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionInvitationReceived.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionKey.cs" />
+    <Compile Include="RMC\GameSessionService\Data\Property.cs" />
     <Compile Include="RMC\GameSessionService\GameSessionService.cs" />
+    <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_CreateSession.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_GetInvitationsReceived.cs" />
+    <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_CreateSession.cs" />
     <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_GetInvitationsReceived.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatContainer.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticExt.cs" />
