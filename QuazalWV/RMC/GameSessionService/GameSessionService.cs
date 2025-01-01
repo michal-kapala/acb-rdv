@@ -18,6 +18,9 @@ namespace QuazalWV
                 case 14:
                     rmc.request = new RMCPacketRequestGameSessionService_GetInvitationsReceived(s);
                     break;
+                case 21:
+                    rmc.request = new RMCPacketRequestGameSessionService_RegisterURLs(s);
+                    break;
                 default:
                     Log.WriteLine(1, $"[RMC GameSession] Error: Unknown Method {rmc.methodID}", Color.Red);
                     break;
@@ -47,6 +50,10 @@ namespace QuazalWV
                 case 14:
                     var getRecvInvites = (RMCPacketRequestGameSessionService_GetInvitationsReceived)rmc.request;
                     reply = new RMCPacketResponseGameSessionService_GetInvitationsReceived();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 21:
+                    reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
