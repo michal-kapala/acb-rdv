@@ -24,6 +24,9 @@ namespace QuazalWV
                 case 21:
                     rmc.request = new RMCPacketRequestGameSessionService_RegisterURLs(s);
                     break;
+                case 23:
+                    rmc.request = new RMCPacketRequestGameSessionService_AbandonSession(s);
+                    break;
                 default:
                     Log.WriteLine(1, $"[RMC GameSession] Error: Unknown Method {rmc.methodID}", Color.Red);
                     break;
@@ -63,6 +66,13 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 21:
+                    reply = new RMCPResponseEmpty();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 23:
+                    var reqAbandon = (RMCPacketRequestGameSessionService_AbandonSession)rmc.request;
+                    Global.Sessions.Find(session => session.Key.SessionId == reqAbandon.Key.SessionId)
+                        .PrivatePids.Remove(client.PID);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

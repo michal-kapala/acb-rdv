@@ -90,6 +90,7 @@
     <Compile Include="RMC\GameSessionService\Data\GameSessionUpdate.cs" />
     <Compile Include="RMC\GameSessionService\Data\Property.cs" />
     <Compile Include="RMC\GameSessionService\GameSessionService.cs" />
+    <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_AbandonSession.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_AddParticipants.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_CreateSession.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_GetInvitationsReceived.cs" />
