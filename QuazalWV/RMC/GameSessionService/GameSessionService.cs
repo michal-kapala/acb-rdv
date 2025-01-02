@@ -15,6 +15,9 @@ namespace QuazalWV
                 case 2:
                     rmc.request = new RMCPacketRequestGameSessionService_UpdateSession(s);
                     break;
+                case 7:
+                    rmc.request = new RMCPacketRequestGameSessionService_SearchSessions(s);
+                    break;
                 case 8:
                     rmc.request = new RMCPacketRequestGameSessionService_AddParticipants(s);
                     break;
@@ -51,7 +54,11 @@ namespace QuazalWV
                     Global.Sessions.Find(session => session.Key.SessionId == reqUpdateSes.SessionUpdate.Key.SessionId)
                         .GameSession.Attributes = reqUpdateSes.SessionUpdate.Attributes;
                     reply = new RMCPResponseEmpty();
-					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 7:
+                    reply = new RMCPacketResponseGameSessionService_SearchSessions();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 8:
                     var reqAddParticip = (RMCPacketRequestGameSessionService_AddParticipants)rmc.request;

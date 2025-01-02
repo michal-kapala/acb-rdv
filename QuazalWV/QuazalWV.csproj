@@ -87,6 +87,8 @@
     <Compile Include="RMC\GameSessionService\Data\GameSession.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionInvitationReceived.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionKey.cs" />
+    <Compile Include="RMC\GameSessionService\Data\GameSessionQuery.cs" />
+    <Compile Include="RMC\GameSessionService\Data\GameSessionSearchResult.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionUpdate.cs" />
     <Compile Include="RMC\GameSessionService\Data\Property.cs" />
     <Compile Include="RMC\GameSessionService\GameSessionService.cs" />
@@ -95,9 +97,11 @@
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_CreateSession.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_GetInvitationsReceived.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_RegisterURLs.cs" />
+    <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_SearchSessions.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_UpdateSession.cs" />
     <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_CreateSession.cs" />
     <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_GetInvitationsReceived.cs" />
+    <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_SearchSessions.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerQuery.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatContainer.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticExt.cs" />
