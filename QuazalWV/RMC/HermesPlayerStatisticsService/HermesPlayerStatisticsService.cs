@@ -15,6 +15,9 @@ namespace QuazalWV
 				case 4:
 					rmc.request = new RMCPacketRequestHermesPlayerStatisticsService_ReadStatsLeaderboardByRange(s);
 					break;
+				case 5:
+					rmc.request = new RMCPacketRequestHermesPlayerStatisticsService_ReadStatsLeaderboardByRangeForPlayer(s);
+					break;
 				default:
 					Log.WriteLine(1, $"[RMC HermesPlayerStats] Error: Unknown Method {rmc.methodID}", Color.Red);
 					break;
@@ -33,6 +36,10 @@ namespace QuazalWV
 					break;
 				case 4:
 					reply = new RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRange();
+					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+					break;
+				case 5:
+					reply = new RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRangeForPlayer();
 					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
 					break;
 				default:

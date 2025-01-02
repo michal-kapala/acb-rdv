@@ -102,7 +102,11 @@
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticExt.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticInfoExt.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticValues.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Request\RMCPacketRequestHermesPlayerStatisticsService_ReadStatsLeaderboardByRangeForPlayer.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Request\RMCPacketRequestHermesPlayerStatisticsService_ReadStatsLeaderboardByRange.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadPlayerStats.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRangeForPlayer.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRange.cs" />
     <Compile Include="RMC\MessagingService\Data\MessageRecipient.cs" />
     <Compile Include="RMC\MessagingService\Data\UserMessage.cs" />
     <Compile Include="RMC\MessagingService\MessagingService.cs" />
