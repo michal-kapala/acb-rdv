@@ -98,13 +98,16 @@
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_UpdateSession.cs" />
     <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_CreateSession.cs" />
     <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_GetInvitationsReceived.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerQuery.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatContainer.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticExt.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticInfoExt.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Data\PlayerStatisticValues.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Request\RMCPacketRequestHermesPlayerStatisticsService_ReadStatsLeaderboardByPlayerNames.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Request\RMCPacketRequestHermesPlayerStatisticsService_ReadStatsLeaderboardByRangeForPlayer.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Request\RMCPacketRequestHermesPlayerStatisticsService_ReadStatsLeaderboardByRange.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadPlayerStats.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByPlayerNames.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRangeForPlayer.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRange.cs" />
     <Compile Include="RMC\MessagingService\Data\MessageRecipient.cs" />
