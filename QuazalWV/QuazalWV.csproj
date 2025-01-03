@@ -94,6 +94,7 @@
     <Compile Include="RMC\GameSessionService\Data\GameSession.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionInvitation.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionInvitationReceived.cs" />
+    <Compile Include="RMC\GameSessionService\Data\GameSessionInvitationSent.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionKey.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionQuery.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionSearchResult.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="RMC\GameSessionService\GameSessionService.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_AbandonSession.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_AddParticipants.cs" />
+    <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_CancelInvitation.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_CreateSession.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_GetInvitationsReceived.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_RegisterURLs.cs" />
