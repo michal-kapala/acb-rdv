@@ -7,9 +7,22 @@ namespace QuazalWV
 	{
 		public List<FriendData> Friends {  get; set; }
 
-		public RMCPacketResponseFriendsService_GetDetailedList()
+		public RMCPacketResponseFriendsService_GetDetailedList(byte relationship)
 		{
 			Friends = new List<FriendData>();
+			if (relationship == 1)
+			{
+				Friends.Add(
+					new FriendData
+					{
+						Pid = 4661,
+						Name = "Fwiend",
+						Relationship = relationship,
+						Details = 0,
+						Status = "Online"
+					}
+				);
+			}
 		}
 
 		public override string PayloadToString()

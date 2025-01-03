@@ -76,8 +76,10 @@
     <Compile Include="RMC\FriendsService\Data\FriendData.cs" />
     <Compile Include="RMC\FriendsService\Data\RelationshipData.cs" />
     <Compile Include="RMC\FriendsService\FriendsService.cs" />
+    <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_AddFriendByNameWithDetails.cs" />
     <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_GetDetailedList.cs" />
     <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_GetRelationships.cs" />
+    <Compile Include="RMC\FriendsService\Response\RMCPacketResponseFriendsService_AddFriendByNameWithDetails.cs" />
     <Compile Include="RMC\FriendsService\Response\RMCPacketResponseFriendsService_GetDetailedList.cs" />
     <Compile Include="RMC\FriendsService\Response\RMCPacketResponseFriendsService_GetRelationships.cs" />
     <Compile Include="RMC\GameInfoService\Data\QFile.cs" />
