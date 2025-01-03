@@ -21,6 +21,9 @@ namespace QuazalWV
                 case 8:
                     rmc.request = new RMCPacketRequestGameSessionService_AddParticipants(s);
                     break;
+                case 12:
+                    rmc.request = new RMCPacketRequestGameSessionService_SendInvitation(s);
+                    break;
                 case 14:
                     rmc.request = new RMCPacketRequestGameSessionService_GetInvitationsReceived(s);
                     break;
@@ -65,8 +68,12 @@ namespace QuazalWV
                     Global.Sessions.Find(session => session.Key.SessionId == reqAddParticip.Key.SessionId)
                         .AddParticipants(reqAddParticip.PublicPids, reqAddParticip.PrivatePids);
                     reply = new RMCPResponseEmpty();
-					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
-					break;
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 12:
+                    reply = new RMCPResponseEmpty();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
                 case 14:
                     var getRecvInvites = (RMCPacketRequestGameSessionService_GetInvitationsReceived)rmc.request;
                     reply = new RMCPacketResponseGameSessionService_GetInvitationsReceived();

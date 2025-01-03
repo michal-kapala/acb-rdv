@@ -92,6 +92,7 @@
     <Compile Include="RMC\GameInfoService\Request\RMCPacketRequestGameInfoService_GetFileListOnGameStorage.cs" />
     <Compile Include="RMC\GameInfoService\Response\RMCPacketResponseGameInfoService_GetFileListOnGameStorage.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSession.cs" />
+    <Compile Include="RMC\GameSessionService\Data\GameSessionInvitation.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionInvitationReceived.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionKey.cs" />
     <Compile Include="RMC\GameSessionService\Data\GameSessionQuery.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_GetInvitationsReceived.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_RegisterURLs.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_SearchSessions.cs" />
+    <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_SendInvitation.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_UpdateSession.cs" />
     <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_CreateSession.cs" />
     <Compile Include="RMC\GameSessionService\Response\RMCPacketResponseGameSessionService_GetInvitationsReceived.cs" />
