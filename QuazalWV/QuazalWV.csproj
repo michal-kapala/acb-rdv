@@ -72,6 +72,7 @@
     <Compile Include="Classes\CommonData\QDateTime.cs" />
     <Compile Include="Classes\CommonData\ResultRange.cs" />
     <Compile Include="Classes\CommonData\StationUrl.cs" />
+    <Compile Include="Classes\Interfaces\AnyDataHeader.cs" />
     <Compile Include="Classes\Models\TelemetryTag.cs" />
     <Compile Include="RMC\FriendsService\Data\FriendData.cs" />
     <Compile Include="RMC\FriendsService\Data\RelationshipData.cs" />
@@ -118,6 +119,9 @@
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByPlayerNames.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRangeForPlayer.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRange.cs" />
+    <Compile Include="RMC\MessageDeliveryService\Data\TextMessage.cs" />
+    <Compile Include="RMC\MessageDeliveryService\MessageDeliveryService.cs" />
+    <Compile Include="RMC\MessageDeliveryService\Request\RMCPacketRequestMessageDeliveryService_DeliverMessage.cs" />
     <Compile Include="RMC\MessagingService\Data\MessageRecipient.cs" />
     <Compile Include="RMC\MessagingService\Data\UserMessage.cs" />
     <Compile Include="RMC\MessagingService\MessagingService.cs" />

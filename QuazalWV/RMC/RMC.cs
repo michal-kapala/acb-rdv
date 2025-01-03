@@ -85,6 +85,9 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.PersistentStoreService:
                     PersistentStoreService.HandleRequest(p, rmc, client);
                     break;
+                case RMCP.PROTOCOL.MessageDeliveryService:
+                    MessageDeliveryService.HandleRequest(p, rmc, client);
+                    break;
                 case RMCP.PROTOCOL.UbiAccountMgmtService:
                     UbiAccountMgmtService.HandleRequest(p, rmc, client);
                     break;
@@ -149,6 +152,9 @@ namespace QuazalWV
                     break;
                 case RMCP.PROTOCOL.PersistentStoreService:
                     PersistentStoreService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.MessageDeliveryService:
+                    MessageDeliveryService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.UbiAccountMgmtService:
                     UbiAccountMgmtService.ProcessRequest(m, rmc);
