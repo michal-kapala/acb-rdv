@@ -12,7 +12,7 @@ namespace QuazalWV
 
 		public PlayerStatisticValues()
 		{
-			UnkInt = 0;
+			UnkInt = 650000; // seems to be best session score but it influences xp so 650 000 forces level 50 (max level)
 			UnkLong1 = 0;
 			UnkLong2 = 0;
 			UnkStr = "";
