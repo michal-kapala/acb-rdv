@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Diagnostics;
+using System.Configuration;
 
 namespace QuazalWV
 {
@@ -8,7 +9,7 @@ namespace QuazalWV
     {
         public static readonly string keyDATA = "CD&ML";
         public static readonly string keyCheckSum = "8dtRv2oj";
-        public static string serverBindAddress = "127.0.0.1";
+        public static string serverBindAddress = ConfigurationManager.AppSettings["SecureServerAddress"];
         public static uint idCounter = 0x12345678;
         public static uint pidCounter = 0x1234;
         public static uint dummyFriendPidCounter = 0x1235;

@@ -7,8 +7,16 @@ There's no need for dedicated game server implementation as AC multiplayers are 
 Credits for the original implementation of GRO backend go to [@Warranty Voider](https://github.com/zeroKilo).
 
 ## Configuration
+Here's the configuration needed to set up your environment.
 
-As of now, you need to create an SQLite database with `users` table:
+### Database
+As of now the database file is excluded from git tracking. Once a proper schema emerges it will be committed.
+
+1. Install [SQLite Browser](https://sqlitebrowser.org/dl/)) and create `database.sqlite` file inside `./ACB RDV/bin/<architecture>/<mode>`.
+
+2. Create the needed tables:
+
+- `users`
 
 ```sql
 CREATE TABLE "users" (
@@ -23,33 +31,41 @@ CREATE TABLE "users" (
 )
 ```
 
-### Users
+- `privileges`
 
-Add `Tracking` user for the game's telemetry service:
+```sql
+CREATE TABLE privileges (
+	id			INTEGER,
+	description	TEXT,
+	locale 		TEXT
+)
+```
 
+3. Populate `users` table:
+- add `Tracking` user for the game's telemetry service
 ```sql
 INSERT INTO users VALUES (1,'Tracking','JaDe!','1234abcd-5678-90ef-4321-0987654321fe','tracking@ubi.com', 'US', 'en')
 ```
 
-You need your real credentials, email and [Ubi account ID](https://www.reddit.com/r/uplay/comments/piyp3h/how_to_find_your_ubisoft_connect_account_id/) to be able to log in as these are passed from Ubi Connect.
-
-Add your Ubi account credentials to log in with:
-
+- add your account (change `<username>` and `<password>`)
 ```sql
-INSERT INTO users VALUES (2,'<Ubi username>','<Ubi password>','<Ubi account ID>', '<Ubi email>', '<country code>', '<preferred language code>')
+INSERT INTO users VALUES (2,'<username>','<password>','1234abcd-5678-90ef-4321-0987654321ff','some@email.com', 'US', 'en')
 ```
 
-The database file is excluded from git tracking. Once a proper schema emerges it will be committed.
+If you want to start the game **from SP binary** you will need your real credentials, email and [Ubi account ID](https://www.reddit.com/r/uplay/comments/piyp3h/how_to_find_your_ubisoft_connect_account_id/) to be able to log in as these are used by Ubi's Orbit API.
 
-#### How to get the tool to work
+![](DocResources/db_users.png)
 
-##### 1.Build
+4. Populate `privileges` table:
 
-When you are building the solution, you should not build the whole solution, because it will error out, you only need to build the `ACB RDV` project.
+```sql
+INSERT INTO privileges VALUES (1,'Allow to play online','en-US'),(1000,'Trajan Market Map','en-US'),(1001,'Aqueduct Map','en-US'),(1004,'Ezio's Helmschmied Drachen Armor Skin','en-US'),(1005,'Harlequin','en-US'),(1006,'Officer','en-US');
+```
 
-Furthermore, you might need to add references to Be.Windows.Forms.HexBox to the QuazalWV depending on various factors, you can do that by right clicking on the project and clicking on add->reference.
+![](DocResources/db_privileges.PNG)
 
-You might also need an app.config file in some folders (the compile errors will specify) which should look something like:
+### Application
+Create `ACBRDV.exe.config` configuration file in `./ACB RDV/bin/<architecture>/<mode>`:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -57,39 +73,56 @@ You might also need an app.config file in some folders (the compile errors will 
     <startup> 
         <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8"/>
     </startup>
+	<appSettings>
+      <add key="SecureServerAddress" value="<server host IP>" />
+    </appSettings>
 </configuration>
 ```
 
+Set `<server host IP>` to the server host's IP depending on your environment (localhost/LAN/Internet).
+
+Make sure the `.cxb` file is present in your server executable's directory.
+
+#### Clients
+
+On every **client** machine add an entry in `C:\Windows\System32\drivers\etc\hosts` to redirect the game's network traffic to the server:
+```
+`<server host IP> onlineconfigservice.ubi.com`
+```
+
+`<server host IP>` should match that of `ACBRDV.exe.config` for all environment scenarios (localhost/LAN/Internet).
+
+You will likely need admin permissions to save `hosts` file.
+
+## Running and debugging
+
+### Server
+
+Make sure the required ports are available:
+
+| Protocol | Port | Service | Availability |
+|---|---|---|---|
+| HTTP | 80 | OnlineConfigSvc | Often used by [IIS](https://en.wikipedia.org/wiki/Internet_Information_Services) |
+| UDP | 21030 | Quazal auth | Usually available |
+| UDP | 21031 | RDV | Usually available |
 
 
-##### 2.Database File
+Make sure you have all required NuGet packages installed.
 
-The database file should be in `SQLite` binary format (you can use sqlite dbbrowser to create it). It should also have the field `pid` filled in (with a random integer). It should be placed in the release build folder after building it. (you can take the schema from the top of the readme page). 
+Build `ACB RDV` project in Visual Studio.
 
-![](DocResources/2024-07-06-13-35-39-image.png)
+Either:
+- run `ACB RDV` project through Visual Studio to debug it
+- use `_runme.bat` in the root directory to run the server executable
 
-The database should be named `database.sqlite` and placed in the Release folder that contains the tool we built during the previous step.
+`./ACB RDV/bin/<architecture>/<mode>/log.txt` contains detailed server log from the last/current run.
 
-##### 3.Runtime
+### Client
 
-You need to add `127.0.0.1 onlineconfigservice.ubi.com` to your hosts file, this is done to redirect the ubisoft server calls to the localhost hosted server.
+Run this command from ACB root directory to start the game:
 
-The next step is making sure you give permissions to the release binary to open the following ports : 
+```
+ACBMP.exe /launchfromotherexec /onlineUser:<user> /onlinePassword:<password>
+```
 
-- TCP 80 for online config service (check if you have iis disabled)
-- UDP 21030 (quazal authentication)
-- UDP 21031 (RDV)
-
-After you make sure, open the binary, start the server and then start the game using the following command:
-
-ACBMP.exe /launchfromotherexec /onlineUser:<ubi user> /onlinePassword:<ubi password>
-
-The `user` and `password` should be the ones from your database file ( the second user that is not the tracking user) 
-
-If everything is successful you will see some messages that look like this upon starting the game and getting to the loading screen:
-
-`7/6/2024 9:54:25 AM : [01][UDP Secure] `*CONNECT*`: PID: 0x00001234, CID: 0, response code 0xE2450886`
-
-If something went wrong, then most messages will be like : 
-
-`7/6/2024 9:54:25 AM : [01][RMC] Received Request : [RMC Packet : Proto = AuthenticationService CallID=28 MethodID=2]`
+Change `<user>` and `<password>` to your credentials from the database file (the user other than `Tracking`).
