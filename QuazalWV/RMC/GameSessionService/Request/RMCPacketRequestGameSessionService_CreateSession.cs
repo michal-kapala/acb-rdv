@@ -9,6 +9,13 @@ namespace QuazalWV
 		public RMCPacketRequestGameSessionService_CreateSession(Stream s)
 		{
 			Session = new GameSession(s);
+			// add missing props as requested by SearchSession
+			var prop = Session.Attributes.Find(p => p.Id == 0x69);
+			if (prop == null)
+				Session.Attributes.Add(new Property { Id = 0x69, Value = 0 }); // Min nb players?
+			prop = Session.Attributes.Find(p => p.Id == 0x6A);
+			if (prop == null)
+				Session.Attributes.Add(new Property { Id = 0x6A, Value = 6 }); // Max nb players?
 		}
 
 		public override string PayloadToString()

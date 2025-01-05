@@ -42,7 +42,9 @@ namespace QuazalWV
                     switch (reqRegisterEx.className)
                     {
                         case "UbiAuthenticationLoginCustomData":
-                            reply = new RMCPacketResponseRegisterEx(client.PID);
+                            foreach (var url in reqRegisterEx.stationUrls)
+                                client.Urls.Add(new StationUrl(url));
+                            reply = new RMCPacketResponseRegisterEx(client);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                             break;
                         default:

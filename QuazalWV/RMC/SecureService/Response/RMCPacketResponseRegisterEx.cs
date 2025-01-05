@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace QuazalWV
 {
@@ -12,9 +8,10 @@ namespace QuazalWV
         public uint resultCode = 0x00010001;
         public uint connectionId = 78;
         public string clientUrl;
-        public RMCPacketResponseRegisterEx(uint pid)
+        public RMCPacketResponseRegisterEx(ClientInfo client)
         {
-            clientUrl = $"prudps:/address={Global.serverBindAddress};port=21031;sid=15;type=3";
+            clientUrl = $"prudps:/address={client.ep.Address};port={client.ep.Port};sid=15;type=3";
+            client.Urls.Add(new StationUrl(clientUrl));
         }
 
         public override byte[] ToBuffer()

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
-using System.Text;
 
 namespace QuazalWV
 {
@@ -23,6 +21,7 @@ namespace QuazalWV
         public uint callCounterRMC;
         public IPEndPoint ep;
         public UdpClient udp;
+        public List<StationUrl> Urls { get; set; } = new List<StationUrl>();
         public bool isLocal = true;
         public User User { get; set; }
         public User TrackingUser { get; set; }

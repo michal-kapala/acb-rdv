@@ -50,7 +50,7 @@ namespace QuazalWV
                 case 1:
                     var reqCreateSes = (RMCPacketRequestGameSessionService_CreateSession)rmc.request;
                     uint sesId = Global.NextGameSessionId++;
-                    var ses = new Session(sesId, reqCreateSes.Session);
+                    var ses = new Session(sesId, reqCreateSes.Session, client);
 					Global.Sessions.Add(ses);
 					reply = new RMCPacketResponseGameSessionService_CreateSession(reqCreateSes.Session.TypeId, sesId);
 					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
@@ -63,7 +63,8 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 7:
-                    reply = new RMCPacketResponseGameSessionService_SearchSessions();
+                    var reqSearchSes = (RMCPacketRequestGameSessionService_SearchSessions)rmc.request;
+                    reply = new RMCPacketResponseGameSessionService_SearchSessions(reqSearchSes.Query);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 8:
@@ -92,8 +93,10 @@ namespace QuazalWV
                     break;
                 case 23:
                     var reqAbandon = (RMCPacketRequestGameSessionService_AbandonSession)rmc.request;
-                    Global.Sessions.Find(session => session.Key.SessionId == reqAbandon.Key.SessionId)
-                        .PrivatePids.Remove(client.PID);
+                    var abandonedSes = Global.Sessions.Find(session => session.Key.SessionId == reqAbandon.Key.SessionId);
+                    abandonedSes.PrivatePids.Remove(client.PID);
+                    if (abandonedSes.PrivatePids.Count == 0)
+                        Global.Sessions.Remove(abandonedSes);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
