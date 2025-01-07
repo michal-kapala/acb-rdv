@@ -62,7 +62,7 @@ If you want to start the game **from SP binary** you will need your real credent
 INSERT INTO privileges VALUES (1,'Allow to play online','en-US'),(1000,'Trajan Market Map','en-US'),(1001,'Aqueduct Map','en-US'),(1004,'Ezio's Helmschmied Drachen Armor Skin','en-US'),(1005,'Harlequin','en-US'),(1006,'Officer','en-US');
 ```
 
-![](DocResources/db_privileges.PNG)
+![](DocResources/db_privileges.png)
 
 ### Application
 Create `ACBRDV.exe.config` configuration file in `./ACB RDV/bin/<architecture>/<mode>`:
@@ -87,7 +87,7 @@ Make sure the `.cxb` file is present in your server executable's directory.
 
 On every **client** machine add an entry in `C:\Windows\System32\drivers\etc\hosts` to redirect the game's network traffic to the server:
 ```
-`<server host IP> onlineconfigservice.ubi.com`
+<server host IP> onlineconfigservice.ubi.com
 ```
 
 `<server host IP>` should match that of `ACBRDV.exe.config` for all environment scenarios (localhost/LAN/Internet).
