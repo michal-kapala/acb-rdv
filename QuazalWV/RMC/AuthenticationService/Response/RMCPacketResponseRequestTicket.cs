@@ -28,7 +28,7 @@ namespace QuazalWV
             };
             // 'Tracking' user
             if(pid == 105)
-                ticketBuffer = Global.MultiplayerEndpoint(client.ep) ? mpTrackingUserTicket : spTrackingUserTicket;
+                ticketBuffer = mpTrackingUserTicket;
             // a player
             else
                 ticketBuffer = ticket.toBuffer();

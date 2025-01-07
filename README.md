@@ -122,7 +122,7 @@ Either:
 Run this command from ACB root directory to start the game:
 
 ```
-ACBMP.exe /launchfromotherexec /onlineUser:<user> /onlinePassword:<password>
+ACBMP.exe /onlineUser:<user> /onlinePassword:<password>
 ```
 
 Change `<user>` and `<password>` to your credentials from the database file (the user other than `Tracking`).
