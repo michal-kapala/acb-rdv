@@ -14,8 +14,7 @@ namespace QuazalWV
 			UnkUint = 0;
 			PlayerName = player;
 			Stats = new List<PlayerStatisticExt>();
-            foreach (var query in queries)
-                
+			foreach (var query in queries)
 				Stats.Add(new PlayerStatisticExt(query));
 		}
 

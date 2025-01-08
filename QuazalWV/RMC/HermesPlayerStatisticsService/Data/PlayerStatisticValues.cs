@@ -10,14 +10,13 @@ namespace QuazalWV
 		public string UnkStr { get; set; }
 		public byte UnkByte { get; set; }
 
-		public PlayerStatisticValues(uint score,uint long1, uint long2,string  unkstr, byte unk_bytes)
+		public PlayerStatisticValues(uint score, uint long1, uint long2, string unkStr, byte unkBytes)
 		{
-            Log.WriteLine(10, "The following information was sent score " + score + "long1 " + long1 +"long2 " + long2+ "string " + unkstr+"byte " + unk_bytes);
-            UnkInt = score;
+			UnkInt = score;
 			UnkLong1 = long1;
 			UnkLong2 = long2;
-			UnkStr = unkstr;
-			UnkByte = unk_bytes;
+			UnkStr = unkStr;
+			UnkByte = unkBytes;
 		}
 
 		public PlayerStatisticValues(Stream s)
