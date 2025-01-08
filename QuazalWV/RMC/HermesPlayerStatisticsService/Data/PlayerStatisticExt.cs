@@ -18,7 +18,7 @@ namespace QuazalWV
 			UnkInt2 = 0;
 			Infos = new List<PlayerStatisticInfoExt>();
 			foreach (uint id in query.InfoIds)
-				Infos.Add(new PlayerStatisticInfoExt((byte)id));
+				Infos.Add(new PlayerStatisticInfoExt((byte)id, (byte)Id));
 			DateTime = new QDateTime(System.DateTime.Now);
 		}
 
