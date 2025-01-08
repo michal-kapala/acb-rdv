@@ -61,8 +61,8 @@ namespace QuazalWV
                 {
                     case PlayerStatValue.ExperiencePointsX1AndTimeX2:
                         if (statid == 1 )
-							// XP
-							Value1 = new PlayerStatisticValues(2000, 10, 20, "", 1);
+                            // XP
+                            Value1 = new PlayerStatisticValues(2000, 10, 20, "", 1);
                         else
                             // Time
                             Value1 = new PlayerStatisticValues(300, 10, 20, "", 1);
