@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace QuazalWV
 {
@@ -35,6 +36,10 @@ namespace QuazalWV
                 m_uiConnectionSignature = client.IDrecv,
                 payload = new byte[0]
             };
+            // for localhost testing, remove from prod
+            if (p.m_oSourceVPort.port == 15)
+                Thread.Sleep(50);
+
             return reply;
         }
 
@@ -52,6 +57,10 @@ namespace QuazalWV
                 uiSeqId = p.uiSeqId,
                 m_uiConnectionSignature = client.IDrecv
             };
+            // for localhost testing, remove from prod
+            if (p.m_oSourceVPort.port == 15)
+                Thread.Sleep(50);
+
             if (p.payload != null && p.payload.Length > 0)
                 reply.payload = MakeConnectPayload(client,p);
             else

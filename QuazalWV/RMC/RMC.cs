@@ -308,6 +308,8 @@ namespace QuazalWV
                 np.uiSeqId++;
                 np.payload = data;
                 np.payloadSize = (ushort)np.payload.Length;
+                // for localhost testing, remove from prod
+                Thread.Sleep(100);
                 WriteLog(10, "sent packet");
                 Send(client.udp, np, client);
             }
