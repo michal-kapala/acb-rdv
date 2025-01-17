@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace QuazalWV
 {
@@ -336,6 +337,7 @@ namespace QuazalWV
                     np.payloadSize = (ushort)np.payload.Length;
                     Send(client.udp, np, client);
                     pos += len;
+                    Thread.Sleep(1);
                 }
                 WriteLog(10, "sent packets");
             }

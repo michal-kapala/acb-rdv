@@ -41,7 +41,7 @@ namespace QuazalWV
 
                     reply = new RMCPacketResponseAuthenticationService_Login(client);
                     //client.sessionKey = ((RMCPacketResponseAuthenticationService_Login)reply).ticket.sessionKey;
-                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, useCompression: false);
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 2:
                     RMCPacketRequestLoginCustomData h = (RMCPacketRequestLoginCustomData)rmc.request;
