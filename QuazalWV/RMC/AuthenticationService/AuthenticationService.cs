@@ -80,6 +80,19 @@ namespace QuazalWV
                     var reqTicket = (RMCPacketRequestRequestTicket)rmc.request;
                     reply = new RMCPacketResponseRequestTicket(reqTicket.sourcePID, client);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    // reset sequence IDs for secure service connection
+                    if (p.m_oSourceVPort.port == 15)
+                    {
+                        // player
+                        client.seqIdReliable = 1;
+                        client.seqIdUnreliable = 1;
+                    }
+                    else
+                    {
+                        // Tracking user
+                        client.seqIdReliableTracking = 1;
+                        client.seqIdUnreliableTracking = 1;
+                    }
                     break;
                 default:
                     Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Method {rmc.methodID}", Color.Red, client);

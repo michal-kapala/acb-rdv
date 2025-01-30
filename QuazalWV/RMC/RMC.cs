@@ -15,8 +15,8 @@ namespace QuazalWV
             if (client == null)
                 return;
             client.sessionID = p.m_bySessionID;
-            if (p.uiSeqId > client.seqCounter)
-                client.seqCounter = p.uiSeqId;
+            if (p.uiSeqId > client.gameSeqId)
+                client.gameSeqId = p.uiSeqId;
             client.udp = udp;
             if (p.flags.Contains(QPacket.PACKETFLAG.FLAG_ACK))
                 return;
@@ -209,6 +209,8 @@ namespace QuazalWV
             string payload = reply.PayloadToString();
             if (payload != "")
                 WriteLog(5, "Response Data Content : \n" + payload);
+            // for localhost testing, remove from prod
+            Thread.Sleep(100);
             SendACK(udp, p, client);
             SendResponsePacket(udp, p, rmc, client, reply, useCompression, error);
         }
@@ -294,9 +296,11 @@ namespace QuazalWV
             m = new MemoryStream();
             Helper.WriteU32(m, (uint)buff.Length);
             m.Write(buff, 0, buff.Length);
-            QPacket np = new QPacket(p.ToBuffer());
-            np.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_NEED_ACK };
-            np.m_uiSignature = client.IDsend;
+            QPacket np = new QPacket(p.ToBuffer())
+            {
+                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_NEED_ACK },
+                m_uiSignature = client.IDsend
+            };
             MakeAndSend(client, np, m.ToArray());
         }
 
@@ -305,11 +309,11 @@ namespace QuazalWV
             MemoryStream m = new MemoryStream(data);
             if (data.Length < MaxRmcPayloadSize)
             {
-                np.uiSeqId++;
+                var seqId = np.m_oDestinationVPort.port == 15 ? client.seqIdUnreliable++ : client.seqIdUnreliableTracking++;
+                np.uiSeqId = seqId;
+                //np.uiSeqId++;
                 np.payload = data;
                 np.payloadSize = (ushort)np.payload.Length;
-                // for localhost testing, remove from prod
-                Thread.Sleep(100);
                 WriteLog(10, "sent packet");
                 Send(client.udp, np, client);
             }
@@ -321,7 +325,8 @@ namespace QuazalWV
                 np.m_byPartNumber = 0;
                 while (pos < data.Length)
                 {
-                    np.uiSeqId = client.seqCounterReliable++;
+                    // response fragmentation for Tracking is unexpected
+                    np.uiSeqId = client.seqIdReliable++;
                     bool isLast = false;
                     int len = (int)MaxRmcPayloadSize;
                     if (len + pos >= data.Length)
@@ -384,7 +389,7 @@ namespace QuazalWV
             q.type = QPacket.PACKETTYPE.DATA;
             q.flags = new List<QPacket.PACKETFLAG>();
             q.payload = new byte[0];
-            q.uiSeqId = (ushort)(++client.seqCounter);
+            q.uiSeqId = (ushort)(++client.gameSeqId);
             q.m_bySessionID = client.sessionID;
             RMCP rmc = new RMCP();
             rmc.proto = RMCP.PROTOCOL.GlobalNotificationEventService;

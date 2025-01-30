@@ -13,11 +13,23 @@ namespace QuazalWV
         public uint IDsend;
         public byte sessionID;
         public byte[] sessionKey = new byte[] { 0x9C, 0xB0, 0x1D, 0x7A, 0x2C, 0x5A, 0x6C, 0x5B, 0xED, 0x12, 0x68, 0x45, 0x69, 0xAE, 0x09, 0x0D };
-        public ushort seqCounter;
+        public ushort gameSeqId;
         /// <summary>
         /// Reliable substream sequence ID.
         /// </summary>
-        public ushort seqCounterReliable = 1;
+        public ushort seqIdReliable = 1;
+        /// <summary>
+        /// Unreliable substream sequence ID.
+        /// </summary>
+        public ushort seqIdUnreliable = 1;
+        /// <summary>
+        /// Reliable substream sequence ID for Tracking user.
+        /// </summary>
+        public ushort seqIdReliableTracking = 1;
+        /// <summary>
+        /// Unreliable substream sequence ID for Tracking user.
+        /// </summary>
+        public ushort seqIdUnreliableTracking = 1;
         public uint callCounterRMC;
         public IPEndPoint ep;
         public UdpClient udp;
