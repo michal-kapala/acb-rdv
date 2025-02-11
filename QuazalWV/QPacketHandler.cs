@@ -46,6 +46,10 @@ namespace QuazalWV
         public static QPacket ProcessCONNECT(ClientInfo client, QPacket p)
         {
             client.IDsend = p.m_uiConnectionSignature;
+            if (p.m_oSourceVPort.port == 15)
+                client.playerSignature = p.m_uiConnectionSignature;
+            else
+                client.trackingSignature = p.m_uiConnectionSignature;
             QPacket reply = new QPacket
             {
                 m_oSourceVPort = p.m_oDestinationVPort,
@@ -53,7 +57,7 @@ namespace QuazalWV
                 flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
                 type = QPacket.PACKETTYPE.CONNECT,
                 m_bySessionID = p.m_bySessionID,
-                m_uiSignature = client.IDsend,
+                m_uiSignature = p.m_uiConnectionSignature,
                 uiSeqId = p.uiSeqId,
                 m_uiConnectionSignature = client.IDrecv
             };
@@ -110,7 +114,7 @@ namespace QuazalWV
                 flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
                 type = QPacket.PACKETTYPE.DISCONNECT,
                 m_bySessionID = p.m_bySessionID,
-                m_uiSignature = client.IDsend - 0x10000,
+                m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature - 0x10000 : client.trackingSignature - 0x10000,
                 uiSeqId = p.uiSeqId,
                 payload = new byte[0]
             };
@@ -126,7 +130,7 @@ namespace QuazalWV
                 flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
                 type = QPacket.PACKETTYPE.PING,
                 m_bySessionID = p.m_bySessionID,
-                m_uiSignature = client.IDsend,
+                m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature : client.trackingSignature,
                 uiSeqId = p.uiSeqId,
                 m_uiConnectionSignature = client.IDrecv,
                 payload = new byte[0]

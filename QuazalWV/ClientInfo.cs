@@ -30,6 +30,14 @@ namespace QuazalWV
         /// Unreliable substream sequence ID for Tracking user.
         /// </summary>
         public ushort seqIdUnreliableTracking = 1;
+        /// <summary>
+        /// Client's PRUDP signature used by the player.
+        /// </summary>
+        public uint playerSignature;
+        /// <summary>
+        /// Client's PRUDP signature used by Tracking user.
+        /// </summary>
+        public uint trackingSignature;
         public uint callCounterRMC;
         public IPEndPoint ep;
         public UdpClient udp;

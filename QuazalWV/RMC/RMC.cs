@@ -221,7 +221,7 @@ namespace QuazalWV
             np.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK };
             np.m_oSourceVPort = p.m_oDestinationVPort;
             np.m_oDestinationVPort = p.m_oSourceVPort;
-            np.m_uiSignature = client.IDsend;
+            np.m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature : client.trackingSignature;
             np.payload = new byte[0];
             np.payloadSize = 0;
             WriteLog(10, "send ACK packet");
@@ -264,7 +264,7 @@ namespace QuazalWV
                 flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_NEED_ACK },
                 m_oSourceVPort = p.m_oDestinationVPort,
                 m_oDestinationVPort = p.m_oSourceVPort,
-                m_uiSignature = client.IDsend
+                m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature : client.trackingSignature
             };
             MakeAndSend(client, np, m.ToArray());
         }
