@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace QuazalWV
 {
@@ -28,7 +29,11 @@ namespace QuazalWV
 
 		public override string PayloadToString()
 		{
-			return "";
+			StringBuilder sb = new StringBuilder();
+			sb.AppendLine($"[Results: {Results.Count}]");
+			foreach (var result in Results)
+				sb.AppendLine(result.ToString());
+			return sb.ToString();
 		}
 
 		public override byte[] ToBuffer()

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace QuazalWV
 {
@@ -46,6 +47,16 @@ namespace QuazalWV
 			Helper.WriteU32(s, (uint)Attributes.Count);
 			foreach (Property prop in Attributes)
 				prop.ToBuffer(s);
+		}
+
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.AppendLine($"[Session ID: {Key.SessionId}]");
+			sb.AppendLine($"[Host: {HostPid}]");
+			foreach (var prop in Attributes)
+				sb.AppendLine($"\t{prop}");
+			return sb.ToString();
 		}
 	}
 }

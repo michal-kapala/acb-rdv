@@ -11,12 +11,15 @@ namespace QuazalWV
             {
                 case 1:
                     rmc.request = new RMCPacketRequestGameSessionService_CreateSession(s);
+                    Log.WriteLine(1, "[RMC] CreateSession props:\n" + rmc.request.PayloadToString(), Color.Blue);
                     break;
                 case 2:
                     rmc.request = new RMCPacketRequestGameSessionService_UpdateSession(s);
+                    Log.WriteLine(1, "[RMC] UpdateSession props:\n" + rmc.request.PayloadToString(), Color.Purple);
                     break;
                 case 7:
                     rmc.request = new RMCPacketRequestGameSessionService_SearchSessions(s);
+                    Log.WriteLine(1, "[RMC] SearchSessions query props:\n" + rmc.request.PayloadToString(), Color.Orange);
                     break;
                 case 8:
                     rmc.request = new RMCPacketRequestGameSessionService_AddParticipants(s);

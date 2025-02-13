@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 
 namespace QuazalWV
 {
@@ -20,7 +21,10 @@ namespace QuazalWV
 
 		public override string PayloadToString()
 		{
-			return "";
+			StringBuilder sb = new StringBuilder();
+			foreach(var prop in Session.Attributes)
+				sb.AppendLine(prop.ToString());
+			return sb.ToString();
 		}
 
 		public override byte[] ToBuffer()
