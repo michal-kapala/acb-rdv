@@ -33,16 +33,20 @@ namespace QuazalWV
 
 		public override string ToString()
 		{
-			if (Id == (uint)MatchmakingParam.MapID)
-				return $"[Map: {Enum.GetName(typeof(Map), Value)}]";
-
-			if (Id == (uint)MatchmakingParam.GameMode)
-				return $"[Mode: {Enum.GetName(typeof(GameMode), Value)}]";
-
-			string name = Enum.GetName(typeof(MatchmakingParam), Id);
-			if (name == null)
-				Log.WriteLine(1, $"[RMC] Param name not found for id={Id}", Color.Red);
-			return $"[{name:2X}: {Value}]";
+			switch((MatchmakingParam)Id)
+			{
+				case MatchmakingParam.MapID:
+					return $"[Map: {Enum.GetName(typeof(Map), Value)}]";
+				case MatchmakingParam.GameMode:
+					return $"[Mode: {Enum.GetName(typeof(GameMode), Value)}]";
+				case MatchmakingParam.GameType:
+					return $"[Type: {Enum.GetName(typeof(GameType), Value)}]";
+				default:
+					string name = Enum.GetName(typeof(MatchmakingParam), Id);
+					if (name == null)
+						Log.WriteLine(1, $"[RMC] Param name not found for id={Id}", Color.Red);
+					return $"[{name:2X}: {Value}]";
+			}
 		}
 	}
 }

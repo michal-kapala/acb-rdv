@@ -23,7 +23,7 @@
 		Unk6B = 0x6B,
 		GameMode = 0x6C,
 		Unk6D = 0x6D,
-		Unk6E = 0x6E,
+		GameType = 0x6E,
 		Accessibility = 0x6F,
 		Unk70 = 0x70,
 		Unk71 = 0x71,

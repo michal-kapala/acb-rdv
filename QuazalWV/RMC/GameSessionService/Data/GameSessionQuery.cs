@@ -42,6 +42,8 @@ namespace QuazalWV
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
+			sb.AppendLine($"[TypeID: {TypeId}]");
+			sb.AppendLine($"[QueryID: {QueryId}]");
 			foreach (var prop in Params)
 				sb.AppendLine(prop.ToString());
 			return sb.ToString();
