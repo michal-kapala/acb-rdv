@@ -72,6 +72,9 @@
     <Compile Include="Classes\CommonData\QDateTime.cs" />
     <Compile Include="Classes\CommonData\ResultRange.cs" />
     <Compile Include="Classes\CommonData\StationUrl.cs" />
+    <Compile Include="Classes\Enums\GameMode.cs" />
+    <Compile Include="Classes\Enums\Map.cs" />
+    <Compile Include="Classes\Enums\MatchmakingParam.cs" />
     <Compile Include="Classes\Interfaces\AnyDataHeader.cs" />
     <Compile Include="Classes\Models\TelemetryTag.cs" />
     <Compile Include="RMC\FriendsService\Data\FriendData.cs" />
