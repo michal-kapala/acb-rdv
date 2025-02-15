@@ -22,7 +22,7 @@
 		Unk6A = 0x6A,
 		Unk6B = 0x6B,
 		GameMode = 0x6C,
-		Unk6D = 0x6D,
+		QueryMaxSlotsTaken = 0x6D,
 		GameType = 0x6E,
 		Accessibility = 0x6F,
 		Unk70 = 0x70,
