@@ -28,6 +28,6 @@
 		Unk70 = 0x70,
 		Unk71 = 0x71,
 		Unk72 = 0x72,
-		Unk73 = 0x73
+		PunkbusterParam = 0x73
 	}
 }
