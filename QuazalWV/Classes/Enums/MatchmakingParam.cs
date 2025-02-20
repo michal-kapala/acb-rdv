@@ -27,7 +27,7 @@
 		Accessibility = 0x6F,
 		Unk70 = 0x70,
 		Unk71 = 0x71,
-		Unk72 = 0x72,
-		PunkbusterParam = 0x73
+		NatType = 0x72,
+		PunkbusterActive = 0x73
 	}
 }
