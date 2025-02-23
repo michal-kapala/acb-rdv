@@ -36,17 +36,24 @@ namespace QuazalWV
 			switch((MatchmakingParam)Id)
 			{
 				case MatchmakingParam.MapID:
-					return $"[Map: {Enum.GetName(typeof(Map), Value)}]";
+					return EnumToStr("Map", typeof(Map));
 				case MatchmakingParam.GameMode:
-					return $"[Mode: {Enum.GetName(typeof(GameMode), Value)}]";
+					return EnumToStr("Mode", typeof(GameMode));
 				case MatchmakingParam.GameType:
-					return $"[Type: {Enum.GetName(typeof(GameType), Value)}]";
+					return EnumToStr("Type", typeof(GameType));
+				case MatchmakingParam.NatType:
+					return EnumToStr("NAT", typeof(NatType));
 				default:
 					string name = Enum.GetName(typeof(MatchmakingParam), Id);
 					if (name == null)
 						Log.WriteLine(1, $"[RMC] Param name not found for id={Id}", Color.Red);
 					return $"[{name:2X}: {Value}]";
 			}
+		}
+
+		private string EnumToStr(string label, Type type)
+		{
+			return $"[{label}: {Enum.GetName(type, Value)}]";
 		}
 	}
 }
