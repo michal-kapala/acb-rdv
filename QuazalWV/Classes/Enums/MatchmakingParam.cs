@@ -5,7 +5,7 @@
 	/// </summary>
 	public enum MatchmakingParam
 	{
-		Unk0 = 0,
+		SearchStrategy = 0,
 		MaxPublicSlots = 3,
 		MaxPrivateSlots = 4,
 		CurrentPublicSlots = 5,
