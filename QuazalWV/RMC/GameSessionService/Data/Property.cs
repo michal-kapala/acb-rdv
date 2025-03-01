@@ -35,6 +35,8 @@ namespace QuazalWV
 		{
 			switch((MatchmakingParam)Id)
 			{
+				case MatchmakingParam.CxbCrcSum:
+					return $"[CXB CRC: 0x{Value:X8}]";
 				case MatchmakingParam.MapID:
 					return EnumToStr("Map", typeof(Map));
 				case MatchmakingParam.GameMode:
@@ -46,8 +48,11 @@ namespace QuazalWV
 				default:
 					string name = Enum.GetName(typeof(MatchmakingParam), Id);
 					if (name == null)
+					{
 						Log.WriteLine(1, $"[RMC] Param name not found for id={Id}", Color.Red);
-					return $"[{name:2X}: {Value}]";
+						return $"[Unk{Id:X2}: {Value}]";
+					}
+					return $"[{name}: {Value}]";
 			}
 		}
 

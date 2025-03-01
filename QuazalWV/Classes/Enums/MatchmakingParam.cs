@@ -13,7 +13,7 @@
 		Unk7 = 7,
 		FreePublicSlots = 0x32,
 		FreePrivateSlots = 0x33,
-		Unk64 = 0x64,
+		CxbCrcSum = 0x64,
 		MapID = 0x65,
 		Unk66 = 0x66,
 		Unk67 = 0x67,
