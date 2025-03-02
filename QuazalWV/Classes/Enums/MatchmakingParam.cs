@@ -25,7 +25,7 @@
 		QueryMaxSlotsTaken = 0x6D,
 		GameType = 0x6E,
 		Accessibility = 0x6F,
-		Unk70 = 0x70,
+		DlcValue = 0x70,
 		Unk71 = 0x71,
 		NatType = 0x72,
 		PunkbusterActive = 0x73
