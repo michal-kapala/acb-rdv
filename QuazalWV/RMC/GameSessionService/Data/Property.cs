@@ -39,6 +39,12 @@ namespace QuazalWV
 					return $"[CXB CRC: 0x{Value:X8}]";
 				case MatchmakingParam.MapID:
 					return EnumToStr("Map", typeof(Map));
+				case MatchmakingParam.HostLevelRange:
+					return EnumToStr("Level range", typeof(LevelRange));
+				case MatchmakingParam.MinLevelRange:
+					return EnumToStr("Min level range", typeof(LevelRange));
+				case MatchmakingParam.MaxLevelRange:
+					return EnumToStr("Max level range", typeof(LevelRange));
 				case MatchmakingParam.GameMode:
 					return EnumToStr("Mode", typeof(GameMode));
 				case MatchmakingParam.GameType:
