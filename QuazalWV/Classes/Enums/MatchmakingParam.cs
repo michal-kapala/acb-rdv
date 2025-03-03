@@ -20,6 +20,9 @@
 		RegionID = 0x68,
 		MinLevelRange = 0x69,
 		MaxLevelRange = 0x6A,
+		/// <summary>
+		/// Seemingly always 1.
+		/// </summary>
 		Unk6B = 0x6B,
 		GameMode = 0x6C,
 		QueryMaxSlotsTaken = 0x6D,
