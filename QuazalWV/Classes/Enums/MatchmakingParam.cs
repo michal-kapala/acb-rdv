@@ -10,7 +10,7 @@
 		MaxPrivateSlots = 4,
 		CurrentPublicSlots = 5,
 		CurrentPrivateSlots = 6,
-		Unk7 = 7,
+		IsPrivate = 7,
 		FreePublicSlots = 0x32,
 		FreePrivateSlots = 0x33,
 		CxbCrcSum = 0x64,
