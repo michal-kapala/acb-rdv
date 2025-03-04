@@ -76,7 +76,7 @@
     <Compile Include="Classes\Enums\GameType.cs" />
     <Compile Include="Classes\Enums\LevelRange.cs" />
     <Compile Include="Classes\Enums\Map.cs" />
-    <Compile Include="Classes\Enums\MatchmakingParam.cs" />
+    <Compile Include="Classes\Enums\SessionParam.cs" />
     <Compile Include="Classes\Enums\NatType.cs" />
     <Compile Include="Classes\Interfaces\AnyDataHeader.cs" />
     <Compile Include="Classes\Models\TelemetryTag.cs" />

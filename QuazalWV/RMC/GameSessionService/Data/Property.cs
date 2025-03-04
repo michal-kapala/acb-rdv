@@ -33,26 +33,26 @@ namespace QuazalWV
 
 		public override string ToString()
 		{
-			switch((MatchmakingParam)Id)
+			switch((SessionParam)Id)
 			{
-				case MatchmakingParam.CxbCrcSum:
+				case SessionParam.CxbCrcSum:
 					return $"[CXB CRC: 0x{Value:X8}]";
-				case MatchmakingParam.MapID:
+				case SessionParam.MapID:
 					return EnumToStr("Map", typeof(Map));
-				case MatchmakingParam.HostLevelRange:
+				case SessionParam.HostLevelRange:
 					return EnumToStr("Level range", typeof(LevelRange));
-				case MatchmakingParam.MinLevelRange:
+				case SessionParam.MinLevelRange:
 					return EnumToStr("Min level range", typeof(LevelRange));
-				case MatchmakingParam.MaxLevelRange:
+				case SessionParam.MaxLevelRange:
 					return EnumToStr("Max level range", typeof(LevelRange));
-				case MatchmakingParam.GameMode:
+				case SessionParam.GameMode:
 					return EnumToStr("Mode", typeof(GameMode));
-				case MatchmakingParam.GameType:
+				case SessionParam.GameType:
 					return EnumToStr("Type", typeof(GameType));
-				case MatchmakingParam.NatType:
+				case SessionParam.NatType:
 					return EnumToStr("NAT", typeof(NatType));
 				default:
-					string name = Enum.GetName(typeof(MatchmakingParam), Id);
+					string name = Enum.GetName(typeof(SessionParam), Id);
 					if (name == null)
 					{
 						Log.WriteLine(1, $"[RMC] Param name not found for id={Id}", Color.Red);

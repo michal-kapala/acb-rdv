@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Property IDs used as game session attributes.
 	/// </summary>
-	public enum MatchmakingParam
+	public enum SessionParam
 	{
 		SearchStrategy = 0,
 		MaxPublicSlots = 3,

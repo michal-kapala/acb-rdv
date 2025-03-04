@@ -20,7 +20,7 @@ namespace QuazalWV
 						Key = ses.Key,
 						HostPid = ses.HostPid,
 						HostUrls = ses.HostUrls,
-						Attributes = ses.GameSession.Attributes
+						Attributes = ses.FilterAttributes()
 					};
 					Results.Add(result);
 				}		

@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.IO;
+using System.Windows.Input;
 
 namespace QuazalWV
 {
@@ -54,10 +55,28 @@ namespace QuazalWV
                     var reqCreateSes = (RMCPacketRequestGameSessionService_CreateSession)rmc.request;
                     uint sesId = Global.NextGameSessionId++;
                     var ses = new Session(sesId, reqCreateSes.Session, client);
-					Global.Sessions.Add(ses);
-					reply = new RMCPacketResponseGameSessionService_CreateSession(reqCreateSes.Session.TypeId, sesId);
-					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
-					break;
+                    // initialize params
+                    var gameType = ses.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
+                    if (gameType == null)
+                        Log.WriteLine(1, $"[Session] Inconsistent session state (id={ses.Key.SessionId}), missing game type", Color.Red);
+                    var currPublicSlots = new Property() { Id = (uint)SessionParam.CurrentPublicSlots, Value = 0 };
+                    var currPrivateSlots = new Property() { Id = (uint)SessionParam.CurrentPrivateSlots, Value = 0 };
+                    var accessibility = new Property() {
+                        Id = (uint)SessionParam.Accessibility,
+                        Value = gameType.Value == (uint)GameType.PRIVATE ? 0u : 1u
+                    };
+                    ses.GameSession.Attributes.Add(currPublicSlots);
+                    ses.GameSession.Attributes.Add(currPrivateSlots);
+                    ses.GameSession.Attributes.Add(accessibility);
+                    // blind NAT type update
+                    var natType = ses.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.NatType);
+                    if (natType == null)
+                        Log.WriteLine(1, $"[Session] Inconsistent session state (id={ses.Key.SessionId}), missing NAT type", Color.Red);
+                    natType.Value = (uint)NatType.OPEN;
+                    Global.Sessions.Add(ses);
+                    reply = new RMCPacketResponseGameSessionService_CreateSession(reqCreateSes.Session.TypeId, sesId);
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
                 case 2:
                     var reqUpdateSes = (RMCPacketRequestGameSessionService_UpdateSession)rmc.request;
                     Global.Sessions.Find(session => session.Key.SessionId == reqUpdateSes.SessionUpdate.Key.SessionId)
@@ -68,6 +87,7 @@ namespace QuazalWV
                 case 7:
                     var reqSearchSes = (RMCPacketRequestGameSessionService_SearchSessions)rmc.request;
                     reply = new RMCPacketResponseGameSessionService_SearchSessions(reqSearchSes.Query);
+                    Log.WriteLine(1, $"[RMC] SearchSessions results: {((RMCPacketResponseGameSessionService_SearchSessions)reply).Results.Count}", Color.Green);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 8:
@@ -97,9 +117,12 @@ namespace QuazalWV
                 case 23:
                     var reqAbandon = (RMCPacketRequestGameSessionService_AbandonSession)rmc.request;
                     var abandonedSes = Global.Sessions.Find(session => session.Key.SessionId == reqAbandon.Key.SessionId);
-                    abandonedSes.PrivatePids.Remove(client.PID);
-                    if (abandonedSes.PrivatePids.Count == 0)
-                        Global.Sessions.Remove(abandonedSes);
+                    if (abandonedSes != null)
+                    {
+                        abandonedSes.PrivatePids.Remove(client.PID);
+                        if (abandonedSes.PrivatePids.Count == 0)
+                            Global.Sessions.Remove(abandonedSes);
+                    }
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
