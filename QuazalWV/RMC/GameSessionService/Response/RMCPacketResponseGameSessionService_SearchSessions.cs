@@ -19,10 +19,11 @@ namespace QuazalWV
 					{
 						Key = ses.Key,
 						HostPid = ses.HostPid,
-						HostUrls = ses.HostUrls,
+						HostUrls = ses.client.RegisteredUrls,
 						Attributes = ses.FilterAttributes()
 					};
-					Results.Add(result);
+                    Log.WriteLine(1, $"[RMCXXXXX] SearchSessions results STUFF: {result}");
+                    Results.Add(result);
 				}		
 			}
 		}

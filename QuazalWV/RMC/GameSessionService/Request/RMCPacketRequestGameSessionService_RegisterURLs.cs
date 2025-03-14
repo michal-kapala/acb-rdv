@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -6,15 +7,20 @@ namespace QuazalWV
 {
 	public class RMCPacketRequestGameSessionService_RegisterURLs : RMCPRequest
 	{
-		public List<StationUrl> Urls {  get; set; }
+        
 
-		public RMCPacketRequestGameSessionService_RegisterURLs(Stream s)
-		{
-			Urls = new List<StationUrl>();
-			uint count = Helper.ReadU32(s);
-			for (uint i = 0; i < count; i++)
-				Urls.Add(new StationUrl(Helper.ReadString(s)));
-		}
+        public List<StationUrl> Urls {  get; set; }
+
+        public RMCPacketRequestGameSessionService_RegisterURLs(Stream s)
+        {
+            Urls = new List<StationUrl>();
+            uint count = Helper.ReadU32(s);
+            for (uint i = 0; i < count; i++)
+            { string b = Helper.ReadString(s);
+              Urls.Add(new StationUrl(b));
+                Log.WriteLine(1, $"[URL gotten from host]: {b}");
+            }
+        }
 
 		public override string ToString()
 		{
@@ -37,5 +43,14 @@ namespace QuazalWV
 				Helper.WriteString(m, url.ToString());
 			return m.ToArray();
 		}
-	}
+
+        internal void registerURLs(ClientInfo client)
+        {
+            client.RegisteredUrls.Clear();
+            foreach (StationUrl url in this.Urls)
+            {
+                client.RegisteredUrls.Add(url);
+            }
+        }
+    }
 }
