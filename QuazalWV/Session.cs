@@ -35,7 +35,7 @@ namespace QuazalWV
 			UpdateCurrentSlots();
 		}
 
-		public bool CheckQuery(GameSessionQuery query)
+		public bool CheckQuery(GameSessionQuery query, ClientInfo client)
 		{
 			var qMinLevelRange = query.Params.Find(param => param.Id == (uint)SessionParam.MinLevelRange);
 			var qMaxLevelRange = query.Params.Find(param => param.Id == (uint)SessionParam.MaxLevelRange);
@@ -45,14 +45,21 @@ namespace QuazalWV
 			// query integrity check
 			if (qMinLevelRange == null || qMaxLevelRange == null || qGameMode == null || qGameType == null)
 			{
-				Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), failed integrity check", Color.Red);
+				Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), failed integrity check", Color.Red, client);
+				return false;
+			}
+
+			// self-hosted
+			if (client.PID == HostPid)
+			{
+				Log.WriteLine(1, $"[Session] Ignoring a self-hosted session", Color.Gray, client);
 				return false;
 			}
 
 			// ignore queries with level limits or without slots
 			if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
 			{
-				Log.WriteLine(1, $"[Session] Session ignored due to level ranges/lack of slots", Color.Gray);
+				Log.WriteLine(1, $"[Session] Session ignored due to level ranges/lack of slots", Color.Gray, client);
 				return false;
 			}
 
@@ -61,14 +68,14 @@ namespace QuazalWV
 
 			if (gameMode == null || gameType == null)
 			{
-				Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), missing game mode or type", Color.Red);
+				Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), missing game mode or type", Color.Red, client);
 				return false;
 			}
 
 			// game mode/type mismatch
 			if (gameMode.Value != qGameMode.Value || gameType.Value != qGameType.Value)
 			{
-				Log.WriteLine(1, $"[Session] Session ignored due to game mode/type mismatch", Color.Gray);
+				Log.WriteLine(1, $"[Session] Session ignored due to game mode/type mismatch", Color.Gray, client);
 				return false;
 			}
 
@@ -76,14 +83,14 @@ namespace QuazalWV
 			var currentSlots = GameSession.Attributes.Find(param => param.Id == slotsParam);
 			if (currentSlots == null)
 			{
-				Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), missing current slots", Color.Red);
+				Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), missing current slots", Color.Red, client);
 				return false;
 			}
 
 			// too many players
 			if (currentSlots.Value > qMaxSlotsTaken.Value)
 			{
-				Log.WriteLine(1, $"[Session] Session ignored due to too many players", Color.Gray);
+				Log.WriteLine(1, $"[Session] Session ignored due to too many players", Color.Gray, client);
 				return false;
 			}
 			return true;

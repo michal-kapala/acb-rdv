@@ -9,16 +9,16 @@ namespace QuazalWV
 	{
 		public List<GameSessionSearchResult> Results { get; set; }
 
-		public RMCPacketResponseGameSessionService_SearchSessions(GameSessionQuery query)
+		public RMCPacketResponseGameSessionService_SearchSessions(GameSessionQuery query, ClientInfo client)
 		{
 			Results = new List<GameSessionSearchResult>();
 			foreach (var ses in Global.Sessions)
 			{
-				if (ses.CheckQuery(query))
+				if (ses.CheckQuery(query, client))
 				{
 					var host = Global.Clients.Find(c => c.PID == ses.HostPid);
 					if (host == null)
-						Log.WriteLine(1, $"[RMC GameSession] Error: host {ses.HostPid} not found for SearchSessions result", Color.Red);
+						Log.WriteLine(1, $"[RMC GameSession] Error: host {ses.HostPid} not found for SearchSessions result", Color.Red, client);
 
 					var result = new GameSessionSearchResult
 					{
@@ -27,7 +27,7 @@ namespace QuazalWV
 						HostUrls = host != null ? host.RegisteredUrls : new List<StationUrl>(),
 						Attributes = ses.FilterAttributes()
 					};
-					Log.WriteLine(2, $"[RMC GameSession] GameSessionSearchResult: {result}");
+					Log.WriteLine(2, $"[RMC GameSession] GameSessionSearchResult: {result}", Color.Black, client);
 					Results.Add(result);
 				}		
 			}

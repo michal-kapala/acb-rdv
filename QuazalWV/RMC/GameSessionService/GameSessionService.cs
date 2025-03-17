@@ -5,28 +5,28 @@ namespace QuazalWV
 {
     public class GameSessionService
     {
-        public static void ProcessRequest(Stream s, RMCP rmc)
+        public static void ProcessRequest(Stream s, RMCP rmc, ClientInfo client)
         {
             switch (rmc.methodID)
             {
                 case 1:
                     rmc.request = new RMCPacketRequestGameSessionService_CreateSession(s);
-                    Log.WriteLine(1, "[RMC GameSession] CreateSession props:\n" + rmc.request.PayloadToString(), Color.Blue);
+                    Log.WriteLine(1, "[RMC GameSession] CreateSession props:\n" + rmc.request.PayloadToString(), Color.Blue, client);
                     break;
                 case 2:
                     rmc.request = new RMCPacketRequestGameSessionService_UpdateSession(s);
-                    Log.WriteLine(1, "[RMC GameSession] UpdateSession props:\n" + rmc.request.PayloadToString(), Color.Purple);
+                    Log.WriteLine(1, "[RMC GameSession] UpdateSession props:\n" + rmc.request.PayloadToString(), Color.Purple, client);
                     break;
                 case 4:
                     rmc.request = new RMCPacketRequestGameSessionService_MigrateSession(s);
                     break;
                 case 5:
                     rmc.request = new RMCPacketRequestGameSessionService_LeaveSession(s);
-                    Log.WriteLine(1, "[RMC GameSession] LeaveSession key:\n" + rmc.request.PayloadToString(), Color.Purple);
+                    Log.WriteLine(1, "[RMC GameSession] LeaveSession key:\n" + rmc.request.PayloadToString(), Color.Purple, client);
                     break;
                 case 7:
                     rmc.request = new RMCPacketRequestGameSessionService_SearchSessions(s);
-                    Log.WriteLine(1, "[RMC GameSession] SearchSessions query props:\n" + rmc.request.PayloadToString(), Color.Orange);
+                    Log.WriteLine(1, "[RMC GameSession] SearchSessions query props:\n" + rmc.request.PayloadToString(), Color.Orange, client);
                     break;
                 case 8:
                     rmc.request = new RMCPacketRequestGameSessionService_AddParticipants(s);
@@ -50,7 +50,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestGameSessionService_AbandonSession(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC GameSession] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteLine(1, $"[RMC GameSession] Error: Unknown Method {rmc.methodID}", Color.Red, client);
                     break;
             }
         }
@@ -70,10 +70,7 @@ namespace QuazalWV
                         Log.WriteLine(1, $"[Session] Inconsistent session state (id={ses.Key.SessionId}), missing game type", Color.Red, client);
                     var currPublicSlots = new Property() { Id = (uint)SessionParam.CurrentPublicSlots, Value = 0 };
                     var currPrivateSlots = new Property() { Id = (uint)SessionParam.CurrentPrivateSlots, Value = 0 };
-                    var accessibility = new Property() {  
-                        Id = (uint)SessionParam.Accessibility,
-                        Value = gameType.Value == (uint)GameType.PRIVATE ? 0u : 1u
-                    };
+                    var accessibility = new Property() { Id = (uint)SessionParam.Accessibility, Value = 0 };
                     ses.GameSession.Attributes.Add(currPublicSlots);
                     ses.GameSession.Attributes.Add(currPrivateSlots);
                     ses.GameSession.Attributes.Add(accessibility);
@@ -116,7 +113,7 @@ namespace QuazalWV
                 case 7:
                     var reqSearchSes = (RMCPacketRequestGameSessionService_SearchSessions)rmc.request;
                     Log.WriteLine(2, $"[RMC] SearchSessions query: {reqSearchSes.Query}", Color.Green, client);
-                    reply = new RMCPacketResponseGameSessionService_SearchSessions(reqSearchSes.Query);
+                    reply = new RMCPacketResponseGameSessionService_SearchSessions(reqSearchSes.Query, client);
                     Log.WriteLine(2, $"[RMC] SearchSessions results: {((RMCPacketResponseGameSessionService_SearchSessions)reply).Results.Count}", Color.Green, client);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

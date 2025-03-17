@@ -176,7 +176,7 @@ namespace QuazalWV
                     LocalizationService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.GameSessionService:
-                    GameSessionService.ProcessRequest(m, rmc);
+                    GameSessionService.ProcessRequest(m, rmc, client);
                     break;
                 case RMCP.PROTOCOL.HermesPlayerStatsService:
                     HermesPlayerStatisticsService.ProcessRequest(m, rmc);
