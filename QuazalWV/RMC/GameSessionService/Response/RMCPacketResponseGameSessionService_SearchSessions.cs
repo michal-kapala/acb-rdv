@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Text;
 
@@ -15,11 +16,15 @@ namespace QuazalWV
 			{
 				if (ses.CheckQuery(query))
 				{
+					var host = Global.Clients.Find(c => c.PID == ses.HostPid);
+					if (host == null)
+						Log.WriteLine(1, $"[RMC GameSession] Error: host {ses.HostPid} not found for SearchSessions result", Color.Red);
+
 					var result = new GameSessionSearchResult
 					{
 						Key = ses.Key,
 						HostPid = ses.HostPid,
-						HostUrls = ses.client.RegisteredUrls,
+						HostUrls = host != null ? host.RegisteredUrls : new List<StationUrl>(),
 						Attributes = ses.FilterAttributes()
 					};
 					Log.WriteLine(1, $"[RMC GameSession] GameSessionSearchResult: {result}");

@@ -12,8 +12,6 @@ namespace QuazalWV
 		public uint HostPid { get; set; }
 		public List<StationUrl> HostUrls { get; set; }
 
-		public ClientInfo client;
-
 		public Session(uint sesId, GameSession ses, ClientInfo host)
 		{
 			GameSession = ses;
@@ -24,7 +22,6 @@ namespace QuazalWV
 			};
 			PublicPids = new List<uint>();
 			PrivatePids = new List<uint>();
-			client = host;
 			HostPid = host.PID;
 			foreach (var url in host.Urls)
 				Log.WriteLine(1, $"[AddedURL] URL added: ${url}", Color.Red);
