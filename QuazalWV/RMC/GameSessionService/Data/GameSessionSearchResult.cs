@@ -13,7 +13,7 @@ namespace QuazalWV
 
 		public GameSessionSearchResult()
 		{
-            Log.WriteLine(1, $"[XXXXXXXXXXXXXXXXXXXXXXX] Here should be searchresults2");
+            
         }
 
 		public GameSessionSearchResult(Stream s)
@@ -30,12 +30,12 @@ namespace QuazalWV
 			HostPid = Helper.ReadU32(s);
 
 			uint count = Helper.ReadU32(s);
-            for (uint i = 0; i < count; i++)
-            {
-                var stationurl = new StationUrl(Helper.ReadString(s));
-                HostUrls.Add(stationurl);
-                Log.WriteLine(1, $"[StationURL] URL is: {stationurl}");
-            }
+			for (uint i = 0; i < count; i++)
+			{
+				var url = new StationUrl(Helper.ReadString(s));
+				HostUrls.Add(url);
+				Log.WriteLine(1, $"[StationURL] URL is: {url}");
+			}
 			count = Helper.ReadU32(s);
 			for (uint i = 0; i < count; i++)
 				Attributes.Add(new Property(s));
@@ -60,8 +60,8 @@ namespace QuazalWV
 			sb.AppendLine($"[Host: {HostPid}]");
 			foreach (var prop in Attributes)
 				sb.AppendLine($"\t{prop}");
-            foreach (var url in HostUrls)
-                sb.AppendLine($"[HostURL: {url}]");
+			foreach (var url in HostUrls)
+				sb.AppendLine($"[HostURL: {url}]");
 			return sb.ToString();
 		}
 	}

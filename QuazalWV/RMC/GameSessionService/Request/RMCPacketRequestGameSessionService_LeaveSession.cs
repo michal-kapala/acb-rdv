@@ -2,30 +2,30 @@
 
 namespace QuazalWV
 {
-    internal class RMCPacketRequestGameSessionService_LeaveSession : RMCPRequest
+    public class RMCPacketRequestGameSessionService_LeaveSession : RMCPRequest
     {
-        public GameSessionKey key;
+        public GameSessionKey Key { get; set; }
 
         public RMCPacketRequestGameSessionService_LeaveSession(Stream s)
         {
-            key = new GameSessionKey(s);
+            Key = new GameSessionKey(s);
         }
 
         public override string PayloadToString()
         {
-            return key.ToString();
+            return Key.ToString();
         }
 
         public override byte[] ToBuffer()
         {
             MemoryStream m = new MemoryStream();
-
+            Key.ToBuffer(m);
             return m.ToArray();
         }
 
         public override string ToString()
         {
-            return "[AddParticipants Request]";
+            return "[LeaveSession Request]";
         }
     }
 }

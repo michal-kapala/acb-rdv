@@ -8,11 +8,12 @@ using System.Threading;
 
 namespace QuazalWV
 {
-    
     public static class QPacketHandler
     {
-        
-        public static QPacket ProcessSYN(QPacket p, IPEndPoint ep, out ClientInfo client)
+		public static List<ulong> timeToIgnore = new List<ulong>();
+		public static Random rand = new Random();
+
+		public static QPacket ProcessSYN(QPacket p, IPEndPoint ep, out ClientInfo client)
         {
             client = Global.GetClientByEndPoint(ep);
             if (client == null)
@@ -140,9 +141,6 @@ namespace QuazalWV
             return reply;
         }
 
-
-        public static List<ulong> timeToIgnore = new List<ulong>();
-        public static Random rand = new Random();
         public static void ProcessPacket(string source, byte[] data, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload = false)
         {
             StringBuilder sb = new StringBuilder();
@@ -204,7 +202,7 @@ namespace QuazalWV
                             m = new MemoryStream();
                             byte b = (byte)(reply.payload[0] == 1 ? 0 : 1);
                             m.WriteByte(b);
-                            uint rvcid = client.RVCid;
+                            uint rvcid = client.rvCID;
                             Log.WriteLine(1, "[rvcid] received : " + rvcid.ToString());
                             Helper.WriteU32(m, rvcid); //RVCID
                             Helper.WriteU64(m, time);

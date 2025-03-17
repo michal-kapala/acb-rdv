@@ -44,7 +44,7 @@ namespace QuazalWV
                         case "UbiAuthenticationLoginCustomData":
                             foreach (var url in reqRegisterEx.stationUrls)
                                 client.Urls.Add(new StationUrl(url));
-                            reply = new RMCPacketResponseRegisterEx(client);
+                            reply = new RMCPacketResponseSecureService_RegisterEx(client);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                             break;
                         default:

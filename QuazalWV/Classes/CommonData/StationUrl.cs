@@ -53,7 +53,7 @@ namespace QuazalWV
             CID = 1;
             PID = client.PID;
             SID = 1;
-            RVCID = client.RVCid;
+            RVCID = client.rvCID;
             Stream = 3;
             Type = 2;
         }
@@ -89,7 +89,6 @@ namespace QuazalWV
                         break;
                     case "RVCID":
                         RVCID = uint.Parse(pair.Value);
-
                         break;
                     case "stream":
                         Stream = byte.Parse(pair.Value);

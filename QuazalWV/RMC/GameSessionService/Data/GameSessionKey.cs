@@ -31,7 +31,7 @@ namespace QuazalWV
         }
         public override string ToString()
         {
-            return $"TypeId: {this.TypeId}, SessionId: {this.SessionId}";
+            return $"[TypeId: {TypeId}, SessionId: {SessionId}]";
         }
     }
 }

@@ -112,7 +112,9 @@
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_CancelInvitation.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_CreateSession.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_GetInvitationsReceived.cs" />
+    <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_LeaveSession.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_RegisterURLs.cs" />
+    <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_RemoveParticipants.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_SearchSessions.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_SendInvitation.cs" />
     <Compile Include="RMC\GameSessionService\Request\RMCPacketRequestGameSessionService_UpdateSession.cs" />
@@ -209,7 +211,7 @@
     <Compile Include="RMC\RMCPResponse.cs" />
     <Compile Include="RMC\RMCPResponseEmpty.cs" />
     <Compile Include="RMC\SecureService\Request\RMCPacketRequestRegisterEx.cs" />
-    <Compile Include="RMC\SecureService\Response\RMCPacketResponseRegisterEx.cs" />
+    <Compile Include="RMC\SecureService\Response\RMCPacketResponseSecureService_RegisterEx.cs" />
     <Compile Include="RMC\SecureService\SecureService.cs" />
     <Compile Include="RMC\TrackingService\Request\RMCPacketRequestTrackingService_SendTag.cs" />
     <Compile Include="RMC\TrackingService\TrackingService.cs" />

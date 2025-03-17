@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.IO;
-using System.Windows.Input;
 
 namespace QuazalWV
 {
@@ -21,7 +20,6 @@ namespace QuazalWV
                 case 4:
                     //rmc.request = new RMCPacketRequestGameSessionService_MigrateSession(s);
                     Log.WriteLine(1, $"[RMC GameSession] Error: Unknown Method MigrateSession {rmc.PayLoadToString()}", Color.Red);
-                    //Log.WriteLine(1, "[RMC] UpdateSession props:\n" + rmc.request.PayloadToString(), Color.Purple);
                     break;
                 case 5:
                     rmc.request = new RMCPacketRequestGameSessionService_LeaveSession(s);
@@ -97,8 +95,8 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 5:
-                    var reqleaveSes = (RMCPacketRequestGameSessionService_LeaveSession)rmc.request;
-                    Global.Sessions.Find(session => session.Key.SessionId == reqleaveSes.key.SessionId)
+                    var reqLeaveSes = (RMCPacketRequestGameSessionService_LeaveSession)rmc.request;
+                    Global.Sessions.Find(session => session.Key.SessionId == reqLeaveSes.Key.SessionId)
                         .GameSession=null;
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
@@ -134,7 +132,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 14:
-                    var getRecvInvites = (RMCPacketRequestGameSessionService_GetInvitationsReceived)rmc.request;
+                    var reqGetInvRecv = (RMCPacketRequestGameSessionService_GetInvitationsReceived)rmc.request;
                     reply = new RMCPacketResponseGameSessionService_GetInvitationsReceived();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
@@ -143,7 +141,8 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 21:
-                    ((RMCPacketRequestGameSessionService_RegisterURLs)rmc.request).registerURLs(client);
+                    var reqRegUrls = (RMCPacketRequestGameSessionService_RegisterURLs)rmc.request;
+                    reqRegUrls.registerUrls(client);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

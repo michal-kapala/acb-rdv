@@ -3,22 +3,20 @@ using System.Text;
 
 namespace QuazalWV
 {
-    public class RMCPacketResponseRegisterEx : RMCPResponse
+    public class RMCPacketResponseSecureService_RegisterEx : RMCPResponse
     {
         public uint resultCode = 0x00010001;
         public uint connectionId = 79;
         public string clientUrl;
-        public RMCPacketResponseRegisterEx(ClientInfo client)
+        public RMCPacketResponseSecureService_RegisterEx(ClientInfo client)
         {
-            this.connectionId = client.RVCid;
+            connectionId = client.rvCID;
             clientUrl = $"prudps:/address={client.ep.Address};port={client.ep.Port};sid=15;type=3";
-            Log.WriteLine(1, $"[RMCPacketResponseRegisterEx] url_REGISTERING: ${clientUrl}", System.Drawing.Color.Red);
             client.Urls.Add(new StationUrl(clientUrl));
         }
 
         public override byte[] ToBuffer()
         {
-            
             MemoryStream m = new MemoryStream();
             Helper.WriteU32(m, resultCode);
             Helper.WriteU32(m, connectionId);

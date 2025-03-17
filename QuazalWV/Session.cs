@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 
 namespace QuazalWV
@@ -13,7 +12,7 @@ namespace QuazalWV
 		public uint HostPid { get; set; }
 		public List<StationUrl> HostUrls { get; set; }
 
-        public ClientInfo client;
+		public ClientInfo client;
 
 		public Session(uint sesId, GameSession ses, ClientInfo host)
 		{
@@ -25,13 +24,11 @@ namespace QuazalWV
 			};
 			PublicPids = new List<uint>();
 			PrivatePids = new List<uint>();
-            client = host;
+			client = host;
 			HostPid = host.PID;
-            foreach (var url in host.Urls)
-            {
-                Log.WriteLine(1, $"[AddedURL] URL added: ${url}", Color.Red);
-            }
-            HostUrls = host.Urls;
+			foreach (var url in host.Urls)
+				Log.WriteLine(1, $"[AddedURL] URL added: ${url}", Color.Red);
+			HostUrls = host.Urls;
 		}
 
 		public void AddParticipants(List<uint> publicPids, List<uint> privatePids)
@@ -119,16 +116,16 @@ namespace QuazalWV
 			return attrs;
 		}
 
-        internal void RemoveParticipants(List<uint> publicPids, List<uint> privatePids)
-        {
-            PublicPids.RemoveAll(item => publicPids.Contains(item));
-            PrivatePids.RemoveAll(item => privatePids.Contains(item));
+		public void RemoveParticipants(List<uint> publicPids, List<uint> privatePids)
+		{
+			PublicPids.RemoveAll(item => publicPids.Contains(item));
+			PrivatePids.RemoveAll(item => privatePids.Contains(item));
 
-            // update slot params
-            var currPublicSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPublicSlots);
-            currPublicSlots.Value = (uint)PublicPids.Count;
-            var currPrivateSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPrivateSlots);
-            currPrivateSlots.Value = (uint)PrivatePids.Count;
-        }
-    }
+			// update slot params
+			var currPublicSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPublicSlots);
+			currPublicSlots.Value = (uint)PublicPids.Count;
+			var currPrivateSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPrivateSlots);
+			currPrivateSlots.Value = (uint)PrivatePids.Count;
+		}
+	}
 }

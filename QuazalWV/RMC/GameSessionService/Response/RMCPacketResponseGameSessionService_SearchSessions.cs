@@ -22,8 +22,8 @@ namespace QuazalWV
 						HostUrls = ses.client.RegisteredUrls,
 						Attributes = ses.FilterAttributes()
 					};
-                    Log.WriteLine(1, $"[RMCXXXXX] SearchSessions results STUFF: {result}");
-                    Results.Add(result);
+					Log.WriteLine(1, $"[RMC GameSession] GameSessionSearchResult: {result}");
+					Results.Add(result);
 				}		
 			}
 		}
