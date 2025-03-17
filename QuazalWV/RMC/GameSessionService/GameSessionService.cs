@@ -11,23 +11,22 @@ namespace QuazalWV
             {
                 case 1:
                     rmc.request = new RMCPacketRequestGameSessionService_CreateSession(s);
-                    Log.WriteLine(1, "[RMC] CreateSession props:\n" + rmc.request.PayloadToString(), Color.Blue);
+                    Log.WriteLine(1, "[RMC GameSession] CreateSession props:\n" + rmc.request.PayloadToString(), Color.Blue);
                     break;
                 case 2:
                     rmc.request = new RMCPacketRequestGameSessionService_UpdateSession(s);
-                    Log.WriteLine(1, "[RMC] UpdateSession props:\n" + rmc.request.PayloadToString(), Color.Purple);
+                    Log.WriteLine(1, "[RMC GameSession] UpdateSession props:\n" + rmc.request.PayloadToString(), Color.Purple);
                     break;
                 case 4:
-                    //rmc.request = new RMCPacketRequestGameSessionService_MigrateSession(s);
-                    Log.WriteLine(1, $"[RMC GameSession] Error: Unknown Method MigrateSession {rmc.PayLoadToString()}", Color.Red);
+                    rmc.request = new RMCPacketRequestGameSessionService_MigrateSession(s);
                     break;
                 case 5:
                     rmc.request = new RMCPacketRequestGameSessionService_LeaveSession(s);
-                    Log.WriteLine(1, "[RMC] LeaveSession key:\n" + rmc.request.PayloadToString(), Color.Purple);
+                    Log.WriteLine(1, "[RMC GameSession] LeaveSession key:\n" + rmc.request.PayloadToString(), Color.Purple);
                     break;
                 case 7:
                     rmc.request = new RMCPacketRequestGameSessionService_SearchSessions(s);
-                    Log.WriteLine(1, "[RMC] SearchSessions query props:\n" + rmc.request.PayloadToString(), Color.Orange);
+                    Log.WriteLine(1, "[RMC GameSession] SearchSessions query props:\n" + rmc.request.PayloadToString(), Color.Orange);
                     break;
                 case 8:
                     rmc.request = new RMCPacketRequestGameSessionService_AddParticipants(s);
@@ -92,6 +91,12 @@ namespace QuazalWV
                     Global.Sessions.Find(session => session.Key.SessionId == reqUpdateSes.SessionUpdate.Key.SessionId)
                         .GameSession.Attributes = reqUpdateSes.SessionUpdate.Attributes;
                     reply = new RMCPResponseEmpty();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 4:
+                    var reqMigrate = (RMCPacketRequestGameSessionService_MigrateSession)rmc.request;
+                    // TODO: select new session, for now return the old key
+                    reply = new RMCPacketResponseGameSessionService_MigrateSession(reqMigrate.Key);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 5:
