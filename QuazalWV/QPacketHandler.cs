@@ -10,7 +10,10 @@ namespace QuazalWV
 {
     public static class QPacketHandler
     {
-        public static QPacket ProcessSYN(QPacket p, IPEndPoint ep, out ClientInfo client)
+		public static List<ulong> timeToIgnore = new List<ulong>();
+		public static Random rand = new Random();
+
+		public static QPacket ProcessSYN(QPacket p, IPEndPoint ep, out ClientInfo client)
         {
             client = Global.GetClientByEndPoint(ep);
             if (client == null)
@@ -138,9 +141,6 @@ namespace QuazalWV
             return reply;
         }
 
-
-        public static List<ulong> timeToIgnore = new List<ulong>();
-
         public static void ProcessPacket(string source, byte[] data, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload = false)
         {
             StringBuilder sb = new StringBuilder();
@@ -192,6 +192,7 @@ namespace QuazalWV
                             reply = ProcessPING(client, p);
                         break;
                     case QPacket.PACKETTYPE.NATPING:
+                        client = Global.GetClientByIDrecv(p.m_uiSignature);
                         ulong time = BitConverter.ToUInt64(p.payload, 5);
                         if (timeToIgnore.Contains(time))
                             timeToIgnore.Remove(time);
@@ -201,14 +202,15 @@ namespace QuazalWV
                             m = new MemoryStream();
                             byte b = (byte)(reply.payload[0] == 1 ? 0 : 1);
                             m.WriteByte(b);
-                            Helper.WriteU32(m, 0x1234); //RVCID
+                            uint rvcid = client.rvCID;
+                            Helper.WriteU32(m, rvcid); //RVCID
                             Helper.WriteU64(m, time);
                             reply.payload = m.ToArray();
                             Send(source, reply, ep, listener);
                             m = new MemoryStream();
                             b = (byte)(b == 1 ? 0 : 1);
                             m.WriteByte(b);
-                            Helper.WriteU32(m, 0x1234); //RVCID
+                            Helper.WriteU32(m, rvcid); //RVCID
                             time = Helper.MakeTimestamp();
                             timeToIgnore.Add(time);
                             Helper.WriteU64(m, Helper.MakeTimestamp());

@@ -3,13 +3,14 @@ using System.Text;
 
 namespace QuazalWV
 {
-    public class RMCPacketResponseRegisterEx : RMCPResponse
+    public class RMCPacketResponseSecureService_RegisterEx : RMCPResponse
     {
         public uint resultCode = 0x00010001;
-        public uint connectionId = 78;
+        public uint connectionId = 79;
         public string clientUrl;
-        public RMCPacketResponseRegisterEx(ClientInfo client)
+        public RMCPacketResponseSecureService_RegisterEx(ClientInfo client)
         {
+            connectionId = client.rvCID;
             clientUrl = $"prudps:/address={client.ep.Address};port={client.ep.Port};sid=15;type=3";
             client.Urls.Add(new StationUrl(clientUrl));
         }

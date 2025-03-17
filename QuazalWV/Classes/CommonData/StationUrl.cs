@@ -53,7 +53,7 @@ namespace QuazalWV
             CID = 1;
             PID = client.PID;
             SID = 1;
-            RVCID = 78;
+            RVCID = client.rvCID;
             Stream = 3;
             Type = 2;
         }

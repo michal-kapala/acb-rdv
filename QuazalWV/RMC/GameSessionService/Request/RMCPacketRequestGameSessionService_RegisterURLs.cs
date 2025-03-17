@@ -13,7 +13,11 @@ namespace QuazalWV
 			Urls = new List<StationUrl>();
 			uint count = Helper.ReadU32(s);
 			for (uint i = 0; i < count; i++)
-				Urls.Add(new StationUrl(Helper.ReadString(s)));
+			{
+				string b = Helper.ReadString(s);
+				Urls.Add(new StationUrl(b));
+				Log.WriteLine(2, $"[RMC GameSession] RegisterURLs - host URL: {b}");
+			}
 		}
 
 		public override string ToString()
@@ -36,6 +40,13 @@ namespace QuazalWV
 			foreach (StationUrl url in Urls)
 				Helper.WriteString(m, url.ToString());
 			return m.ToArray();
+		}
+
+		public void RegisterUrls(ClientInfo client)
+		{
+			client.RegisteredUrls.Clear();
+			foreach (StationUrl url in Urls)
+				client.RegisteredUrls.Add(url);
 		}
 	}
 }

@@ -29,5 +29,9 @@ namespace QuazalWV
             Helper.WriteU32(s, TypeId);
             Helper.WriteU32(s, SessionId);
         }
+        public override string ToString()
+        {
+            return $"[TypeId: {TypeId}, SessionId: {SessionId}]";
+        }
     }
 }

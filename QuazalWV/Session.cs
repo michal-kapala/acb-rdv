@@ -23,6 +23,8 @@ namespace QuazalWV
 			PublicPids = new List<uint>();
 			PrivatePids = new List<uint>();
 			HostPid = host.PID;
+			foreach (var url in host.Urls)
+				Log.WriteLine(2, $"[Session] Host URL added: ${url}", Color.Green);
 			HostUrls = host.Urls;
 		}
 
@@ -30,12 +32,7 @@ namespace QuazalWV
 		{
 			PublicPids.AddRange(publicPids);
 			PrivatePids.AddRange(privatePids);
-
-			// update slot params
-			var currPublicSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPublicSlots);
-			currPublicSlots.Value = (uint)PublicPids.Count;
-			var currPrivateSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPrivateSlots);
-			currPrivateSlots.Value = (uint)PrivatePids.Count;
+			UpdateCurrentSlots();
 		}
 
 		public bool CheckQuery(GameSessionQuery query)
@@ -109,6 +106,49 @@ namespace QuazalWV
 				attrs.Add(attr);
 			}
 			return attrs;
+		}
+
+		public void RemoveParticipants(List<uint> publicPids, List<uint> privatePids)
+		{
+			PublicPids.RemoveAll(item => publicPids.Contains(item));
+			PrivatePids.RemoveAll(item => privatePids.Contains(item));
+			UpdateCurrentSlots();
+		}
+
+		public void Leave(ClientInfo client)
+		{
+			PublicPids.Remove(client.PID);
+			PrivatePids.Remove(client.PID);
+			UpdateCurrentSlots();
+			// host left - assign new host (migrate?)
+			if (client.PID == HostPid)
+			{
+				if (PublicPids.Count > 0)
+					HostPid = PublicPids[0];
+				else
+					HostPid = PrivatePids[0];
+				Log.WriteLine(1, $"[Session] On-leave host migration from {client.PID} to {HostPid}", Color.Orange);
+				var newHost = Global.Clients.Find(c => c.PID == HostPid);
+				if (newHost == null)
+				{
+					Log.WriteLine(1, $"[Session] On-leave host migration elected non-existent host {HostPid}", Color.Red);
+					return;
+				}
+				HostUrls = newHost.RegisteredUrls;	
+			}
+		}
+
+		public uint NbParticipants()
+		{
+			return (uint)(PublicPids.Count + PrivatePids.Count);
+		}
+
+		private void UpdateCurrentSlots()
+		{
+			var currPublicSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPublicSlots);
+			currPublicSlots.Value = (uint)PublicPids.Count;
+			var currPrivateSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPrivateSlots);
+			currPrivateSlots.Value = (uint)PrivatePids.Count;
 		}
 	}
 }
