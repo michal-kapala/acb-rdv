@@ -96,8 +96,15 @@ namespace QuazalWV
                     break;
                 case 5:
                     var reqLeaveSes = (RMCPacketRequestGameSessionService_LeaveSession)rmc.request;
-                    Global.Sessions.Find(session => session.Key.SessionId == reqLeaveSes.Key.SessionId)
-                        .GameSession=null;
+                    var leftSes = Global.Sessions.Find(session => session.Key.SessionId == reqLeaveSes.Key.SessionId);
+                    // delete the session if empty
+                    if (leftSes.NbParticipants() == 1)
+                    {
+                        Global.Sessions.Remove(leftSes);
+                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.PID}", Color.Gray);
+                    }
+                    else
+                        leftSes.Leave(client);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
@@ -114,8 +121,6 @@ namespace QuazalWV
                     Global.Sessions.Find(session => session.Key.SessionId == reqAddParticip.Key.SessionId)
                         .AddParticipants(reqAddParticip.PublicPids, reqAddParticip.PrivatePids);
                     reply = new RMCPResponseEmpty();
-                    Log.WriteLine(1, $"[RMC] Addparticipant query public pids: {string.Join(", ",reqAddParticip.PublicPids)}", Color.Green);
-                    Log.WriteLine(1, $"[RMC] Addparticipant query private pids: {string.Join(", ", reqAddParticip.PrivatePids)}", Color.Green);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 9:
@@ -123,8 +128,6 @@ namespace QuazalWV
                     Global.Sessions.Find(session => session.Key.SessionId == reqRemoveParticip.Key.SessionId)
                         .RemoveParticipants(reqRemoveParticip.PublicPids, reqRemoveParticip.PrivatePids);
                     reply = new RMCPResponseEmpty();
-                    Log.WriteLine(1, $"[RMC] RemoveParticipant query public pids: {string.Join(", ", reqRemoveParticip.PublicPids)}", Color.Green);
-                    Log.WriteLine(1, $"[RMC] RemoveParticipant query private pids: {string.Join(", ", reqRemoveParticip.PrivatePids)}", Color.Green);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 12:
