@@ -203,7 +203,6 @@ namespace QuazalWV
                             byte b = (byte)(reply.payload[0] == 1 ? 0 : 1);
                             m.WriteByte(b);
                             uint rvcid = client.rvCID;
-                            Log.WriteLine(1, "[rvcid] received : " + rvcid.ToString());
                             Helper.WriteU32(m, rvcid); //RVCID
                             Helper.WriteU64(m, time);
                             reply.payload = m.ToArray();

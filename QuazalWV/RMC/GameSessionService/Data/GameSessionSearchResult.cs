@@ -20,7 +20,6 @@ namespace QuazalWV
 		{
 			HostUrls = new List<StationUrl>();
 			Attributes = new List<Property>();
-            Log.WriteLine(1, $"[XXXXXXXXXXXXXXXXXXXXXXX] Here should be searchresults");
             FromStream(s);
 		}
 
@@ -28,14 +27,10 @@ namespace QuazalWV
 		{
 			Key = new GameSessionKey(s);
 			HostPid = Helper.ReadU32(s);
-
 			uint count = Helper.ReadU32(s);
 			for (uint i = 0; i < count; i++)
-			{
-				var url = new StationUrl(Helper.ReadString(s));
-				HostUrls.Add(url);
-				Log.WriteLine(1, $"[StationURL] URL is: {url}");
-			}
+				HostUrls.Add(new StationUrl(Helper.ReadString(s)));
+			
 			count = Helper.ReadU32(s);
 			for (uint i = 0; i < count; i++)
 				Attributes.Add(new Property(s));

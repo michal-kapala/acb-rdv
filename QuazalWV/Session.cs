@@ -24,7 +24,7 @@ namespace QuazalWV
 			PrivatePids = new List<uint>();
 			HostPid = host.PID;
 			foreach (var url in host.Urls)
-				Log.WriteLine(1, $"[Session] Host URL added: ${url}", Color.Red);
+				Log.WriteLine(2, $"[Session] Host URL added: ${url}", Color.Green);
 			HostUrls = host.Urls;
 		}
 

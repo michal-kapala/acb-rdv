@@ -27,7 +27,7 @@ namespace QuazalWV
 						HostUrls = host != null ? host.RegisteredUrls : new List<StationUrl>(),
 						Attributes = ses.FilterAttributes()
 					};
-					Log.WriteLine(1, $"[RMC GameSession] GameSessionSearchResult: {result}");
+					Log.WriteLine(2, $"[RMC GameSession] GameSessionSearchResult: {result}");
 					Results.Add(result);
 				}		
 			}

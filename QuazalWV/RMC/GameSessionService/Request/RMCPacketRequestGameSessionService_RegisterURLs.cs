@@ -16,7 +16,7 @@ namespace QuazalWV
 			{
 				string b = Helper.ReadString(s);
 				Urls.Add(new StationUrl(b));
-				Log.WriteLine(1, $"[URL gotten from host]: {b}");
+				Log.WriteLine(2, $"[RMC GameSession] RegisterURLs - host URL: {b}");
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace QuazalWV
 			return m.ToArray();
 		}
 
-		public void registerUrls(ClientInfo client)
+		public void RegisterUrls(ClientInfo client)
 		{
 			client.RegisteredUrls.Clear();
 			foreach (StationUrl url in Urls)
