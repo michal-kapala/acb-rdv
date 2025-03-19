@@ -55,7 +55,9 @@ namespace QuazalWV
                                 if (user.Password == h.password)
                                 {
                                     reply = new RMCPacketResponseLoginCustomData(client.PID, client.sPID, client.sPort);
-                                    client.PID = user.Pid;
+                                    user.Pid = client.PID;
+                                    Global.RemoveSessionsOnLogin( client);
+                                    //to do kick everyone that has joined the sessions hosted by the guy who logged in again
                                     client.User = user;
                                     client.sessionKey = ((RMCPacketResponseLoginCustomData)reply).ticket.sessionKey;
                                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);

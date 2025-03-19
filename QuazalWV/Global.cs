@@ -2,6 +2,7 @@
 using System.Net;
 using System.Diagnostics;
 using System.Configuration;
+using System;
 
 namespace QuazalWV
 {
@@ -58,6 +59,13 @@ namespace QuazalWV
         private static void WriteLog(int priority, string s)
         {
             Log.WriteLine(priority, "[Global] " + s);
+        }
+
+        internal static void RemoveSessionsOnLogin(ClientInfo client)
+        {
+            client.RegisteredUrls.Clear();
+            client.Urls.Clear();
+            Sessions.RemoveAll(s => s.username == client.User.Name);
         }
     }
 }
