@@ -5,8 +5,7 @@ namespace QuazalWV
 {
 	public class Session
 	{
-        public string username { get; private set; }
-        public GameSession GameSession { get; set; }
+		public GameSession GameSession { get; set; }
 		public GameSessionKey Key { get; set; }
 		public List<uint> PublicPids {  get; set; }
 		public List<uint> PrivatePids { get; set; }
@@ -15,8 +14,7 @@ namespace QuazalWV
 
 		public Session(uint sesId, GameSession ses, ClientInfo host)
 		{
-            username = host.User.Name;
-            GameSession = ses;
+			GameSession = ses;
 			Key = new GameSessionKey
 			{
 				TypeId = ses.TypeId,

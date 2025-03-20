@@ -2,7 +2,6 @@
 using System.Net;
 using System.Diagnostics;
 using System.Configuration;
-using System;
 
 namespace QuazalWV
 {
@@ -65,7 +64,7 @@ namespace QuazalWV
         {
             client.RegisteredUrls.Clear();
             client.Urls.Clear();
-            Sessions.RemoveAll(s => s.username == client.User.Name);
+            Sessions.RemoveAll(s => s.HostPid == client.PID);
         }
     }
 }
