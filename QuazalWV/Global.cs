@@ -59,5 +59,12 @@ namespace QuazalWV
         {
             Log.WriteLine(priority, "[Global] " + s);
         }
+
+        internal static void RemoveSessionsOnLogin(ClientInfo client)
+        {
+            client.RegisteredUrls.Clear();
+            client.Urls.Clear();
+            Sessions.RemoveAll(s => s.HostPid == client.PID);
+        }
     }
 }
