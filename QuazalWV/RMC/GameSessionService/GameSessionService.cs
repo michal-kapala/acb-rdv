@@ -65,6 +65,7 @@ namespace QuazalWV
                     uint sesId = Global.NextGameSessionId++;
                     var ses = new Session(sesId, reqCreateSes.Session, client);
                     // initialize params
+                    Log.WriteLine(1, $"[Session]created session (id={ses.Key.SessionId} client {client.User.Name} user pid {client.User.Pid}) :)", Color.Red, client);
                     var gameType = ses.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
                     if (gameType == null)
                         Log.WriteLine(1, $"[Session] Inconsistent session state (id={ses.Key.SessionId}), missing game type", Color.Red, client);
