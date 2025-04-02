@@ -65,7 +65,7 @@ namespace QuazalWV
         {
             client.RegisteredUrls.Clear();
             client.Urls.Clear();
-            Sessions.RemoveAll(s => s.username == client.User.Name);
+            Sessions.RemoveAll(s => s.HostPid == client.PID);
         }
     }
 }
