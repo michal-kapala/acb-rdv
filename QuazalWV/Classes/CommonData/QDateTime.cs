@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 
 namespace QuazalWV
@@ -7,7 +8,6 @@ namespace QuazalWV
     {
         public ulong RawTime { get; set; }
         public DateTime Time { get; set; }
-
         const uint MonthMask = 0x3C00000;
         const uint DayMask = 0x3E0000;
         const uint HourMask = 0x1F000;
@@ -23,12 +23,18 @@ namespace QuazalWV
         public QDateTime(Stream s)
         {
             FromStream(s);
-            Time = ToDateTime(RawTime);
+            if (RawTime != 0 && ( (RawTime >> 56 & 0xff ) != 0xff ) )
+                Time = ToDateTime(RawTime);
+            else
+            {
+                Log.WriteLine(1, $"[QDateTime] Invalid time: {RawTime}", Color.Red);
+                Time = DateTime.Now;
+            }
         }
 
         public void FromStream(Stream s)
         {
-            RawTime = Helper.ReadU64(s);
+            RawTime = Helper.ReadU64DateTime(s);
         }
 
         public void ToBuffer(Stream s)

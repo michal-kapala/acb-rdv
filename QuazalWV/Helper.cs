@@ -2,8 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text;  
 using System.Security.Cryptography;
 using Ionic.Zlib;
 
@@ -56,6 +55,13 @@ namespace QuazalWV
                           ((byte)s.ReadByte() << 48) |
                           ((byte)s.ReadByte() << 56));
         }
+
+        public static ulong ReadU64DateTime(Stream s)
+        {
+            BinaryReader reader = new BinaryReader(s);
+            return reader.ReadUInt64();
+        }
+
 
         public static float ReadFloat(Stream s)
         {

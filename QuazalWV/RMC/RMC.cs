@@ -125,6 +125,9 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.UplayWinService:
                     UplayWinService.HandleRequest(p, rmc, client);
                     break;
+                case RMCP.PROTOCOL.VirginService:
+                    VirginService.HandleRequest(p, rmc, client);
+                    break;
                 default:
                     WriteLog(1, $"Error: No handler implemented for packet protocol {rmc.proto}");
                     break;
@@ -174,6 +177,9 @@ namespace QuazalWV
                     break;
                 case RMCP.PROTOCOL.LocalizationService:
                     LocalizationService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.VirginService:
+                    VirginService.ProcessRequest(m, rmc, client);
                     break;
                 case RMCP.PROTOCOL.GameSessionService:
                     GameSessionService.ProcessRequest(m, rmc, client);

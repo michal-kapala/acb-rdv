@@ -135,6 +135,7 @@
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByPlayerNames.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRangeForPlayer.cs" />
     <Compile Include="RMC\HermesPlayerStatisticsService\Response\RMCPacketResponseHermesPlayerStatisticsService_ReadStatsLeaderboardByRange.cs" />
+    <Compile Include="RMC\HermesPlayerStatisticsService\Request\RMCPacketRequestHermesPlayerStatisticsService_SendPlayerStats.cs" />
     <Compile Include="RMC\MessageDeliveryService\Data\TextMessage.cs" />
     <Compile Include="RMC\MessageDeliveryService\MessageDeliveryService.cs" />
     <Compile Include="RMC\MessageDeliveryService\Request\RMCPacketRequestMessageDeliveryService_DeliverMessage.cs" />
@@ -227,6 +228,9 @@
     <Compile Include="RMC\UplayWinService\Request\RMCPacketRequestUplayWinService_GetRewards.cs" />
     <Compile Include="RMC\UplayWinService\Response\RMCPacketResponseUplayWinService_GetRewards.cs" />
     <Compile Include="RMC\UplayWinService\UplayWinService.cs" />
+    <Compile Include="RMC\VirginService\Data\VirginInfo.cs" />
+    <Compile Include="RMC\VirginService\Request\RMCPacketRequestVirginService_SendVirginInfo.cs" />
+    <Compile Include="RMC\VirginService\VirginService.cs" />
     <Compile Include="Session.cs" />
   </ItemGroup>
   <ItemGroup>
