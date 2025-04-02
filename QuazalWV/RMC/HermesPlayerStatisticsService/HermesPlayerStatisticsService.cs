@@ -10,11 +10,9 @@ namespace QuazalWV
 			switch (rmc.methodID)
 			{
 				case 2:
-                    rmc.request = new RMCPacketRequestHermesPlayerStatisticsService_SendPlayerStats(s);
-					Log.WriteLine(1, "[RMC HermesSendPlayerStats ] recv");
-
+					rmc.request = new RMCPacketRequestHermesPlayerStatisticsService_SendPlayerStats(s);
                     break;
-                case 3:
+				case 3:
 					rmc.request = new RMCPacketRequestHermesPlayerStatisticsService_ReadPlayerStats(s);
 					break;
 				case 4:
@@ -37,12 +35,11 @@ namespace QuazalWV
 			RMCPResponse reply;
 			switch (rmc.methodID)
 			{
-                case 2:
-                    Log.WriteLine(1, "[RMC HermesSendPlayerStats ] sent back");
-                    reply = new RMCPResponseEmpty();
-                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
-                    break;
-                case 3:
+				case 2:
+					reply = new RMCPResponseEmpty();
+					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+					break;
+				case 3:
 					var reqReadPlayerStats = (RMCPacketRequestHermesPlayerStatisticsService_ReadPlayerStats)rmc.request;
 					reply = new RMCPacketResponseHermesPlayerStatisticsService_ReadPlayerStats(client, reqReadPlayerStats.Queries);
 					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);

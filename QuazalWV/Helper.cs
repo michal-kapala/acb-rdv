@@ -2,11 +2,9 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text;  
 using System.Security.Cryptography;
 using Ionic.Zlib;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace QuazalWV
 {
@@ -58,18 +56,10 @@ namespace QuazalWV
                           ((byte)s.ReadByte() << 56));
         }
 
-        public static ulong ReadU64Datetime(Stream s)
+        public static ulong ReadU64DateTime(Stream s)
         {
             BinaryReader reader = new BinaryReader(s);
             return reader.ReadUInt64();
-            //return (ulong)((byte)s.ReadByte() |
-            //              ((byte)s.ReadByte() << 8) |
-            //              ((byte)s.ReadByte() << 16) |
-            //              ((byte)s.ReadByte() << 24) |
-            //              ((byte)s.ReadByte() << 32) |
-            //              ((byte)s.ReadByte() << 40) |
-            //              ((byte)s.ReadByte() << 48) |
-            //              ((byte)s.ReadByte() << 56));
         }
 
 
