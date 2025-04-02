@@ -62,7 +62,6 @@ namespace QuazalWV
             return reader.ReadUInt64();
         }
 
-
         public static float ReadFloat(Stream s)
         {
             byte[] b = new byte[4];

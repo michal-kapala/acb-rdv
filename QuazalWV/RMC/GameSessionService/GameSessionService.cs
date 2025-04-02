@@ -65,8 +65,8 @@ namespace QuazalWV
                     uint sesId = Global.NextGameSessionId++;
                     var ses = new Session(sesId, reqCreateSes.Session, client);
                     Log.WriteLine(1, $"[RMC GameSession] New session (id={ses.Key.SessionId})", Color.Blue, client);
-					// initialize params
-					var gameType = ses.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
+                    // initialize params
+                    var gameType = ses.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
                     if (gameType == null)
                         Log.WriteLine(1, $"[Session] Inconsistent session state (id={ses.Key.SessionId}), missing game type", Color.Red, client);
                     var currPublicSlots = new Property() { Id = (uint)SessionParam.CurrentPublicSlots, Value = 0 };

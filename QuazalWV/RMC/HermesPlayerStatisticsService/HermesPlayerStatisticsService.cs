@@ -11,7 +11,7 @@ namespace QuazalWV
 			{
 				case 2:
 					rmc.request = new RMCPacketRequestHermesPlayerStatisticsService_SendPlayerStats(s);
-                    break;
+					break;
 				case 3:
 					rmc.request = new RMCPacketRequestHermesPlayerStatisticsService_ReadPlayerStats(s);
 					break;

@@ -8,15 +8,15 @@ namespace QuazalWV
 
         public RMCPacketRequestVirginService_SendVirginInfo(Stream s)
         {
-			Info = new VirginInfo(s);
+            Info = new VirginInfo(s);
         }
 
-		public override string PayloadToString()
-		{
-			return Info.ToString();
-		}
+        public override string PayloadToString()
+        {
+            return Info.ToString();
+        }
 
-		public override string ToString()
+        public override string ToString()
         {
             return "[SendVirginInfo Request] ";
         }
