@@ -11,6 +11,8 @@ namespace QuazalWV
         public uint sPID;
         public ushort sPort;
         public uint IDrecv;
+        public uint GameSessionID;
+        public bool InGameSession = false;
         public uint rvCID = (uint)rand.Next();
         public uint IDsend;
         public byte sessionID;

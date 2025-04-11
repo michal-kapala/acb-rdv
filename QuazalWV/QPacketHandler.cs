@@ -294,7 +294,8 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, "[Processing Packet] Something went wrong: " + ex.Message, Color.Red);
+                        Log.WriteLine(1, "[Processing Packet] Something went wrong2: " + ex.Message, Color.Red);
+                        Log.WriteLine(1, ex.StackTrace,Color.Purple);
                     }
                 }
                 else 
@@ -308,7 +309,8 @@ namespace QuazalWV
                         }
                         catch (Exception ex)
                         {
-                            Log.WriteLine(1, "[Processing Packet] Something went wrong: " + ex.Message,Color.Red);
+                            Log.WriteLine(1, "[Processing Packet] Something went wrong2: " + ex.Message,Color.Red);
+                            Log.WriteLine(1, ex.StackTrace, Color.Purple);
                         }
                     }
 

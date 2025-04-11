@@ -115,10 +115,9 @@ namespace QuazalWV
 			return attrs;
 		}
 
-		public void RemoveParticipants(List<uint> publicPids, List<uint> privatePids)
+		public void RemoveParticipants(List<uint> publicPids)
 		{
 			PublicPids.RemoveAll(item => publicPids.Contains(item));
-			PrivatePids.RemoveAll(item => privatePids.Contains(item));
 			UpdateCurrentSlots();
 		}
 
@@ -153,9 +152,35 @@ namespace QuazalWV
 		private void UpdateCurrentSlots()
 		{
 			var currPublicSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPublicSlots);
-			currPublicSlots.Value = (uint)PublicPids.Count;
-			var currPrivateSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPrivateSlots);
-			currPrivateSlots.Value = (uint)PrivatePids.Count;
+            Log.WriteLine(1, $"[RMC] GameSession: {GameSession}", Color.HotPink);
+
+            Log.WriteLine(1, $"[RMC] SearchSessions results: {currPublicSlots}",Color.Purple);
+            Log.WriteLine(1, $"[RMC] SearchSessions results: {PublicPids.Count}",Color.Red);
+			if (currPublicSlots == null)
+			{
+                GameSession.Attributes.Add(new Property((uint)SessionParam.CurrentPublicSlots,(uint) PublicPids.Count));
+                Log.WriteLine(1, $"[RMC] -------This should not happen -----", Color.Purple);
+            }
+            else
+            {
+                currPublicSlots.Value = (uint)PublicPids.Count;
+
+            }
+
+            var currPrivateSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPrivateSlots);
+            if (currPrivateSlots == null)
+            {
+                GameSession.Attributes.Add(new Property((uint)SessionParam.CurrentPrivateSlots, (uint)PrivatePids.Count));
+                Log.WriteLine(1, $"[RMC] -------This should not happen -----", Color.Purple);
+
+            }
+            else
+            {
+                currPrivateSlots.Value = (uint)PrivatePids.Count;
+
+            }
+            
 		}
-	}
+
+    }
 }

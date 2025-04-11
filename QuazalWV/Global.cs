@@ -20,7 +20,7 @@ namespace QuazalWV
         public static Stopwatch uptime = new Stopwatch();
         public static uint NextGameSessionId { get; set; } = 1;
         public static List<Session> Sessions { get; set; } = new List<Session>();
-
+        public static List<GameSession> GameSessions { get; set; } = new List<GameSession>();
         public static ClientInfo GetClientByEndPoint(IPEndPoint ep)
         {
             foreach (ClientInfo c in Clients)

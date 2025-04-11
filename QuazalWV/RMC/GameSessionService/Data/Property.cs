@@ -18,8 +18,13 @@ namespace QuazalWV
 		{
 			FromStream(s);
 		}
+        public Property(uint id,uint value)
+        {
+            Id = id;
+            Value = value;
+        }
 
-		public void FromStream(Stream s)
+        public void FromStream(Stream s)
 		{
 			Id = Helper.ReadU32(s);
 			Value = Helper.ReadU32(s);

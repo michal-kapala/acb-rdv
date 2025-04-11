@@ -16,11 +16,7 @@ namespace QuazalWV
             uint count = Helper.ReadU32(s);
             for (uint i = 0; i < count; i++)
                 PublicPids.Add(Helper.ReadU32(s));
-
-            PrivatePids = new List<uint>();
-            count = Helper.ReadU32(s);
-            for (uint i = 0; i < count; i++)
-                PrivatePids.Add(Helper.ReadU32(s));
+;
         }
 
         public override string PayloadToString()
@@ -34,9 +30,6 @@ namespace QuazalWV
             Key.ToBuffer(m);
             Helper.WriteU32(m, (uint)PublicPids.Count);
             foreach (uint pid in PublicPids)
-                Helper.WriteU32(m, pid);
-            Helper.WriteU32(m, (uint)PrivatePids.Count);
-            foreach (uint pid in PrivatePids)
                 Helper.WriteU32(m, pid);
             return m.ToArray();
         }
