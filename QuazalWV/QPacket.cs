@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
 
 namespace QuazalWV
 {
     public class QPacket
     {
+        public bool packet_processed = false;
+        public bool packet_began_processing = false;
         public enum STREAMTYPE
         {
             Unused,
@@ -82,10 +86,73 @@ namespace QuazalWV
         public byte checkSum;
         public bool usesCompression = true;
         public uint realSize;
-
+        public string source;
+        public IPEndPoint ep;
+        public UdpClient listener;
+        public uint serverPID;
+        public ushort listenPort;
+        public bool removeConnectPayload;
+        public byte[] data;
         public QPacket()
         {
         }
+
+
+
+        public QPacket(byte[] data, string source, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload)
+        {
+            this.ep = ep;
+            this.listener = listener;
+            this.serverPID = serverPID;
+            this.listenPort = listenPort;
+            this.removeConnectPayload = removeConnectPayload;
+            this.data = data;
+            MemoryStream m = new MemoryStream(data);
+            m_oSourceVPort = new VPort(Helper.ReadU8(m));
+            m_oDestinationVPort = new VPort(Helper.ReadU8(m));
+            m_byPacketTypeFlags = Helper.ReadU8(m);
+            type = (PACKETTYPE)(m_byPacketTypeFlags & 0x7);
+            flags = new List<PACKETFLAG>();
+            ExtractFlags();
+            m_bySessionID = Helper.ReadU8(m);
+            m_uiSignature = Helper.ReadU32(m);
+            uiSeqId = Helper.ReadU16(m);
+            if (type == PACKETTYPE.SYN || type == PACKETTYPE.CONNECT)
+                m_uiConnectionSignature = Helper.ReadU32(m);
+            if (type == PACKETTYPE.DATA)
+                m_byPartNumber = Helper.ReadU8(m);
+            if (flags.Contains(PACKETFLAG.FLAG_HAS_SIZE))
+                payloadSize = Helper.ReadU16(m);
+            else
+                payloadSize = (ushort)(m.Length - m.Position - 1);
+            MemoryStream pl = new MemoryStream();
+            if (payloadSize != 0)
+                for (int i = 0; i < payloadSize; i++)
+                    pl.WriteByte(Helper.ReadU8(m));
+            payload = pl.ToArray();
+            if (payload != null && payload.Length > 0 && type != PACKETTYPE.SYN && m_oSourceVPort.type != STREAMTYPE.NAT)
+            {
+                if (m_oSourceVPort.type == STREAMTYPE.OldRVSec)
+                    payload = Helper.Decrypt(Global.keyDATA, payload);
+                usesCompression = payload[0] != 0;
+                if (usesCompression)
+                {
+                    MemoryStream m2 = new MemoryStream();
+                    m2.Write(payload, 1, payload.Length - 1);
+                    payload = Helper.Decompress(m2.ToArray());
+                }
+                else
+                {
+                    MemoryStream m2 = new MemoryStream();
+                    m2.Write(payload, 1, payload.Length - 1);
+                    payload = m2.ToArray();
+                }
+                payloadSize = (ushort)payload.Length;
+            }
+            checkSum = Helper.ReadU8(m);
+            realSize = (uint)m.Position;
+        }
+
 
         public QPacket(byte[] data)
         {
@@ -158,9 +225,9 @@ namespace QuazalWV
             }
             if (type == PACKETTYPE.SYN || (type == PACKETTYPE.CONNECT && payload.Length > 0))
                 Helper.WriteU32(m, m_uiConnectionSignature);
-            if(type == PACKETTYPE.DATA)
+            if (type == PACKETTYPE.DATA)
                 Helper.WriteU8(m, m_byPartNumber);
-            
+
             if (tmpPayload != null && tmpPayload.Length > 0 && type != PACKETTYPE.SYN && m_oSourceVPort.type != STREAMTYPE.NAT)
             {
                 if (usesCompression)
@@ -207,7 +274,7 @@ namespace QuazalWV
             {
                 case 3:
                     return 0xB5;
-                    //return 0xE3;
+                //return 0xE3;
                 case 1:
                 case 5:
                 default:
@@ -258,13 +325,13 @@ namespace QuazalWV
         {
             StringBuilder sb = new StringBuilder();
             foreach (PACKETFLAG flag in flags)
-                sb.Append("[" + flag.ToString().Replace("FLAG_","") + "]");
+                sb.Append("[" + flag.ToString().Replace("FLAG_", "") + "]");
             return sb.ToString();
         }
 
         public string ToStringDetailed()
         {
-            StringBuilder sb = new StringBuilder();            
+            StringBuilder sb = new StringBuilder();
             sb.AppendLine("UDPPacket {");
             sb.AppendLine("\tFrom         : " + m_oSourceVPort);
             sb.AppendLine("\tTo           : " + m_oDestinationVPort);
@@ -285,7 +352,7 @@ namespace QuazalWV
             sb.AppendLine();
             sb.AppendLine("\tChecksum     : 0x" + checkSum.ToString("X2"));
             sb.AppendLine("}");
-            return sb.ToString();     
+            return sb.ToString();
         }
 
         public string ToStringShort()
