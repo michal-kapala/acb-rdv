@@ -11,247 +11,56 @@ using System.Linq;
 
 namespace QuazalWV
 {
+    
+    public class ExpiringLockManager<TKey>
+    {
+        private class LockWrapper
+        {
+            public object LockObject { get; } = new object();
+            public DateTime LastUsed { get; set; } = DateTime.UtcNow;
+        }
+
+        private readonly ConcurrentDictionary<TKey, LockWrapper> _locks = new ConcurrentDictionary<TKey, LockWrapper>();
+        private readonly TimeSpan _expiration;
+        private readonly Timer _cleanupTimer;
+
+        public ExpiringLockManager(TimeSpan expiration, TimeSpan cleanupInterval)
+        {
+            _expiration = expiration;
+            _cleanupTimer = new Timer(Cleanup, null, cleanupInterval, cleanupInterval);
+        }
+
+        public object GetLock(TKey key)
+        {
+            var wrapper = _locks.GetOrAdd(key, _ => new LockWrapper());
+            wrapper.LastUsed = DateTime.UtcNow;
+            return wrapper.LockObject;
+        }
+
+        private void Cleanup(object state)
+        {
+            var now = DateTime.UtcNow;
+            foreach (var kvp in _locks)
+            {
+                if (now - kvp.Value.LastUsed > _expiration)
+                {
+                    Log.WriteLine(1, "removed lock which was no longer used", Color.Red);
+                    _locks.TryRemove(kvp.Key, out _);
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            _cleanupTimer.Dispose();
+        }
+    }
     public static class QPacketHandler
     {
         public static List<ulong> timeToIgnore = new List<ulong>();
         public static Random rand = new Random();
-        private static ConcurrentDictionary<uint, List<QPacket>> sessionPackets = new ConcurrentDictionary<uint, List<QPacket>>();
-        private static readonly object _lock = new object();
+        private static ExpiringLockManager<IPAddress> lockManager = new ExpiringLockManager<IPAddress>(  expiration: TimeSpan.FromMinutes(5), cleanupInterval: TimeSpan.FromMinutes(1) );
 
-
-        //check if parameters were already processed
-        public static bool IsCorrectPacket(QPacket pack, uint lastorder)
-        {
-
-            if (pack.uiSeqId == 1 && pack.packet_processed == false && pack.packet_began_processing == false)
-            {
-                //Log.WriteLine(1, $"[QUAZAL Packet Handler] Treating first packet  {pack.uiSeqId} connid {pack.m_bySessionID}");
-                return true;
-            }
-            if (pack.uiSeqId == lastorder + 1)
-            {
-                //Log.WriteLine(1, $"[QUAZAL Packet Handler] Treating middle packet {pack.uiSeqId} connid {pack.m_bySessionID}");
-                return true;
-            }
-            return false;
-
-        }
-
-        public static (QPacket, bool) FetchUnusedQpackets()
-        {
-            //Log.WriteLine(1, "[QUAZAL Packet Handler] Searching for untreated packets");
-            lock (_lock)  // Ensure thread-safety
-            {
-                foreach (var ConPack in sessionPackets)
-                {
-                    List<QPacket> valueList = ConPack.Value;
-
-                    if (valueList[0].packet_processed == false && IsCorrectPacket(valueList[0], 0))
-                    {
-                        return (valueList[0], true);
-                    }
-                    else
-                    if (valueList[0].uiSeqId != 1)
-                    {
-                        //Log.WriteLine(5, $"[QUAZAL Packet Handler] Cannot treat packet {valueList[0].uiSeqId} connid {valueList[0].m_bySessionID}");
-                        continue;
-                    }
-
-                    for (int it = 1; it < valueList.Count; it++)
-                    {
-                        QPacket pastVal = valueList[it - 1];
-
-                        if (IsCorrectPacket(valueList[it], pastVal.uiSeqId))
-                        {
-                            return (valueList[it], true);
-                        }
-                        else if (valueList[it].uiSeqId != pastVal.uiSeqId + 1)
-                        {
-                            Log.WriteLine(1, $"[QUAZAL Packet Handler] Found out of order packet {valueList[0].uiSeqId} connid {valueList[0].m_bySessionID}");
-                            break;
-                        }
-                    }
-                }
-
-            }
-            return (new QPacket(), false);
-        }
-        //assumption 0 order does not matter
-        // 1 is the first sequence and will reset the whole traffic
-        // to treat old seqid after new seqid for same connection being reused
-        public static void InsertPacket(QPacket packet, List<QPacket> packetlist)
-        {
-            for (int i = 0; i < packetlist.Count; i++)
-            {
-                if (packetlist[i].uiSeqId > packet.uiSeqId)
-                {
-                    //Log.WriteLine(1, $"[QUAZAL Packet Handler] insert {packet.uiSeqId} connid {packet.m_bySessionID}");
-                    packetlist.Insert(i, packet);
-                    return;
-
-                }
-            }
-            //Log.WriteLine(1, $"[QUAZAL Packet Handler] This should not happen 4 {packet.uiSeqId} ");
-
-        }
-        public static void DumpPacketQueue(ConcurrentDictionary<uint, List<QPacket>> packetqueue)
-        {
-
-            foreach (var kvp in packetqueue)
-            {
-                //Log.WriteLine(1, $"Key: {kvp.Key}");
-                //Log.WriteLine(1, "Values: " + string.Join(", ", kvp.Value.Select(p => p.uiSeqId)));
-                //Log.WriteLine(1, ""); // For better formatting
-            }
-        }
-        public static void HandleQpacket(QPacket packet)//(QPacket,bool)
-        {
-            DumpPacketQueue(sessionPackets);
-            int i;
-            if (packet.uiSeqId == 0 || packet.m_bySessionID == 0)
-            {
-                ProcessQpacket(packet);
-                return;
-            }
-            lock (_lock)  // Ensure thread-safety
-            {
-                // If the key doesn't exist, create a new list for it
-                if (!sessionPackets.ContainsKey(packet.m_bySessionID))
-                {
-                    sessionPackets[packet.m_bySessionID] = new List<QPacket>();
-                    sessionPackets[packet.m_bySessionID].Add(packet);
-                    DumpPacketQueue(sessionPackets);
-                    if (packet.packet_processed == false && packet.packet_began_processing == false && packet.uiSeqId == 1)
-                    {
-                        //Log.WriteLine(1, $"[QUAZAL Packet Handler] processing x1 {packet.uiSeqId}");
-                        ProcessQpacket(packet);
-                        return;
-                    }
-
-                }
-                else
-                {
-                    List<QPacket> sessionlist = sessionPackets[packet.m_bySessionID];
-                    if (packet.uiSeqId == 1)
-                    {
-                        //Log.WriteLine(1, $"[QUAZAL Packet Handler] Resetting the connid {packet.m_bySessionID}");
-                        for (i = 1; i < sessionlist.Count; i++)
-                        {
-
-                            if (sessionlist[i].packet_processed == false && sessionlist[i].packet_began_processing == false)
-                            {
-                                Log.WriteLine(1, $"[QUAZAL Packet Handler] Found out of order packet seqid {sessionlist[i].uiSeqId} connid {sessionlist[i].m_bySessionID}");
-                                ProcessQpacket(sessionlist[i]);
-
-
-                            }
-                        }
-                        //sessionlist.Clear();
-                        //sessionlist.Add(packet);
-                        //Log.WriteLine(1, $"[QUAZAL Packet Handler] processing the first packet for {packet.m_bySessionID}");
-                        ProcessQpacket(packet);
-                        return;
-                    }
-                    if (sessionlist[0].packet_processed == false && sessionlist[0].packet_began_processing == false)
-                    {
-                        if (sessionlist[0].uiSeqId == 1)
-                        {
-                            //Log.WriteLine(1, $"[QUAZAL Packet Handler] processing x1 {packet.uiSeqId}");
-                            ProcessQpacket(packet);
-                            return;
-                        }
-                        else
-                        if (packet.uiSeqId == sessionlist[0].uiSeqId - 1)
-                        {
-                            //Log.WriteLine(1, $"[QUAZAL Packet Handler] waiting for first packet to do all of them {packet.m_bySessionID}");
-                            sessionlist.Insert(0, packet);
-                            return;
-                        }
-                    }
-                    for (i = 1; i < sessionlist.Count; i++)
-                    {
-                        if (sessionlist[i].uiSeqId > packet.uiSeqId && sessionlist[i].uiSeqId != packet.uiSeqId + 1)
-                        {
-                            //Log.WriteLine(1, $"[QUAZAL Packet Handler] waiting for first packet to do all of them {packet.m_bySessionID}");
-                            sessionlist.Insert(i, packet);
-                            return;
-                        }
-                        if (sessionlist[i].uiSeqId == packet.uiSeqId)//remove if not good
-                        {                                            //remove if not good
-                            ProcessQpacket(packet);                  //remove if not good
-                            return;                                  //remove if not good
-                        }                                            //remove if not good
-                        if (sessionlist[i].packet_processed == true && sessionlist[i].packet_began_processing == true)
-                            continue;
-                        if (sessionlist[i].uiSeqId > sessionlist[i - 1].uiSeqId + 1)
-                        {
-                            if (sessionlist[i].uiSeqId == packet.uiSeqId + 1)
-                            {
-                                //Log.WriteLine(1, $"[QUAZAL Packet Handler] processing x2 {packet.uiSeqId}");
-                                ProcessQpacket(packet);
-                                ProcessQpacket(sessionlist[i]);
-                                sessionlist.Insert(i, packet);
-                                for (int it = i; it < sessionlist.Count; it++)
-                                {
-                                    QPacket pastVal = sessionlist[it - 1];
-
-                                    if (IsCorrectPacket(sessionlist[it], pastVal.uiSeqId))
-                                    {
-                                        //Log.WriteLine(1, $"[QUAZAL Packet Handler] processing x3 {packet.uiSeqId}");
-                                        ProcessQpacket(sessionlist[it]);
-                                    }
-                                    else if (sessionlist[it].uiSeqId != pastVal.uiSeqId + 1)
-                                    {
-                                        Log.WriteLine(1, $"[QUAZAL Packet Handler] Found another out of order packet {sessionlist[it].uiSeqId} connid {sessionlist[it].m_bySessionID}");
-                                        return;
-                                    }
-                                }
-                                return;
-
-                            }
-                            else
-                            {
-                                //Log.WriteLine(1, $"[QUAZAL Packet Handler] this should not be hapening fix seqid {packet.uiSeqId} prevconnid {sessionlist[i].uiSeqId} connid {packet.m_bySessionID}");
-                                return;
-                            }
-                        }
-                        if (sessionlist[i].uiSeqId == sessionlist[i - 1].uiSeqId + 1 && sessionlist[i].packet_began_processing != true)
-                        {
-                            //Log.WriteLine(1, $"[QUAZAL Packet Handler] Forgot to process packet processing now this should not be happening{packet.uiSeqId} {packet.m_bySessionID}");
-
-                            ProcessQpacket(sessionlist[i]);
-                        }
-                    }
-                    //Log.WriteLine(1, $"[QUAZAL Packet Handler] I is {i} ");
-                    if (sessionlist.Count + 1 == packet.uiSeqId)
-                    {
-                        //Log.WriteLine(1, $"[QUAZAL Packet Handler] Packet arrvied in order processing if01 {packet.uiSeqId} {packet.m_bySessionID}");
-                        sessionlist.Add(packet);
-                        //Log.WriteLine(1, "Values: " + string.Join(", ", sessionlist.Select(p => p.uiSeqId)));
-                        ProcessQpacket(packet);
-                        return;
-
-                    }
-                    else
-                        if (sessionlist.Count + 1 < packet.uiSeqId)
-                    {
-                        Log.WriteLine(1, $"[QUAZAL Packet Handler] Found out of order packet {packet.uiSeqId} connid {packet.m_bySessionID}");
-                        sessionlist.Add(packet);
-                        return;
-                    }
-                    else
-                    {
-                        //Log.WriteLine(1, $"[QUAZAL Packet Handler] This should not happen {packet.uiSeqId} connid {packet.m_bySessionID} should be {sessionlist.Count + 1}");
-                    }
-
-                }
-
-
-
-            }
-            //start waiter
-            return;
-        }
         public static QPacket ProcessSYN(QPacket p, IPEndPoint ep, out ClientInfo client)
         {
             client = Global.GetClientByEndPoint(ep);
@@ -475,11 +284,34 @@ namespace QuazalWV
             while (true)
             {
                 QPacket p = new QPacket(data, source, ep, listener, serverPID, listenPort, removeConnectPayload);
-                //Log.WriteLine(1, $"Logical Processing packet size {p.realSize} sequence id {p.uiSeqId} connection id {p.m_bySessionID} sport {p.m_oSourceVPort} dport {p.m_oDestinationVPort}", Color.Red);
+                //Log.WriteLine(1, $"Logical Processing packet size {p.realSize} IP IS {p.ep.Address} sequence id {p.uiSeqId} connection id {p.m_bySessionID} sport {p.m_oSourceVPort} dport {p.m_oDestinationVPort}", Color.Red);
                 //HandleQpacket(p);
-                lock (_lock)  // Ensure thread-safety
+                if (p.uiSeqId==0)
                 {
-                    ProcessQpacket(p);
+                    try
+                    {
+                        ProcessQpacket(p);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteLine(1, "[Processing Packet] Something went wrong: " + ex.Message, Color.Red);
+                    }
+                }
+                else 
+                {
+                    var itemLock = lockManager.GetLock(p.ep.Address);
+                    lock (itemLock)
+                    {
+                        try
+                        {
+                            ProcessQpacket(p);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.WriteLine(1, "[Processing Packet] Something went wrong: " + ex.Message,Color.Red);
+                        }
+                    }
+
                 }
                 //Log.WriteLine(1, $"Finished logical processing", Color.Red);
                 if (p.realSize != data.Length)
@@ -502,6 +334,7 @@ namespace QuazalWV
 
         public static void Send(string source, QPacket p, IPEndPoint ep, UdpClient listener)
         {
+
             byte[] data = p.ToBuffer();
             StringBuilder sb = new StringBuilder();
             foreach (byte b in data)
