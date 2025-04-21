@@ -40,7 +40,19 @@ CREATE TABLE privileges (
 	locale 		TEXT
 )
 ```
-
+`friends table`
+```
+CREATE TABLE relationship (
+    uidrequestor INTEGER NOT NULL,
+    uidrequestee INTEGER NOT NULL,
+    status TINYINT NOT NULL CHECK (status BETWEEN 0 AND 255),  -- 1 byte value
+    detail_value INTEGER,  -- can be any integer
+    
+    PRIMARY KEY (uidrequestor, uidrequestee)
+    FOREIGN KEY (uidrequestor) REFERENCES users(id),
+    FOREIGN KEY (uidrequestee) REFERENCES users(id)
+)
+```
 3. Populate `users` table:
 - add `Tracking` user for the game's telemetry service
 ```sql
