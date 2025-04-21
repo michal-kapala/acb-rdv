@@ -72,10 +72,12 @@
     <Compile Include="Classes\CommonData\QDateTime.cs" />
     <Compile Include="Classes\CommonData\ResultRange.cs" />
     <Compile Include="Classes\CommonData\StationUrl.cs" />
+    <Compile Include="Classes\Enums\FriendDBret.cs" />
     <Compile Include="Classes\Enums\GameMode.cs" />
     <Compile Include="Classes\Enums\GameType.cs" />
     <Compile Include="Classes\Enums\LevelRange.cs" />
     <Compile Include="Classes\Enums\Map.cs" />
+    <Compile Include="Classes\Enums\PlayerRelationship.cs" />
     <Compile Include="Classes\Enums\SessionParam.cs" />
     <Compile Include="Classes\Enums\NatType.cs" />
     <Compile Include="Classes\Interfaces\AnyDataHeader.cs" />
@@ -83,6 +85,7 @@
     <Compile Include="RMC\FriendsService\Data\FriendData.cs" />
     <Compile Include="RMC\FriendsService\Data\RelationshipData.cs" />
     <Compile Include="RMC\FriendsService\FriendsService.cs" />
+    <Compile Include="RMC\FriendsService\RelationshipDBData.cs" />
     <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_AddFriendByNameWithDetails.cs" />
     <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_BlackList.cs" />
     <Compile Include="RMC\FriendsService\Request\RMCPacketRequestFriendsService_ClearRelationship.cs" />
@@ -93,6 +96,9 @@
     <Compile Include="RMC\FriendsService\Response\RMCPacketResponseFriendsService_ClearRelationship.cs" />
     <Compile Include="RMC\FriendsService\Response\RMCPacketResponseFriendsService_GetDetailedList.cs" />
     <Compile Include="RMC\FriendsService\Response\RMCPacketResponseFriendsService_GetRelationships.cs" />
+    <Compile Include="RMC\FriendsService\RMCPacketRequestFriendsService_AcceptFriendship.cs" />
+    <Compile Include="RMC\FriendsService\RMCPacketRequestFriendsService_DeclineFriendship.cs" />
+    <Compile Include="RMC\FriendsService\RMCPacketResponseFriendsService_boolean.cs" />
     <Compile Include="RMC\GameInfoService\Data\QFile.cs" />
     <Compile Include="RMC\GameInfoService\GameInfoService.cs" />
     <Compile Include="RMC\GameInfoService\Request\RMCPacketRequestGameInfoService_GetFileListOnGameStorage.cs" />

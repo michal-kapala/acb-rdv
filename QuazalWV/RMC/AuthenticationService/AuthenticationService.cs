@@ -35,8 +35,11 @@ namespace QuazalWV
                     User u = DBHelper.GetUserByName(loginReq.username);
                     // 'Tracking' account (telemetry) needs to exist, users call LoginCustomData
                     if (u != null && loginReq.username == "Tracking")
+                    {
+                        Log.WriteLine(1, $"[RMC Authentication] Login called for a user {loginReq.username}", Color.Red);
                         client.TrackingUser = u;
-                    else 
+                    }
+                    else
                         Log.WriteLine(1, $"[RMC Authentication] Login called for a non-existent user {loginReq.username}", Color.Red);
 
                     reply = new RMCPacketResponseAuthenticationService_Login(client);
@@ -55,7 +58,6 @@ namespace QuazalWV
                                 if (user.Password == h.password)
                                 {
                                     reply = new RMCPacketResponseLoginCustomData(client.PID, client.sPID, client.sPort);
-                                    user.Pid = client.PID;
                                     Global.RemoveSessionsOnLogin(client);
                                     // TODO: kick everyone that has joined the sessions hosted by the guy who logged in again
                                     client.User = user;

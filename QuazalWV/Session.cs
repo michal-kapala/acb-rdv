@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Security.Policy;
 
 namespace QuazalWV
 {
@@ -14,7 +15,8 @@ namespace QuazalWV
 
 		public Session(uint sesId, GameSession ses, ClientInfo host)
 		{
-			GameSession = ses;
+            Log.WriteLine(2, $"[Session] Client: ${host.User.Name} created Session: ${sesId}", Color.Green);
+            GameSession = ses;
 			Key = new GameSessionKey
 			{
 				TypeId = ses.TypeId,
@@ -158,8 +160,9 @@ namespace QuazalWV
             Log.WriteLine(1, $"[RMC] SearchSessions results: {PublicPids.Count}",Color.Red);
 			if (currPublicSlots == null)
 			{
+				
                 GameSession.Attributes.Add(new Property((uint)SessionParam.CurrentPublicSlots,(uint) PublicPids.Count));
-                Log.WriteLine(1, $"[RMC] -------This should not happen -----", Color.Purple);
+                Log.WriteLine(1, $"[RMC] -------This should not happen ----- {Key.SessionId}", Color.Purple);
             }
             else
             {
@@ -171,7 +174,7 @@ namespace QuazalWV
             if (currPrivateSlots == null)
             {
                 GameSession.Attributes.Add(new Property((uint)SessionParam.CurrentPrivateSlots, (uint)PrivatePids.Count));
-                Log.WriteLine(1, $"[RMC] -------This should not happen -----", Color.Purple);
+                Log.WriteLine(1, $"[RMC] -------This should not happen2 ----- {Key.SessionId}", Color.Purple);
 
             }
             else
