@@ -1,19 +1,20 @@
 ﻿using System.IO;
 
+
 namespace QuazalWV
 {
-    internal class RMCPacketResponseFriendsService_BlackList : RMCPResponse
+    internal class RMCPacketResponseFriendsService_boolean : RMCPResponse
     {
         public bool RetVal { get; set; }
 
-        public RMCPacketResponseFriendsService_BlackList(bool retval)
+        public RMCPacketResponseFriendsService_boolean(bool retval)
         {
             RetVal = retval;
         }
 
         public override string ToString()
         {
-            return "[BlackList Response]";
+            return "[Addfrient Response]";
         }
 
         public override string PayloadToString()

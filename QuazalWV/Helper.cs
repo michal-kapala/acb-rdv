@@ -38,10 +38,8 @@ namespace QuazalWV
 
         public static uint ReadU32(Stream s)
         {
-            return (uint)((byte)s.ReadByte() | 
-                         ((byte)s.ReadByte() << 8) | 
-                         ((byte)s.ReadByte() << 16) | 
-                         ((byte)s.ReadByte() << 24));
+            BinaryReader reader = new BinaryReader(s);
+            return reader.ReadUInt32();
         }
 
         public static ulong ReadU64(Stream s)
