@@ -59,7 +59,7 @@ namespace QuazalWV
         }
 
         /// <summary>
-        /// Parses a prudp URL string.
+        /// Parses a PRUDP URL string.
         /// </summary>
         /// <param name="url"></param>
         public StationUrl(string url)

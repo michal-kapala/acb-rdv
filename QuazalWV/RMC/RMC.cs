@@ -142,6 +142,9 @@ namespace QuazalWV
             rmc.methodID = Helper.ReadU32(m);
             switch (rmc.proto)
             {
+                case RMCP.PROTOCOL.NATTraversalRelayService:
+                    NATTraversalService.ProcessRequest(m, rmc);
+                    break;
                 case RMCP.PROTOCOL.AuthenticationService:
                     AuthenticationService.ProcessRequest(m, rmc);
                     break;
@@ -200,7 +203,6 @@ namespace QuazalWV
                     UplayWinService.ProcessRequest(m, rmc);
                     break;
                 case RMCP.PROTOCOL.MatchMakingService:
-                case RMCP.PROTOCOL.NATTraversalRelayService:
                     break;
                 default:
                     WriteLog(1, "Error: No request reader implemented for packet protocol " + rmc.proto);
