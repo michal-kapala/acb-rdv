@@ -1,9 +1,7 @@
-﻿using System.IO;
-
-namespace QuazalWV
+﻿namespace QuazalWV
 {
-    public class RelationshipDBData
-    {
+    public class RelationshipDBData : DbModel
+	{
         public uint Pidrequestor { get; set; }
         public uint Pidrequestee { get; set; }
         /// <summary>
@@ -19,8 +17,7 @@ namespace QuazalWV
 
         public RelationshipDBData()
         {
-            Details = 0;
-            Status = 0;
+            
         }
 
     }
