@@ -7,12 +7,8 @@ namespace QuazalWV
         public uint Pid { get; set; }
         public string Name { get; set; }
         /// <summary>
-        /// Defines friend's current status.
+        /// Defines friend's current status (PlayerRelationship).
         /// </summary>
-        /// 0 - incoming invitation request
-        /// 1 - outgoing invitation request
-        /// 2 - friend (offline? blocked?)
-        /// 3 - friend (online?)
         public byte ByRelationship { get; set; }
         public uint Details { get; set; }
         public byte Status { get; set; }
@@ -26,6 +22,27 @@ namespace QuazalWV
         public RelationshipData(Stream s)
         {
             FromStream(s);
+        }
+
+        public RelationshipData(Relationship relationship, User otherUser, bool online)
+        {
+            Pid = otherUser.Pid;
+            Name = otherUser.Name;
+            switch (relationship.Type)
+            {
+                case DbPlayerRelationshipType.Pending:
+                    ByRelationship = otherUser.Pid == relationship.RequesterPid ? (byte)PlayerRelationship.PendingIn : (byte)PlayerRelationship.PendingOut;
+                    break;
+                case DbPlayerRelationshipType.Blocked:
+                    ByRelationship = (byte)PlayerRelationship.Blocked;
+                    break;
+                case DbPlayerRelationshipType.Friends:
+                    ByRelationship = (byte)PlayerRelationship.Friend;
+                    break;
+            }
+            Details = relationship.Details;
+            // TODO: check status values
+            Status = (byte)(online ? 1 : 0);
         }
 
         public void FromStream(Stream s)

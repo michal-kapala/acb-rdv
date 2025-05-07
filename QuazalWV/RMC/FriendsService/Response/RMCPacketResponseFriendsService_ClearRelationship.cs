@@ -6,9 +6,9 @@ namespace QuazalWV
 	{
 		public bool RetVal { get; set; }
 
-		public RMCPacketResponseFriendsService_ClearRelationship()
+		public RMCPacketResponseFriendsService_ClearRelationship(bool result)
 		{
-			RetVal = true;
+			RetVal = result;
 		}
 
 		public override string ToString()

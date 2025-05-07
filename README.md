@@ -35,22 +35,22 @@ CREATE TABLE "users" (
 
 ```sql
 CREATE TABLE privileges (
-	id			INTEGER,
-	description	TEXT,
-	locale 		TEXT
+    id			INTEGER,
+    description	TEXT,
+    locale 		TEXT
 )
 ```
-`friends table`
+- `relationships`
 ```
-CREATE TABLE relationship (
-    uidrequestor INTEGER NOT NULL,
-    uidrequestee INTEGER NOT NULL,
-    status TINYINT NOT NULL CHECK (status BETWEEN 0 AND 255),  -- 1 byte value
-    detail_value INTEGER,  -- can be any integer
+CREATE TABLE relationships (
+    requester INTEGER NOT NULL,
+    requestee INTEGER NOT NULL,
+    type TINYINT NOT NULL,
+    details INTEGER,
     
-    PRIMARY KEY (uidrequestor, uidrequestee)
-    FOREIGN KEY (uidrequestor) REFERENCES users(id),
-    FOREIGN KEY (uidrequestee) REFERENCES users(id)
+    PRIMARY KEY (requester, requestee)
+    FOREIGN KEY (requester) REFERENCES users(id),
+    FOREIGN KEY (requestee) REFERENCES users(id)
 )
 ```
 3. Populate `users` table:
@@ -85,8 +85,8 @@ Create `ACBRDV.exe.config` configuration file in `./ACB RDV/bin/<architecture>/<
     <startup> 
         <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8"/>
     </startup>
-	<appSettings>
-      <add key="SecureServerAddress" value="<server host IP>" />
+    <appSettings>
+        <add key="SecureServerAddress" value="<server host IP>" />
     </appSettings>
 </configuration>
 ```

@@ -1,20 +1,19 @@
 ﻿using System.IO;
 
-
 namespace QuazalWV
 {
-    internal class RMCPacketResponseFriendsService_boolean : RMCPResponse
+    internal class RMCPacketResponseFriendsService_DeclineFriendship : RMCPResponse
     {
         public bool RetVal { get; set; }
 
-        public RMCPacketResponseFriendsService_boolean(bool retval)
+        public RMCPacketResponseFriendsService_DeclineFriendship(bool retval)
         {
             RetVal = retval;
         }
 
         public override string ToString()
         {
-            return "[Addfrient Response]";
+            return "[DeclineFriendship Response]";
         }
 
         public override string PayloadToString()
