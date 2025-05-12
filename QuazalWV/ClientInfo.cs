@@ -1,16 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
+using System.Text;
+
+//TODO sign out if the same client signs in
 
 namespace QuazalWV
 {
     public class ClientInfo
     {
         public static System.Random rand = new System.Random();
-        public uint PID;
-        public uint sPID;
+        public uint ServerIncrementedGeneratedPID;
+        public uint ServerStaticID;
         public ushort sPort;
-        public uint IDrecv;
+        public uint clientServerGeneratedConnectionSig;
         public uint GameSessionID;
         public bool InGameSession = false;
         public uint rvCID = (uint)rand.Next();
@@ -54,5 +57,15 @@ namespace QuazalWV
         public User TrackingUser { get; set; }
         public string LocaleCode { get; set; }
         public List<string> TrackingUserUrls { get; set; } = new List<string>();
+        public IPAddress IPaddress { get; internal set; }
+        public bool Playersignout =false;
+        public bool Trackingsignout = false;
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($" gamesessid {GameSessionID} user {User} sessionID {sessionID} pid {ServerIncrementedGeneratedPID} spid {ServerStaticID} ");
+            return sb.ToString();
+        }
     }
 }

@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace QuazalWV
 {
-    public static class NotificationQuene
+    public static class NotificationQueue
     {
         private static readonly object _sync = new object();
-        private static List<NotificationQueneEntry> quene = new List<NotificationQueneEntry>();
+        private static List<NotificationQueueEntry> queue = new List<NotificationQueueEntry>();
 
-        public static void AddNotification(NotificationQueneEntry n)
+        public static void AddNotification(NotificationQueueEntry n)
         {
             lock (_sync)
             {
-                quene.Add(n);
+                queue.Add(n);
             }
         }
 
@@ -23,14 +23,14 @@ namespace QuazalWV
         {
             lock (_sync)
             {
-                for (int i = 0; i < quene.Count; i++)
+                for (int i = 0; i < queue.Count; i++)
                 {
-                    NotificationQueneEntry n = quene[i];
+                    NotificationQueueEntry n = queue[i];
                     if (n.timer.ElapsedMilliseconds > n.timeout)
                     {
                         n.Execute();
                         n.timer.Stop();
-                        quene.RemoveAt(i);
+                        queue.RemoveAt(i);
                         i--;
                     }
                 }

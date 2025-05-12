@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Drawing;
-
+using System;
+using System.Net;
+//TODO LOGIN WILL FAIL WHEN YOU GET NOTIF THAT SOMEONE ELSE LOGINS AND YOU SIGN IN WITH YOUR USER
 namespace QuazalWV
 {
     public static class AuthenticationService
@@ -31,20 +33,28 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 1:
-                    var loginReq = (RMCPacketRequestAuthenticationService_Login)rmc.request;
-                    User u = DBHelper.GetUserByName(loginReq.username);
-                    // 'Tracking' account (telemetry) needs to exist, users call LoginCustomData
-                    if (u != null && loginReq.username == "Tracking")
+                    try
                     {
-                        Log.WriteLine(1, $"[RMC Authentication] Login called for a user {loginReq.username}", Color.Red);
-                        client.TrackingUser = u;
-                    }
-                    else
-                        Log.WriteLine(1, $"[RMC Authentication] Login called for a non-existent user {loginReq.username}", Color.Red);
+                        var loginReq = (RMCPacketRequestAuthenticationService_Login)rmc.request;
+                        User u = DBHelper.GetUserByName(loginReq.username);
+                        // 'Tracking' account (telemetry) needs to exist, users call LoginCustomData
+                        if (u != null && loginReq.username == "Tracking")
+                        {
+                            Log.WriteLine(1, $"[RMC Authentication] Login called for a user {loginReq.username}", Color.Red);
+                            client.TrackingUser = u;
+                        }
+                        else
+                            Log.WriteLine(1, $"[RMC Authentication] Login called for a non-existent user {loginReq.username}", Color.Red);
 
-                    reply = new RMCPacketResponseAuthenticationService_Login(client);
-                    //client.sessionKey = ((RMCPacketResponseAuthenticationService_Login)reply).ticket.sessionKey;
-                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                        reply = new RMCPacketResponseAuthenticationService_Login(client);
+                        //client.sessionKey = ((RMCPacketResponseAuthenticationService_Login)reply).ticket.sessionKey;
+                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    }
+                    catch (Exception ex)
+                    {
+                        // This will catch any other exceptions
+                        Console.WriteLine("An error occurred: " + ex.Message);
+                    }
                     break;
                 case 2:
                     RMCPacketRequestLoginCustomData h = (RMCPacketRequestLoginCustomData)rmc.request;
@@ -57,10 +67,13 @@ namespace QuazalWV
                             {
                                 if (user.Password == h.password)
                                 {
-                                    reply = new RMCPacketResponseLoginCustomData(client.PID, client.sPID, client.sPort);
-                                    Global.RemoveSessionsOnLogin(client);
+                                    Log.WriteLine(1,$"client login with spid {client.ServerStaticID} and pid {client.ServerIncrementedGeneratedPID}",Color.RoyalBlue);
+                                    Global.KickoutDuplicateSessionByUsername(user.Name,  client.ep);
+                                    reply = new RMCPacketResponseLoginCustomData(client.ServerIncrementedGeneratedPID, client.ServerStaticID, client.sPort);
+                                    //Global.RemoveSessionsOnLogin(client);
                                     // TODO: kick everyone that has joined the sessions hosted by the guy who logged in again
                                     client.User = user;
+                                    client.IPaddress = p.ep.Address;
                                     client.sessionKey = ((RMCPacketResponseLoginCustomData)reply).ticket.sessionKey;
                                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                                 }

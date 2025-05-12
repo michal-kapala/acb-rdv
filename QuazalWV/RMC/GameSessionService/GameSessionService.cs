@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+
 
 namespace QuazalWV
 {
@@ -167,7 +169,7 @@ namespace QuazalWV
                     if (leftSes.NbParticipants() == 1)
                     {
                         Global.Sessions.Remove(leftSes);
-                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.User.Pid}", Color.Gray, client);
+                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.User.UserDBPid}", Color.Gray, client);
                     }
                     else
                         leftSes.Leave(client);
@@ -190,10 +192,10 @@ namespace QuazalWV
                         .AddParticipants(reqAddParticip.PublicPids, reqAddParticip.PrivatePids);
                     foreach (uint i in reqAddParticip.PublicPids)
                     {
-                        ClientInfo result = Global.Clients.Find(cli => cli.PID == i);
+                        ClientInfo result = Global.Clients.Find(cli => cli.ServerIncrementedGeneratedPID == i);
                         if (result!=null)
                         {
-                            Log.WriteLine(1, $"[RMC] Addparticipants2 abandon: {result.User.Pid} session {result.GameSessionID}", Color.Green, client);
+                            Log.WriteLine(1, $"[RMC] Addparticipants2 abandon: {result.User.UserDBPid} session {result.GameSessionID}", Color.Green, client);
                             if (result.InGameSession == true)
                             {
                                var future_abandoned  = Global.Sessions.Find(session => session.Key.SessionId == result.GameSessionID);
@@ -210,7 +212,7 @@ namespace QuazalWV
                     }
                     foreach (uint i in reqAddParticip.PrivatePids)
                     {
-                        ClientInfo result = Global.Clients.Find(cli => cli.PID == i);
+                        ClientInfo result = Global.Clients.Find(cli => cli.ServerIncrementedGeneratedPID == i);
                         if (result != null)
                         {
                             result.GameSessionID = reqAddParticip.Key.SessionId;
@@ -235,7 +237,13 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 12:
-                    Log.WriteLine(1, $"[RMC] GameSessionService SendInvitation ", Color.Blue);
+                    var sendInvitation = (RMCPacketRequestGameSessionService_SendInvitation)rmc.request;
+                    Log.WriteLine(1, $"[RMC] GameSessionService SendInvitation \n${sendInvitation.ToString()}", Color.Blue);
+                    List<User> invitedUsers = DBHelper.GetUsersByID(sendInvitation.Invitation.Recipients);
+                    //foreach(User user in invitedUsers)
+                    //{
+                    //    if Global.
+                    //}
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
@@ -270,30 +278,30 @@ namespace QuazalWV
                     {
                         abandonedSes = Global.Sessions.Find(session => session.Key.SessionId == reqAbandon.Key.SessionId);
                     }
-                    Log.WriteLine(1, $"[RMC] RemoveGameSessionService Abandon Session client pid {client.User.Pid} abandonedSes {abandonedSes.Key.SessionId}", Color.Blue);
+                    Log.WriteLine(1, $"[RMC] RemoveGameSessionService Abandon Session client pid {client.User.UserDBPid} abandonedSes {abandonedSes.Key.SessionId}", Color.Blue);
                     if (abandonedSes != null)
                     {
                         if (abandonedSes.NbParticipants() == 1)
                         {
                             Global.Sessions.Remove(abandonedSes);
-                            Log.WriteLine(1, $"[RMC GameSession] Session {abandonedSes.Key.SessionId} deleted on abandon from player {client.User.Pid}", Color.Gray, client);
+                            Log.WriteLine(1, $"[RMC GameSession] Session {abandonedSes.Key.SessionId} deleted on abandon from player {client.User.UserDBPid}", Color.Gray, client);
                             client.GameSessionID = 0xffffffff;
                             client.InGameSession = false;
                         }
                         else
                         {
                             bool notExist = false;
-                            if (abandonedSes.PublicPids.Contains(client.PID))
+                            if (abandonedSes.PublicPids.Contains(client.ServerIncrementedGeneratedPID))
                             {
-                                abandonedSes.PublicPids.Remove(client.PID);
+                                abandonedSes.PublicPids.Remove(client.ServerIncrementedGeneratedPID);
                             }
                             else
                             {
                                 notExist = true;
                             }
-                            if (abandonedSes.PrivatePids.Contains(client.PID))
+                            if (abandonedSes.PrivatePids.Contains(client.ServerIncrementedGeneratedPID))
                             {
-                                abandonedSes.PrivatePids.Remove(client.PID);
+                                abandonedSes.PrivatePids.Remove(client.ServerIncrementedGeneratedPID);
                                 notExist = false;
                             }
                             else if (notExist==true)

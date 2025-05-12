@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 
 namespace QuazalWV
@@ -13,7 +14,8 @@ namespace QuazalWV
 			uint count = Helper.ReadU32(s);
 			for (int i = 0; i < count; i++)
 				Pids.Add(Helper.ReadU32(s));
-		}
+            Log.WriteLine(1, $"[RMC GetPresence] GetPresence stuff {string.Join(", ", Pids)}", Color.Red);
+        }
 
 		public override string ToString()
 		{

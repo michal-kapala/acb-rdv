@@ -1,8 +1,10 @@
 ﻿using QuazalWV.Classes.Enums;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Drawing;
+using System.Linq;
 
 namespace QuazalWV
 {
@@ -73,7 +75,7 @@ namespace QuazalWV
                 // If less than 2 IDs found, insert both into BackupTable
                 if (ConditionsMet == true)
                 {
-                    string insertQuery = "INSERT INTO relationship (uidrequestor, uidrequestee , status, detail_value ) VALUES (@id1,@id2,0,@detail)";
+                    string insertQuery = "INSERT INTO relationship (uidrequestor, uidrequestee , status, detail_value ) VALUES (@id1,@id2,0,@detail),(@id1,@id2,2,@detail)";
                     using (var insertCommand = new SQLiteCommand(insertQuery, connection))
                     {
                         insertCommand.Parameters.AddWithValue("@id1", requestor);
@@ -318,20 +320,49 @@ namespace QuazalWV
         public static User GetUserByName(string name)
         {
             User result = null;
-            string query = @"SELECT * FROM users WHERE name=@name";
+            String query = "SELECT * FROM users WHERE name=@name";
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@name", name);
                 using (var reader = command.ExecuteReader())
+
+                    while (reader.Read())
                 {
+                    result = new User
+                    {
+                        UserDBPid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
+                        Name = reader.GetString(reader.GetOrdinal("name")),
+                        Password = reader.GetString(reader.GetOrdinal("password")),
+                        UserDBUbiId = reader.GetString(reader.GetOrdinal("ubi_id")),
+                        Email = reader.GetString(reader.GetOrdinal("email")),
+                        CountryCode = reader.GetString(reader.GetOrdinal("country_code")),
+                        PrefLang = reader.GetString(reader.GetOrdinal("pref_lang"))
+                    };
+                        Log.WriteLine(1,$"user is  {result}");
+                    return result;
+                }
+            }
+            return result;
+        }
+
+        public static User GetUserByID(uint UserDBpid)
+        {
+            User result = null;
+            string query = @"SELECT * FROM users WHERE pid=@id";
+            using (var command = new SQLiteCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@id", UserDBpid);
+                using (var reader = command.ExecuteReader())
+                {
+
                     while (reader.Read())
                     {
                         result = new User
                         {
-                            Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("id"))),
+                            UserDBPid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             Password = reader.GetString(reader.GetOrdinal("password")),
-                            UbiId = reader.GetString(reader.GetOrdinal("password")),
+                            UserDBUbiId = reader.GetString(reader.GetOrdinal("ubi_id")),
                             Email = reader.GetString(reader.GetOrdinal("email")),
                             CountryCode = reader.GetString(reader.GetOrdinal("country_code")),
                             PrefLang = reader.GetString(reader.GetOrdinal("pref_lang"))
@@ -344,34 +375,38 @@ namespace QuazalWV
 
             return result;
         }
-        public static User GetUserByID(uint id)
+        public static List<User> GetUsersByID(List<uint>userids)
         {
-            User result = null;
-            string query = @"SELECT * FROM users WHERE id=@id";
-            using (var command = new SQLiteCommand(query, connection))
+            List<User> results = new List<User> { };
+            string placeholders = string.Join(", ", userids.Select((_, i) => $"@id{i}"));
+            string query = $"SELECT * FROM users WHERE pid IN ({placeholders})";
+            using (SQLiteCommand command = new SQLiteCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@id", id);
-                using (var reader = command.ExecuteReader())
+                for (int i = 0; i < userids.Count; i++)
+                {
+                    command.Parameters.AddWithValue($"@id{i}", userids[i]);
+                }
+                using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        result = new User
+                        results.Append( new User
                         {
-                            Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("id"))),
+                            UserDBPid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             Password = reader.GetString(reader.GetOrdinal("password")),
-                            UbiId = reader.GetString(reader.GetOrdinal("password")),
+                            UserDBUbiId = reader.GetString(reader.GetOrdinal("pid")),
                             Email = reader.GetString(reader.GetOrdinal("email")),
                             CountryCode = reader.GetString(reader.GetOrdinal("country_code")),
                             PrefLang = reader.GetString(reader.GetOrdinal("pref_lang"))
-                        };
-                        return result;
+                        });
+                        
                     }
                 }
             }
 
 
-            return result;
+            return results;
         }
         public static List<Privilege> GetPrivileges(string locale)
         {

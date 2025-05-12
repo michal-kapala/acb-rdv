@@ -20,7 +20,7 @@ namespace QuazalWV
 
         public RMCPacketResponseRequestTicket(uint pid, ClientInfo client)
         {
-            ticket = new KerberosTicket(client.sPID)
+            ticket = new KerberosTicket(client.ServerStaticID)
             {
                 userPID = pid,
                 sessionKey = new byte[] { 0x9C, 0xB0, 0x1D, 0x7A, 0x2C, 0x5A, 0x6C, 0x5B, 0xED, 0x12, 0x68, 0x45, 0x69, 0xAE, 0x09, 0x0D },

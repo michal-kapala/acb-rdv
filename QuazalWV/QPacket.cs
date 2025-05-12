@@ -90,6 +90,7 @@ namespace QuazalWV
         public IPEndPoint ep;
         public UdpClient listener;
         public uint serverPID;
+        public ushort replyPort;
         public ushort listenPort;
         public bool removeConnectPayload;
         public byte[] data;
@@ -99,11 +100,12 @@ namespace QuazalWV
 
 
 
-        public QPacket(byte[] data, string source, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload)
+        public QPacket(byte[] data, string source, IPEndPoint ep, UdpClient listener, uint serverPID, ushort replyport, ushort listenPort, bool removeConnectPayload)
         {
             this.ep = ep;
             this.listener = listener;
             this.serverPID = serverPID;
+            this.replyPort = replyport;
             this.listenPort = listenPort;
             this.removeConnectPayload = removeConnectPayload;
             this.data = data;

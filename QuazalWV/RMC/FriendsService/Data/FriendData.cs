@@ -37,5 +37,9 @@ namespace QuazalWV
 			Helper.WriteU32(s, Details);
 			Helper.WriteString(s, Status);
 		}
-	}
+        public override string ToString()
+        {
+			return $"pid {Pid}  name{Name} Relationship {Relationship} ";
+        }
+    }
 }

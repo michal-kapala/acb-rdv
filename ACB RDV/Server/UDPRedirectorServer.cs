@@ -7,6 +7,7 @@ namespace AcbRdv
 {
     public static class UDPRedirectorServer
     {
+        public static readonly uint serverPID = 0x1000;
         public static readonly object _sync = new object();
         public static bool _exit = false;
         public static ushort listenPort = 21030;
@@ -53,7 +54,8 @@ namespace AcbRdv
 
         public static void ProcessPacket(byte[] data, IPEndPoint ep)
         {
-            QPacketHandler.ProcessPacket("UDP Redirector", data, ep, listener, UDPMainServer.serverPID, UDPMainServer.listenPort);
+       
+            QPacketHandler.ProcessPacket("UDP Redirector", data, ep, listener, UDPRedirectorServer.serverPID, UDPMainServer.listenPort, UDPRedirectorServer.listenPort);
         }
 
         private static void WriteLog(int priority, string s)

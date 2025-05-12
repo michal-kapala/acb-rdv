@@ -24,7 +24,7 @@ namespace QuazalWV
 			switch (rmc.methodID)
 			{
 				case 1:
-					reply = new RMCPacketResponseUbiNewsService_GetNewsChannel(client.PID);
+					reply = new RMCPacketResponseUbiNewsService_GetNewsChannel(client.ServerIncrementedGeneratedPID);
 					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
 					break;
 				default:

@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using QuazalWV.Classes.Enums;
+using System.Runtime.Remoting.Contexts;
 
 namespace QuazalWV
 {
@@ -74,8 +75,25 @@ namespace QuazalWV
                         }
                         else if (invitee != null)
                         {
-                            Log.WriteLine(1, $"[ADD Friend Attempt]:  {invitee.Pid} fake {inviter.Pid}", Color.Red);
-                            query_result = DBHelper.AddFriendRequest(inviter.Pid, invitee.Pid, reqAddFriendByName.Details);
+                            Log.WriteLine(1, $"[ADD Friend Attempt]:  {invitee.UserDBPid} fake {inviter.UserDBPid}", Color.Red);
+                            query_result = DBHelper.AddFriendRequest(inviter.UserDBPid, invitee.UserDBPid, reqAddFriendByName.Details);
+                            foreach (ClientInfo tempclient in Global.Clients)//if online send notification
+                            {
+                                if (tempclient.User.Name == reqAddFriendByName.Invitee)
+                                {
+                                    Log.WriteLine(1, $"[Accept Friend Attempt]:  sent notification to client {tempclient.User.Name}");
+                                    NotificationQueue.AddNotification(
+                                    new NotificationQueueEntry(tempclient,
+                                       0,
+                                       0,
+                                       1,
+                                       12,
+                                       inviter.UserDBPid,
+                                       2,
+                                       0,
+                                       reqAddFriendByName.Inviter));
+                                }
+                            }
                         }
                         if (invitee == null)
                         {
@@ -85,8 +103,10 @@ namespace QuazalWV
                             break;
                         }
                         Log.WriteLine(1, $"[ADD Friend Attempt]: add friend result is {query_result}", Color.Red);
-                        reply = new RMCPacketResponseFriendsService_AddFriendByNameWithDetails(invitee.Pid, reqAddFriendByName.Invitee, query_result == FriendDBret.Succeeded);
+                        reply = new RMCPacketResponseFriendsService_AddFriendByNameWithDetails(invitee.UserDBPid, reqAddFriendByName.Invitee, query_result == FriendDBret.Succeeded);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                        
+
                     }
                     catch (Exception ex)
                     {
@@ -98,7 +118,7 @@ namespace QuazalWV
                     //TODO verify if the other player actually sent the invite or hacking attempt
                     var reqAcceptFriendship = (RMCPacketRequestFriendsService_AcceptFriendship)rmc.request;
 
-                    DBHelper.RemoveRelationshipBoth(client.User.Pid, reqAcceptFriendship.Pid, (byte)PlayerRelationship.pending);
+                    DBHelper.RemoveRelationshipBoth(client.User.UserDBPid, reqAcceptFriendship.Pid, (byte)PlayerRelationship.pending);
 
                     invitee = DBHelper.GetUserByID(reqAcceptFriendship.Pid);
                     if (invitee == null)
@@ -109,12 +129,29 @@ namespace QuazalWV
                         break;
 
                     }
-                    query_result = DBHelper.AddFriend(client.User.Pid, invitee.Pid, reqAcceptFriendship.Details);
+                    query_result = DBHelper.AddFriend(client.User.UserDBPid, invitee.UserDBPid, reqAcceptFriendship.Details);
                     if (query_result == FriendDBret.Succeeded)
                     {
                         reply = new RMCPacketResponseFriendsService_boolean(false);
-
+                        Log.WriteLine(1, $"[Accept Friend Attempt]:  target user pid {invitee.UserDBPid} {reqAcceptFriendship.Pid}", Color.Red);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                        foreach (ClientInfo tempclient in Global.Clients)//if online send notification
+                        {
+                            if (tempclient.User.UserDBPid == reqAcceptFriendship.Pid)
+                            {
+                                Log.WriteLine(1, $"[Accept Friend Attempt]:  sent notification to client {tempclient.User.Name}");
+                                NotificationQueue.AddNotification(
+                                new NotificationQueueEntry(tempclient,
+                                   0,
+                                   0,
+                                   1,
+                                   12,
+                                   client.User.UserDBPid,
+                                   1,
+                                   0,
+                                   client.User.Name));
+                            }
+                        }
 
                     }
                     else
@@ -138,11 +175,28 @@ namespace QuazalWV
                             break;
 
                         }
-                        result = DBHelper.RemoveRelationshipBoth(client.User.Pid, reqDeclineFriendship.Pid, (byte)PlayerRelationship.pending);
+                        result = DBHelper.RemoveRelationshipBoth(client.User.UserDBPid, reqDeclineFriendship.Pid, (byte)PlayerRelationship.pending);
                         if (result == true)
                         {
                             reply = new RMCPacketResponseFriendsService_boolean(true);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                            foreach (ClientInfo tempclient in Global.Clients)//if online send notification
+                            {
+                                if (tempclient.User.UserDBPid == reqDeclineFriendship.Pid)
+                                {
+                                    Log.WriteLine(1, $"[deny Friend Attempt]:  sent notification to client {tempclient.User.Name}");
+                                    NotificationQueue.AddNotification(
+                                    new NotificationQueueEntry(tempclient,
+                                       0,
+                                       0,
+                                       1,
+                                       12,
+                                       client.User.UserDBPid,
+                                       0,
+                                       0,
+                                       client.User.Name));
+                                }
+                            }
                         }
                         else
                         {
@@ -169,9 +223,9 @@ namespace QuazalWV
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, 0x80650019);
                             break;
                         }
-                        query_result = DBHelper.AddBlacklistRequest(client.User.Pid, blacklistee.Pid, reqBlacklist.Details);
-                        DBHelper.RemoveRelationshipBoth(client.User.Pid, blacklistee.Pid, (byte)PlayerRelationship.pending);
-                        DBHelper.RemoveRelationshipBoth(client.User.Pid, blacklistee.Pid, (byte)PlayerRelationship.friend);
+                        query_result = DBHelper.AddBlacklistRequest(client.User.UserDBPid, blacklistee.UserDBPid, reqBlacklist.Details);
+                        DBHelper.RemoveRelationshipBoth(client.User.UserDBPid, blacklistee.UserDBPid, (byte)PlayerRelationship.pending);
+                        DBHelper.RemoveRelationshipBoth(client.User.UserDBPid, blacklistee.UserDBPid, (byte)PlayerRelationship.friend);
                         if (query_result != FriendDBret.Succeeded)
                         {
                             Log.WriteLine(1, $"[ADD Blacklist Attempt]: blacklisted person could not be done", Color.Red);
@@ -195,13 +249,30 @@ namespace QuazalWV
                         var reqDeleteRel = (RMCPacketRequestFriendsService_ClearRelationship)rmc.request;
                         Log.WriteLine(1, $"pid is {reqDeleteRel.Pid}", Color.Red);
                         uint requestee_user_pid = reqDeleteRel.Pid;
-                        uint current_pid = client.User.Pid;
+                        uint current_pid = client.User.UserDBPid;
                         DBHelper.RemoveRelationshipBoth(current_pid, requestee_user_pid, (byte)PlayerRelationship.pending);
                         Log.WriteLine(1, $"[ADD Friend Attempt]: cleared relationships blocked is only cleared one way {requestee_user_pid} {current_pid} ", Color.Red);
                         DBHelper.RemoveRelationshipOneSided(current_pid, requestee_user_pid, (byte)PlayerRelationship.blocked);
                         DBHelper.RemoveRelationshipBoth(current_pid, requestee_user_pid, (byte)PlayerRelationship.friend);
                         reply = new RMCPacketResponseFriendsService_ClearRelationship();
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                        foreach (ClientInfo tempclient in Global.Clients)//if online send notification
+                        {
+                            if (tempclient.User.UserDBPid == reqDeleteRel.Pid)
+                            {
+                                Log.WriteLine(1, $"[cleared relationships]:  sent notification to client {tempclient.User.Name}");
+                                NotificationQueue.AddNotification(
+                                new NotificationQueueEntry(tempclient,
+                                   0,
+                                   0,
+                                   1,
+                                   12,
+                                   client.User.UserDBPid,
+                                   0,
+                                   0,
+                                   client.User.Name));
+                            }
+                        }
                         Log.WriteLine(1, $"[ADD Friend Attempt]: cleared relationships blocked is only cleared one way ", Color.Red);
 
                     }
@@ -216,12 +287,23 @@ namespace QuazalWV
                     try
                     {
                         var reqGetDetailedList = (RMCPacketRequestFriendsService_GetDetailedList)rmc.request;
-                        Log.WriteLine(1, $"[RMC RelationshipList] client {client.User.Pid} requested  {reqGetDetailedList.ToString()}", Color.Red);
-                        List<RelationshipDBData> rels = DBHelper.ReturnRelationships(client.User.Pid, reqGetDetailedList.Relationship, reqGetDetailedList.Reversed);
+                        Log.WriteLine(1, $"[RMC RelationshipList] client {client.User.UserDBPid} requested  {reqGetDetailedList.ToString()}", Color.Red);
+                        List<RelationshipDBData> rels = DBHelper.ReturnRelationships(client.User.UserDBPid, reqGetDetailedList.Relationship, reqGetDetailedList.Reversed);
                         Log.WriteLine(1, $"[RMC RelationshipList] returned rels{rels.Count} requested ");
                         List<FriendData> friends = FriendsFromRelationships(rels, client, reqGetDetailedList.Relationship);
-
-                        Log.WriteLine(1, $"[RMC RelationshipList] returned friens{friends.Count} requested ");
+                        Log.WriteLine(1, $"[RMC RelationshipList] returned friends {string.Join(", ", friends)} requested ");
+                        if (reqGetDetailedList.Relationship==1)
+                        {
+                            friends.Add(new FriendData
+                            {
+                                Pid = 4661,
+                                Name = "Fwiend",
+                                Relationship = 1,
+                                Details = 0,
+                                Status = "Online"
+                            });
+                        }
+                        Log.WriteLine(1, $"[RMC RelationshipList] returned friends {friends.Count} requested ");
                         reply = new RMCPacketResponseFriendsService_GetDetailedList(friends);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     }
@@ -258,10 +340,10 @@ namespace QuazalWV
             foreach (var relationship in rels)
             {
 
-                if (client.User.Pid == relationship.Pidrequestor)
+                if (client.User.UserDBPid == relationship.Pidrequestor)
                 {
                     tempfriend = new FriendData();
-                    tempfriend.Status = "Offline";
+                    tempfriend.Status = "Online";//change to ONLINE
                     tempfriend.Pid = relationship.Pidrequestee;
                     tempfriend.Relationship = relationship.Status;
                     tempfriend.Details = relationship.Details;
@@ -269,7 +351,8 @@ namespace QuazalWV
                     tempfriend.Name = reluser.Name;
                     foreach (ClientInfo clientiter in Global.Clients)
                     {
-                        if (clientiter.User.Pid == relationship.Pidrequestee)
+                        Log.WriteLine(1, $"user found is {clientiter.User}");
+                        if (clientiter.User != null && clientiter.User.UserDBPid == relationship.Pidrequestee)
                             tempfriend.Status = "Online";
                     }
                     Log.WriteLine(1, $"[RMC Friends] Friend added  {tempfriend.ToString()}", Color.Red);
@@ -280,13 +363,13 @@ namespace QuazalWV
                     reluser = DBHelper.GetUserByID(relationship.Pidrequestor);
                     tempfriend = new FriendData();
                     tempfriend.Status = "Offline";
-                    tempfriend.Pid = reluser.Pid;
+                    tempfriend.Pid = reluser.UserDBPid;
                     tempfriend.Relationship = relationship.Status;
                     tempfriend.Details = relationship.Details;
                     tempfriend.Name = reluser.Name;
                     foreach (ClientInfo clientiter in Global.Clients)
                     {
-                        if (clientiter.User.Pid == reluser.Pid)
+                        if (clientiter.User.UserDBPid == reluser.UserDBPid)
                             tempfriend.Status = "Online";
                     }
                     Log.WriteLine(1, $"[RMC Friends] Friend added  {tempfriend.ToString()}", Color.Red);

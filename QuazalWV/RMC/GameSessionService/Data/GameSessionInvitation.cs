@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace QuazalWV
 {
@@ -19,6 +20,14 @@ namespace QuazalWV
 			Recipients = new List<uint>();
 			FromStream(s);
 		}
+		public override string ToString()
+		{
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"Key of the game Invite : {Key}\n");
+            sb.Append($"Recipients : {string.Join(", ", Recipients)} \n");
+			sb.Append($"Message: {Message}");
+            return sb.ToString();
+        }
 
 		public void FromStream(Stream s)
 		{

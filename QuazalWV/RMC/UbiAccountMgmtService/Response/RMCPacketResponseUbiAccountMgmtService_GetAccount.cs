@@ -15,7 +15,7 @@ namespace QuazalWV
             {
                 UbiAccount = new UbiAccount()
                 {
-                    UbiAccountId = user.UbiId,
+                    UbiAccountId = user.UserDBUbiId,
                     Username = user.Name,
                     Email = user.Email,
                     CountryCode = user.CountryCode,

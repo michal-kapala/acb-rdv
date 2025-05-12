@@ -10,7 +10,10 @@ namespace QuazalWV
 		public RMCPacketResponseRichPresenceService_GetPresence()
 		{
 			Elements = new List<PresenceElement>();
-		}
+            //byte[] byteArray = new byte[] { 0x0,0x0,0x0 };
+			//Elements.Add(new PresenceElement(1, 1, false, byteArray));
+
+        }
 
 		public override string ToString()
 		{

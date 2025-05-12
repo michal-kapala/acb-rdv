@@ -25,8 +25,8 @@ namespace AcbRdv
             {
                 foreach (ClientInfo client in Global.Clients)
                 {
-                    NotificationQuene.AddNotification(
-                        new NotificationQueneEntry(client, 
+                    NotificationQueue.AddNotification(
+                        new NotificationQueueEntry(client, 
                             0,
                             Convert.ToUInt32(textBox1.Text),
                             Convert.ToUInt32(textBox2.Text),

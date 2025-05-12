@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections;
 
 namespace QuazalWV
 {
-    public class NotificationQueneEntry
+    public class NotificationQueueEntry
     {
         public ClientInfo client;
         public Stopwatch timer;
@@ -20,7 +21,7 @@ namespace QuazalWV
         public uint param3;
         public string paramStr;
 
-        public NotificationQueneEntry(ClientInfo c, uint time, uint src, uint t, uint st, uint p1, uint p2, uint p3, string ps)
+        public NotificationQueueEntry(ClientInfo c, uint time, uint src, uint t, uint st, uint p1, uint p2, uint p3, string ps)
         {
             client = c;
             timer = new Stopwatch();

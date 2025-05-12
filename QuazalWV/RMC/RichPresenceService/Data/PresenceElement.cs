@@ -13,6 +13,13 @@ namespace QuazalWV
 		{
 			Buffer = new QBuffer();
 		}
+		public PresenceElement(uint par1, uint par2, bool parb, byte[] stream)
+		{
+			UnkInt1 = par1;
+			UnkBool = parb;
+			UnkInt2 = par2;
+			Buffer=new QBuffer( stream);
+		}
 
 		public PresenceElement(Stream s)
 		{

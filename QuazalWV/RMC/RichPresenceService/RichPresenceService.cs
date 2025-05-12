@@ -27,11 +27,13 @@ namespace QuazalWV
 			switch (rmc.methodID)
 			{
 				case 1:
-					reply = new RMCPResponseEmpty();
+                    Log.WriteLine(1, $"[RMC RichPresence] richpresence {rmc.methodID}", Color.Red, client);
+                    reply = new RMCPResponseEmpty();
 					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
 					break;
 				case 2:
-					reply = new RMCPacketResponseRichPresenceService_GetPresence();
+                    Log.WriteLine(1, $"[RMC RichPresence] richpresence {rmc.methodID}", Color.Red, client);
+                    reply = new RMCPacketResponseRichPresenceService_GetPresence();
 					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
 					break;
 				default:
