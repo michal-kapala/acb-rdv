@@ -34,10 +34,5 @@ namespace QuazalWV
 			foreach (Property p in Attributes)
 				p.ToBuffer(s);
 		}
-
-        public override string  ToString()
-        {
-            return $"TypeID: {TypeId}, Attribute count: {Attributes.Count}, Attributes: {string.Join(", ", Attributes)}";
-        }
     }
 }

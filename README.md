@@ -41,7 +41,7 @@ CREATE TABLE privileges (
 )
 ```
 - `relationships`
-```
+```sql
 CREATE TABLE relationships (
     requester INTEGER NOT NULL,
     requestee INTEGER NOT NULL,
