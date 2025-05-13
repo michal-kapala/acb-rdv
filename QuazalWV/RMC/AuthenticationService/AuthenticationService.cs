@@ -32,16 +32,13 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 1:
+                    var loginReq = (RMCPacketRequestAuthenticationService_Login)rmc.request;
                     try
                     {
-                        var loginReq = (RMCPacketRequestAuthenticationService_Login)rmc.request;
                         User u = DBHelper.GetUserByName(loginReq.username);
                         // 'Tracking' account (telemetry) needs to exist, users call LoginCustomData
                         if (u != null && loginReq.username == "Tracking")
-                        {
-                            Log.WriteLine(1, $"[RMC Authentication] Login called for a user {loginReq.username}", Color.Red);
                             client.TrackingUser = u;
-                        }
                         else
                             Log.WriteLine(1, $"[RMC Authentication] Login called for a non-existent user {loginReq.username}", Color.Red);
 
@@ -51,8 +48,7 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        // This will catch any other exceptions
-                        Console.WriteLine("An error occurred: " + ex.Message);
+                        Log.WriteLine(1, $"[RMC Authentication] Login for Tracking: {ex}", Color.Red);
                     }
                     break;
                 case 2:

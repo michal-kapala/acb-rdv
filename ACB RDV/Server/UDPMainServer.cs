@@ -54,7 +54,7 @@ namespace AcbRdv
 
         public static void ProcessPacket(byte[] data, IPEndPoint ep)
         {
-            QPacketHandler.ProcessPacket("UDP Backend", data, ep, listener, UDPMainServer.serverPID, UDPMainServer.listenPort);
+            QPacketHandler.ProcessPrudpPacket("UDP Backend", data, ep, listener, UDPMainServer.serverPID, UDPMainServer.listenPort);
         }
 
         private static void WriteLog(int priority, string s)

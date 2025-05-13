@@ -35,9 +35,9 @@ CREATE TABLE "users" (
 
 ```sql
 CREATE TABLE privileges (
-    id			INTEGER,
-    description	TEXT,
-    locale 		TEXT
+    id          INTEGER,
+    description TEXT,
+    locale      TEXT
 )
 ```
 - `relationships`

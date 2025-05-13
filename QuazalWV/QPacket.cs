@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 
@@ -11,8 +9,6 @@ namespace QuazalWV
 {
     public class QPacket
     {
-        public bool packet_processed = false;
-        public bool packet_began_processing = false;
         public enum STREAMTYPE
         {
             Unused,
@@ -97,8 +93,6 @@ namespace QuazalWV
         {
         }
 
-
-
         public QPacket(byte[] data, string source, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload)
         {
             this.ep = ep;
@@ -152,7 +146,6 @@ namespace QuazalWV
             checkSum = Helper.ReadU8(m);
             realSize = (uint)m.Position;
         }
-
 
         public QPacket(byte[] data)
         {
@@ -274,7 +267,7 @@ namespace QuazalWV
             {
                 case 3:
                     return 0xB5;
-                //return 0xE3;
+                    //return 0xE3;
                 case 1:
                 case 5:
                 default:

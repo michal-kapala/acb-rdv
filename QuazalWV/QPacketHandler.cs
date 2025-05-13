@@ -6,55 +6,9 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Drawing;
-using System.Collections.Concurrent;
-using System.Linq;
 
 namespace QuazalWV
 {
-    
-    public class ExpiringLockManager<TKey>
-    {
-        private class LockWrapper
-        {
-            public object LockObject { get; } = new object();
-            public DateTime LastUsed { get; set; } = DateTime.UtcNow;
-        }
-
-        private readonly ConcurrentDictionary<TKey, LockWrapper> _locks = new ConcurrentDictionary<TKey, LockWrapper>();
-        private readonly TimeSpan _expiration;
-        private readonly Timer _cleanupTimer;
-
-        public ExpiringLockManager(TimeSpan expiration, TimeSpan cleanupInterval)
-        {
-            _expiration = expiration;
-            _cleanupTimer = new Timer(Cleanup, null, cleanupInterval, cleanupInterval);
-        }
-
-        public object GetLock(TKey key)
-        {
-            var wrapper = _locks.GetOrAdd(key, _ => new LockWrapper());
-            wrapper.LastUsed = DateTime.UtcNow;
-            return wrapper.LockObject;
-        }
-
-        private void Cleanup(object state)
-        {
-            var now = DateTime.UtcNow;
-            foreach (var kvp in _locks)
-            {
-                if (now - kvp.Value.LastUsed > _expiration)
-                {
-                    Log.WriteLine(1, "removed lock which was no longer used", Color.Red);
-                    _locks.TryRemove(kvp.Key, out _);
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            _cleanupTimer.Dispose();
-        }
-    }
     public static class QPacketHandler
     {
         public static List<ulong> timeToIgnore = new List<ulong>();
@@ -66,7 +20,6 @@ namespace QuazalWV
             client = Global.GetClientByEndPoint(ep);
             if (client == null)
             {
-                //Log.WriteLine(2, "[QUAZAL] Creating new client data...");
                 client = new ClientInfo
                 {
                     ep = ep,
@@ -96,34 +49,31 @@ namespace QuazalWV
 
         public static QPacket ProcessCONNECT(ClientInfo client, QPacket p)
         {
-
+            client.IDsend = p.m_uiConnectionSignature;
+            if (p.m_oSourceVPort.port == 15)
+                client.playerSignature = p.m_uiConnectionSignature;
+            else
+                client.trackingSignature = p.m_uiConnectionSignature;
+            QPacket reply = new QPacket
             {
-                client.IDsend = p.m_uiConnectionSignature;
-                if (p.m_oSourceVPort.port == 15)
-                    client.playerSignature = p.m_uiConnectionSignature;
-                else
-                    client.trackingSignature = p.m_uiConnectionSignature;
-                QPacket reply = new QPacket
-                {
-                    m_oSourceVPort = p.m_oDestinationVPort,
-                    m_oDestinationVPort = p.m_oSourceVPort,
-                    flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
-                    type = QPacket.PACKETTYPE.CONNECT,
-                    m_bySessionID = p.m_bySessionID,
-                    m_uiSignature = p.m_uiConnectionSignature,
-                    uiSeqId = p.uiSeqId,
-                    m_uiConnectionSignature = client.IDrecv
-                };
-                // for localhost testing, remove from prod
-                if (p.m_oSourceVPort.port == 15)
-                    Thread.Sleep(50);
+                m_oSourceVPort = p.m_oDestinationVPort,
+                m_oDestinationVPort = p.m_oSourceVPort,
+                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
+                type = QPacket.PACKETTYPE.CONNECT,
+                m_bySessionID = p.m_bySessionID,
+                m_uiSignature = p.m_uiConnectionSignature,
+                uiSeqId = p.uiSeqId,
+                m_uiConnectionSignature = client.IDrecv
+            };
+            // for localhost testing, remove from prod
+            if (p.m_oSourceVPort.port == 15)
+                Thread.Sleep(50);
 
-                if (p.payload != null && p.payload.Length > 0)
-                    reply.payload = MakeConnectPayload(client, p);
-                else
-                    reply.payload = new byte[0];
-                return reply;
-            }
+            if (p.payload != null && p.payload.Length > 0)
+                reply.payload = MakeConnectPayload(client, p);
+            else
+                reply.payload = new byte[0];
+            return reply;
         }
 
         private static byte[] MakeConnectPayload(ClientInfo client, QPacket p)
@@ -146,13 +96,13 @@ namespace QuazalWV
             {
                 // response code dumped from the original traffic
                 responseCode = 0xF94C56FB;
-                //Log.WriteLine(1, $"[UDP Secure] CONNECT for Tracking user, response code 0x{responseCode:X8}");
+                Log.WriteLine(1, $"[UDP Secure] CONNECT for Tracking user, response code 0x{responseCode:X8}");
                 m = new MemoryStream();
                 Helper.WriteU32(m, 4);
                 Helper.WriteU32(m, responseCode);
                 return m.ToArray();
             }
-            //Log.WriteLine(1, $"[UDP Secure] CONNECT: PID: 0x{pid:X8}, CID: {cid}, response code 0x{responseCode:X8}");
+            Log.WriteLine(1, $"[UDP Secure] CONNECT: PID: 0x{pid:X8}, CID: {cid}, response code 0x{responseCode:X8}");
             m = new MemoryStream();
             Helper.WriteU32(m, 4);
             Helper.WriteU32(m, responseCode + 1);
@@ -192,11 +142,19 @@ namespace QuazalWV
             return reply;
         }
 
-        public static void ProcessQpacket(QPacket p)
+        public static void ProcessPacket(QPacket p)
         {
-            LogQpacket(p);
-            p.packet_began_processing = true;
-            //Log.WriteLine(1, $"[QUAZAL Packet Handler] Actual Processing{p.uiSeqId} connid {p.m_bySessionID}");
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in p.data)
+                sb.Append(b.ToString("X2") + " ");
+            MemoryStream m = new MemoryStream(p.data);
+            byte[] buff = new byte[(int)p.realSize];
+            m.Seek(0, 0);
+            m.Read(buff, 0, buff.Length);
+            Log.LogPacket(false, buff);
+            Log.WriteLine(5, "[" + p.source + "] received : " + p.ToStringShort());
+            Log.WriteLine(10, "[" + p.source + "] received : " + sb.ToString());
+            Log.WriteLine(10, "[" + p.source + "] received : " + p.ToStringDetailed());
             QPacket reply = null;
             ClientInfo client = null;
             if (p.type != QPacket.PACKETTYPE.SYN && p.type != QPacket.PACKETTYPE.NATPING)
@@ -239,7 +197,7 @@ namespace QuazalWV
                     else
                     {
                         reply = p;
-                        MemoryStream m = new MemoryStream();
+                        m = new MemoryStream();
                         byte b = (byte)(reply.payload[0] == 1 ? 0 : 1);
                         m.WriteByte(b);
                         uint rvcid = client.rvCID;
@@ -260,42 +218,22 @@ namespace QuazalWV
             }
             if (reply != null)
                 Send(p.source, reply, p.ep, p.listener);
-            p.packet_processed = true;
-            //Log.WriteLine(1, $"Finished Actual processing {p.uiSeqId} sessionid id {p.m_bySessionID}", Color.Blue);
         }
 
-        public static void LogQpacket(QPacket p)
+        public static void ProcessPrudpPacket(string source, byte[] data, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload = false)
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (byte b in p.data)
-                sb.Append(b.ToString("X2") + " ");
-            MemoryStream m = new MemoryStream(p.data);
-            byte[] buff = new byte[(int)p.realSize];
-            m.Seek(0, 0);
-            m.Read(buff, 0, buff.Length);
-            Log.LogPacket(false, buff);
-            //Log.WriteLine(5, "[" + p.source + "] received : " + p.ToStringShort());
-            //Log.WriteLine(10, "[" + p.source + "] received : " + sb.ToString());
-            //Log.WriteLine(10, "[" + p.source + "] received : " + p.ToStringDetailed());
-        }
-        public static void ProcessPacket(string source, byte[] data, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload = false)
-        {
-            //Log.WriteLine(1, $"processing packet {source} {serverPID}", Color.Brown);
             while (true)
             {
                 QPacket p = new QPacket(data, source, ep, listener, serverPID, listenPort, removeConnectPayload);
-                //Log.WriteLine(1, $"Logical Processing packet size {p.realSize} IP IS {p.ep.Address} sequence id {p.uiSeqId} connection id {p.m_bySessionID} sport {p.m_oSourceVPort} dport {p.m_oDestinationVPort}", Color.Red);
-                //HandleQpacket(p);
                 if (p.uiSeqId==0)
                 {
                     try
                     {
-                        ProcessQpacket(p);
+                        ProcessPacket(p);
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, "[Processing Packet] Something went wrong2: " + ex.Message, Color.Red);
-                        Log.WriteLine(1, ex.StackTrace,Color.Purple);
+                        Log.WriteLine(1, $"[PRUDP] {ex}", Color.Red);
                     }
                 }
                 else 
@@ -305,7 +243,7 @@ namespace QuazalWV
                     {
                         try
                         {
-                            ProcessQpacket(p);
+                            ProcessPacket(p);
                         }
                         catch (Exception ex)
                         {
@@ -313,37 +251,30 @@ namespace QuazalWV
                             Log.WriteLine(1, ex.StackTrace, Color.Purple);
                         }
                     }
-
                 }
-                //Log.WriteLine(1, $"Finished logical processing", Color.Red);
                 if (p.realSize != data.Length)
                 {
                     MemoryStream m = new MemoryStream(data);
                     int left = (int)(data.Length - p.realSize);
-                    //Log.WriteLine(1, $"left bytes {left}");
                     byte[] newData = new byte[left];
                     m.Seek(p.realSize, 0);
                     m.Read(newData, 0, left);
                     data = newData;
                 }
                 else
-                {
-                    //Log.WriteLine(1, $"broke off packer {p.uiSeqId} sessionid id {p.m_bySessionID}", Color.Blue);
                     break;
-                }
             }
         }
 
         public static void Send(string source, QPacket p, IPEndPoint ep, UdpClient listener)
         {
-
             byte[] data = p.ToBuffer();
             StringBuilder sb = new StringBuilder();
             foreach (byte b in data)
                 sb.Append(b.ToString("X2") + " ");
-            //Log.WriteLine(5, "[" + source + "] send : " + p.ToStringShort());
-            //Log.WriteLine(10, "[" + source + "] send : " + sb.ToString());
-            //Log.WriteLine(10, "[" + source + "] send : " + p.ToStringDetailed());
+            Log.WriteLine(5, "[" + source + "] send : " + p.ToStringShort());
+            Log.WriteLine(10, "[" + source + "] send : " + sb.ToString());
+            Log.WriteLine(10, "[" + source + "] send : " + p.ToStringDetailed());
             listener.Send(data, data.Length, ep);
             Log.LogPacket(true, data);
         }
