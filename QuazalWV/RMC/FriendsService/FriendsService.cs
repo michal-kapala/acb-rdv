@@ -180,7 +180,7 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-
+                        Log.WriteLine(1, $"[RMC Friends] GetRelationships: {ex.Message}", Color.Red, client);
                     }
                     break;
                 default:

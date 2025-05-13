@@ -254,7 +254,7 @@ namespace QuazalWV
         public static List<Relationship> GetInvites(uint pid, bool incoming = true)
         {
             string col = incoming ? "requestee" : "requester";
-            string query = $"SELECT * FROM relationships WHERE {col} = @pid AND type = {DbPlayerRelationshipType.Pending}";
+            string query = $"SELECT * FROM relationships WHERE {col} = @pid AND type = {(uint)DbPlayerRelationshipType.Pending}";
             List<Relationship> relations = new List<Relationship>();
             using (var command = new SQLiteCommand(query, connection))
             {

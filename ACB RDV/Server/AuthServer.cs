@@ -5,7 +5,7 @@ using QuazalWV;
 
 namespace AcbRdv
 {
-    public static class UDPRedirectorServer
+    public static class AuthServer
     {
         public static readonly object _sync = new object();
         public static bool _exit = false;
@@ -53,12 +53,12 @@ namespace AcbRdv
 
         public static void ProcessPacket(byte[] data, IPEndPoint ep)
         {
-            QPacketHandler.ProcessPrudpPacket("UDP Redirector", data, ep, listener, UDPMainServer.serverPID, UDPMainServer.listenPort);
+            QPacketHandler.ProcessPacket("Auth", data, ep, listener, RdvServer.serverPID, RdvServer.listenPort);
         }
 
         private static void WriteLog(int priority, string s)
         {
-            Log.WriteLine(priority, "[UDP Redirector] " + s);
+            Log.WriteLine(priority, "[Auth] " + s);
         }
     }
 }
