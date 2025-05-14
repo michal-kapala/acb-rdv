@@ -28,16 +28,18 @@ namespace QuazalWV
             {
                 case DbPlayerRelationshipType.Pending:
                     Relationship = otherUser.Pid == relationship.RequesterPid ? (byte)PlayerRelationship.PendingIn : (byte)PlayerRelationship.PendingOut;
+                    Status = "";
                     break;
                 case DbPlayerRelationshipType.Blocked:
                     Relationship = (byte)PlayerRelationship.Blocked;
+                    Status = "";
                     break;
                 case DbPlayerRelationshipType.Friends:
                     Relationship = (byte)PlayerRelationship.Friend;
+                    Status = online ? "Online" : "Offline";
                     break;
             }
             Details = relationship.Details;
-            Status = online ? "Online" : "Offline";
         }
 
         public void FromStream(Stream s)

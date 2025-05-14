@@ -313,7 +313,7 @@ namespace QuazalWV
                 command.Parameters.AddWithValue("@requester", requester);
                 command.Parameters.AddWithValue("@requestee", requestee);
                 int rowsAffected = command.ExecuteNonQuery();
-                Console.WriteLine($"Relationship between {requester} and {requestee} removed.");
+                Log.WriteLine(1, $"[DB] Relationship between {requester} and {requestee} removed.", Color.Orange);
                 return rowsAffected > 0;
             }
         }
@@ -338,20 +338,20 @@ namespace QuazalWV
             return result;
         }
 
-        public static User GetUserByID(uint id)
+        public static User GetUserByID(uint pid)
         {
             User result = null;
-            string query = @"SELECT * FROM users WHERE id=@id";
+            string query = @"SELECT * FROM users WHERE pid=@pid";
             using (var command = new SQLiteCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@pid", pid);
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
                         result = new User
                         {
-                            Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("id"))),
+                            Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             Password = reader.GetString(reader.GetOrdinal("password")),
                             UbiId = reader.GetString(reader.GetOrdinal("password")),
