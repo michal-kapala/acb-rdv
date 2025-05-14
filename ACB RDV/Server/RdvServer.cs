@@ -5,12 +5,13 @@ using QuazalWV;
 
 namespace AcbRdv
 {
-    public static class UDPRedirectorServer
+    public static class RdvServer
     {
+        public static readonly uint serverPID = 0x1000;
         public static readonly object _sync = new object();
         public static bool _exit = false;
-        public static ushort listenPort = 21030;
-        private static UdpClient listener;
+        public static ushort listenPort = 21031;
+        public static UdpClient listener;
         public static ushort _skipNextNAT = 0xFFFF;
 
         public static void Start()
@@ -53,12 +54,12 @@ namespace AcbRdv
 
         public static void ProcessPacket(byte[] data, IPEndPoint ep)
         {
-            QPacketHandler.ProcessPacket("UDP Redirector", data, ep, listener, UDPMainServer.serverPID, UDPMainServer.listenPort);
+            QPacketHandler.ProcessPacket("RDV", data, ep, listener, serverPID, listenPort);
         }
 
         private static void WriteLog(int priority, string s)
         {
-            Log.WriteLine(priority, "[UDP Redirector] " + s);
+            Log.WriteLine(priority, "[RDV] " + s);
         }
     }
 }

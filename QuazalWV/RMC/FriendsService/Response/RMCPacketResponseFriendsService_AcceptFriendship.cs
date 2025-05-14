@@ -2,18 +2,18 @@
 
 namespace QuazalWV
 {
-    internal class RMCPacketResponseFriendsService_BlackList : RMCPResponse
+    internal class RMCPacketResponseFriendsService_AcceptFriendship : RMCPResponse
     {
         public bool RetVal { get; set; }
 
-        public RMCPacketResponseFriendsService_BlackList(bool retval)
+        public RMCPacketResponseFriendsService_AcceptFriendship(bool retval)
         {
             RetVal = retval;
         }
 
         public override string ToString()
         {
-            return "[BlackList Response]";
+            return "[AcceptFriendship Response]";
         }
 
         public override string PayloadToString()

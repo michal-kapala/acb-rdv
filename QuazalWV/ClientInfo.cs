@@ -50,5 +50,12 @@ namespace QuazalWV
         public User TrackingUser { get; set; }
         public string LocaleCode { get; set; }
         public List<string> TrackingUserUrls { get; set; } = new List<string>();
+        /// <summary>
+        /// Current game session ID.
+        /// </summary>
+        public uint GameSessionID = 0;
+        public bool InGameSession = false;
+        public uint AbandonedSessionID = 0;
+        public bool AbandoningSession = false;
     }
 }

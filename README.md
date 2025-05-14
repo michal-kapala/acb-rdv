@@ -35,12 +35,24 @@ CREATE TABLE "users" (
 
 ```sql
 CREATE TABLE privileges (
-	id			INTEGER,
-	description	TEXT,
-	locale 		TEXT
+    id          INTEGER,
+    description TEXT,
+    locale      TEXT
 )
 ```
-
+- `relationships`
+```sql
+CREATE TABLE relationships (
+    requester INTEGER NOT NULL,
+    requestee INTEGER NOT NULL,
+    type TINYINT NOT NULL,
+    details INTEGER,
+    
+    PRIMARY KEY (requester, requestee)
+    FOREIGN KEY (requester) REFERENCES users(id),
+    FOREIGN KEY (requestee) REFERENCES users(id)
+)
+```
 3. Populate `users` table:
 - add `Tracking` user for the game's telemetry service
 ```sql
@@ -73,8 +85,8 @@ Create `ACBRDV.exe.config` configuration file in `./ACB RDV/bin/<architecture>/<
     <startup> 
         <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8"/>
     </startup>
-	<appSettings>
-      <add key="SecureServerAddress" value="<server host IP>" />
+    <appSettings>
+        <add key="SecureServerAddress" value="<server host IP>" />
     </appSettings>
 </configuration>
 ```

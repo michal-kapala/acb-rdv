@@ -8,9 +8,9 @@ namespace QuazalWV
     {
         public List<RelationshipData> Relationships { get; set; }
 
-        public RMCPacketResponseFriendsService_GetRelationships()
+        public RMCPacketResponseFriendsService_GetRelationships(List<RelationshipData> rdata)
         {
-            Relationships = new List<RelationshipData>();
+            Relationships = rdata;
         }
 
         public override string ToString()

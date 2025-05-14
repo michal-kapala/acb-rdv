@@ -2,20 +2,19 @@
 
 namespace QuazalWV
 {
-    public class RMCPacketRequestFriendsService_BlackList : RMCPRequest
+    internal class RMCPacketRequestFriendsService_AcceptFriendship : RMCPRequest
     {
         public uint Pid { get; set; }
         public uint Details { get; set; }
-
-        public RMCPacketRequestFriendsService_BlackList(Stream s)
+        
+        public RMCPacketRequestFriendsService_AcceptFriendship(Stream s)
         {
             Pid = Helper.ReadU32(s);
-            Details = Helper.ReadU32(s);
         }
 
         public override string ToString()
         {
-            return "[BlackList Request]";
+            return "[AcceptFriendship Request]";
         }
 
         public override string PayloadToString()
@@ -32,3 +31,4 @@ namespace QuazalWV
         }
     }
 }
+

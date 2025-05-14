@@ -8,6 +8,7 @@
 		ChestCapture = 2,
 		Alliance = 3,
 		Wanted = 4,
+		Intro = 5,
 		Assassinate = 6,
 		Escort = 7,
 		AdvancedAlliance = 8,

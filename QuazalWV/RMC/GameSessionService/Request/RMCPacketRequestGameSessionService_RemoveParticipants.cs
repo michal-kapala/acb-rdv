@@ -35,6 +35,7 @@ namespace QuazalWV
             Helper.WriteU32(m, (uint)PublicPids.Count);
             foreach (uint pid in PublicPids)
                 Helper.WriteU32(m, pid);
+            
             Helper.WriteU32(m, (uint)PrivatePids.Count);
             foreach (uint pid in PrivatePids)
                 Helper.WriteU32(m, pid);

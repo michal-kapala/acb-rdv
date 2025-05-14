@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
 
 namespace QuazalWV
 {
@@ -82,7 +82,7 @@ namespace QuazalWV
         public byte checkSum;
         public bool usesCompression = true;
         public uint realSize;
-
+        
         public QPacket()
         {
         }
@@ -158,9 +158,9 @@ namespace QuazalWV
             }
             if (type == PACKETTYPE.SYN || (type == PACKETTYPE.CONNECT && payload.Length > 0))
                 Helper.WriteU32(m, m_uiConnectionSignature);
-            if(type == PACKETTYPE.DATA)
+            if (type == PACKETTYPE.DATA)
                 Helper.WriteU8(m, m_byPartNumber);
-            
+
             if (tmpPayload != null && tmpPayload.Length > 0 && type != PACKETTYPE.SYN && m_oSourceVPort.type != STREAMTYPE.NAT)
             {
                 if (usesCompression)
@@ -258,13 +258,13 @@ namespace QuazalWV
         {
             StringBuilder sb = new StringBuilder();
             foreach (PACKETFLAG flag in flags)
-                sb.Append("[" + flag.ToString().Replace("FLAG_","") + "]");
+                sb.Append("[" + flag.ToString().Replace("FLAG_", "") + "]");
             return sb.ToString();
         }
 
         public string ToStringDetailed()
         {
-            StringBuilder sb = new StringBuilder();            
+            StringBuilder sb = new StringBuilder();
             sb.AppendLine("UDPPacket {");
             sb.AppendLine("\tFrom         : " + m_oSourceVPort);
             sb.AppendLine("\tTo           : " + m_oDestinationVPort);
@@ -285,7 +285,7 @@ namespace QuazalWV
             sb.AppendLine();
             sb.AppendLine("\tChecksum     : 0x" + checkSum.ToString("X2"));
             sb.AppendLine("}");
-            return sb.ToString();     
+            return sb.ToString();
         }
 
         public string ToStringShort()
