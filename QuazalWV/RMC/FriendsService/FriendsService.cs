@@ -65,8 +65,17 @@ namespace QuazalWV
                         else
                         {
                             dbResult = DBHelper.AddFriendRequest(client.User.Pid, invitee.Pid, reqAddFriendByName.Details);
-                            reply = new RMCPacketResponseFriendsService_AddFriendByNameWithDetails(invitee.Pid, reqAddFriendByName.Invitee);
-                            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                            switch (dbResult)
+                            {
+                                case DbRelationshipResult.UserBlocked:
+                                    reply = new RMCPResponseEmpty();
+                                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.Friends_CannotAddBlacklistedPlayer);
+                                    break;
+                                default:
+                                    reply = new RMCPacketResponseFriendsService_AddFriendByNameWithDetails(invitee.Pid, reqAddFriendByName.Invitee);
+                                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                                    break;
+                            }
                         }
                     }
                     catch (Exception ex)

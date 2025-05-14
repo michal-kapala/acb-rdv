@@ -28,18 +28,7 @@ namespace QuazalWV
         {
             Pid = otherUser.Pid;
             Name = otherUser.Name;
-            switch (relationship.Type)
-            {
-                case DbPlayerRelationshipType.Pending:
-                    ByRelationship = otherUser.Pid == relationship.RequesterPid ? (byte)PlayerRelationship.PendingIn : (byte)PlayerRelationship.PendingOut;
-                    break;
-                case DbPlayerRelationshipType.Blocked:
-                    ByRelationship = (byte)PlayerRelationship.Blocked;
-                    break;
-                case DbPlayerRelationshipType.Friends:
-                    ByRelationship = (byte)PlayerRelationship.Friend;
-                    break;
-            }
+            ByRelationship = (byte)relationship.Type;
             Details = relationship.Details;
             // TODO: check status values
             Status = (byte)(online ? 1 : 0);

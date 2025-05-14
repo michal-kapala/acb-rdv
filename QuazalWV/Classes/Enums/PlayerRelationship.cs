@@ -3,20 +3,16 @@
     public enum PlayerRelationship
     {
         /// <summary>
-        /// Incoming invitation request.
+        /// The players are friends.
         /// </summary>
-        PendingIn = 0,
+        Friend = 1,
         /// <summary>
-        /// Outgoing invitation request.
+        /// Invitation request.
         /// </summary>
-        PendingOut = 1,
+        Pending = 2,
         /// <summary>
         /// One of the players has blocked the other.
         /// </summary>
-        Blocked = 2,
-        /// <summary>
-        /// The players are friends.
-        /// </summary>
-        Friend = 3,
+        Blocked = 3,
     }
 }

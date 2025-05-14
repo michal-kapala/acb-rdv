@@ -39,7 +39,7 @@ namespace QuazalWV
         {
             // verify users exist beforehand
             string query = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-            List<DbPlayerRelationshipType> forbidden = new List<DbPlayerRelationshipType> { DbPlayerRelationshipType.Pending, DbPlayerRelationshipType.Blocked };
+            List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Pending, PlayerRelationship.Blocked };
             List<Relationship> relations = new List<Relationship>();
             using (var command = new SQLiteCommand(query, connection))
             {
@@ -53,13 +53,14 @@ namespace QuazalWV
                         {
                             RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
                             RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
-                            Type = (DbPlayerRelationshipType)reader.GetByte(2),
+                            Type = (PlayerRelationship)reader.GetByte(2),
                             Details = Convert.ToUInt32(reader.GetInt32(3))
                         };
                         relations.Add(relationship);
                         if (forbidden.Contains(relationship.Type))
                         {
-                            Log.WriteLine(1, "[DB] Some invites are still pending or one of the players was blocked", Color.Orange);
+                            if (relationship.Type == PlayerRelationship.Blocked)
+                                return DbRelationshipResult.UserBlocked;
                             return DbRelationshipResult.Failed;
                         }
                     }
@@ -73,7 +74,7 @@ namespace QuazalWV
                         Log.WriteLine(1, "[DB] Saved an invite", Color.Orange);
                         insertCommand.Parameters.AddWithValue("@requester", requester);
                         insertCommand.Parameters.AddWithValue("@requestee", requestee);
-                        insertCommand.Parameters.AddWithValue("@type", DbPlayerRelationshipType.Pending);
+                        insertCommand.Parameters.AddWithValue("@type", PlayerRelationship.Pending);
                         insertCommand.Parameters.AddWithValue("@details", details);
                         int rowsAffected = insertCommand.ExecuteNonQuery();
                         if (rowsAffected > 0)
@@ -93,7 +94,7 @@ namespace QuazalWV
         {
             // verify users exist beforehand
             string query = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-            List<DbPlayerRelationshipType> forbidden = new List<DbPlayerRelationshipType> { DbPlayerRelationshipType.Blocked };
+            List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Blocked };
             List<Relationship> relations = new List<Relationship>();
             using (var command = new SQLiteCommand(query, connection))
             {
@@ -107,7 +108,7 @@ namespace QuazalWV
                         {
                             RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
                             RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
-                            Type = (DbPlayerRelationshipType)Convert.ToByte(reader.GetInt32(2)),
+                            Type = (PlayerRelationship)Convert.ToByte(reader.GetInt32(2)),
                             Details = Convert.ToUInt32(reader.GetInt32(3))
                         };
                         relations.Add(relationship);
@@ -119,12 +120,12 @@ namespace QuazalWV
                     }
                 }
 
-                if (relations.Count == 1 && relations.First().Type != DbPlayerRelationshipType.Blocked)
+                if (relations.Count == 1 && relations.First().Type != PlayerRelationship.Blocked)
                 {
-                    string sql = "UPDATE relationships SET type = @type, details = @details WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
+                    string sql = "UPDATE relationships SET requester = @requester, requestee = @requestee, type = @type, details = @details WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
                     using (var cmd = new SQLiteCommand(sql, connection))
                     {
-                        cmd.Parameters.AddWithValue("@type", DbPlayerRelationshipType.Blocked);
+                        cmd.Parameters.AddWithValue("@type", PlayerRelationship.Blocked);
                         cmd.Parameters.AddWithValue("@details", details);
                         cmd.Parameters.AddWithValue("@requester", requester);
                         cmd.Parameters.AddWithValue("@requestee", requestee);
@@ -148,7 +149,7 @@ namespace QuazalWV
         public static DbRelationshipResult AddFriend(uint requester, uint requestee, uint details)
         {
             string querySql = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-            List<DbPlayerRelationshipType> forbidden = new List<DbPlayerRelationshipType> { DbPlayerRelationshipType.Friends };
+            List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Friend };
             List<Relationship> relations = new List<Relationship>();
             using (var query = new SQLiteCommand(querySql, connection))
             {
@@ -162,7 +163,7 @@ namespace QuazalWV
                         {
                             RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
                             RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
-                            Type = (DbPlayerRelationshipType)reader.GetByte(2),
+                            Type = (PlayerRelationship)reader.GetByte(2),
                             Details = Convert.ToUInt32(reader.GetInt32(3))
                         };
                         relations.Add(relationship);
@@ -174,13 +175,13 @@ namespace QuazalWV
                     }
                 }
 
-                if (relations.Count == 1 && relations.First().Type == DbPlayerRelationshipType.Pending)
+                if (relations.Count == 1 && relations.First().Type == PlayerRelationship.Pending)
                 {
                     string sql = "UPDATE relationships SET type = @type, details = @details WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
                     using (var cmd = new SQLiteCommand(sql, connection))
                     {
                         Log.WriteLine(1, $"[DB] Friendship from {requester} accepted by {requestee}", Color.Orange);
-                        cmd.Parameters.AddWithValue("@type", DbPlayerRelationshipType.Friends);
+                        cmd.Parameters.AddWithValue("@type", PlayerRelationship.Friend);
                         cmd.Parameters.AddWithValue("@details", details);
                         cmd.Parameters.AddWithValue("@requester", requester);
                         cmd.Parameters.AddWithValue("@requestee", requestee);
@@ -200,14 +201,12 @@ namespace QuazalWV
         {
             switch((PlayerRelationship)type)
             {
-                case PlayerRelationship.PendingIn:
-                    return GetInvites(pid);
-                case PlayerRelationship.PendingOut:
-                    return GetInvites(pid, false);
-                case PlayerRelationship.Blocked:
-                    return GetSymmetric(pid, (byte)DbPlayerRelationshipType.Blocked);
                 case PlayerRelationship.Friend:
-                    return GetSymmetric(pid, (byte)DbPlayerRelationshipType.Friends);
+                    return GetSymmetric(pid, (byte)PlayerRelationship.Friend);
+                case PlayerRelationship.Pending:
+                    return GetInvites(pid);
+                case PlayerRelationship.Blocked:
+                    return GetSymmetric(pid, (byte)PlayerRelationship.Blocked);
                 default:
                     Log.WriteLine(1, $"[DB] Unknown relationship type {type}", Color.Red);
                     return new List<Relationship>();
@@ -251,10 +250,9 @@ namespace QuazalWV
             return rdata;
         }
 
-        public static List<Relationship> GetInvites(uint pid, bool incoming = true)
+        public static List<Relationship> GetInvites(uint pid)
         {
-            string col = incoming ? "requestee" : "requester";
-            string query = $"SELECT * FROM relationships WHERE {col} = @pid AND type = {(uint)DbPlayerRelationshipType.Pending}";
+            string query = $"SELECT * FROM relationships WHERE (requester = @pid OR requestee = @pid) AND type = {(uint)PlayerRelationship.Pending}";
             List<Relationship> relations = new List<Relationship>();
             using (var command = new SQLiteCommand(query, connection))
             {
@@ -267,7 +265,7 @@ namespace QuazalWV
                         {
                             RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
                             RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
-                            Type = (DbPlayerRelationshipType)reader.GetByte(2),
+                            Type = (PlayerRelationship)reader.GetByte(2),
                             Details = Convert.ToUInt32(reader.GetInt32(3))
                         };
                         relations.Add(relationship);
@@ -280,7 +278,11 @@ namespace QuazalWV
 
         public static List<Relationship> GetSymmetric(uint pid, byte type)
         {
-            string query = $"SELECT * FROM relationships WHERE (requester = @pid AND type = @type) OR (requestee = @pid AND type = @type)";
+            string query;
+            if ((PlayerRelationship)type == PlayerRelationship.Friend)
+                query = $"SELECT * FROM relationships WHERE (requester = @pid OR requestee = @pid) AND type = @type";
+            else
+                query = $"SELECT * FROM relationships WHERE requester = @pid AND type = @type";
             List<Relationship> relations = new List<Relationship>();
             using (var command = new SQLiteCommand(query, connection))
             {
@@ -294,7 +296,7 @@ namespace QuazalWV
                         {
                             RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
                             RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
-                            Type = (DbPlayerRelationshipType)reader.GetByte(2),
+                            Type = (PlayerRelationship)reader.GetByte(2),
                             Details = Convert.ToUInt32(reader.GetInt32(3))
                         };
                         relations.Add(relationship);
@@ -321,6 +323,7 @@ namespace QuazalWV
         public static User GetUserByName(string name)
         {
             User result = null;
+            // TODO: this SQL injection angle should get fixed at some point
             List<List<string>> results = GetQueryResults("SELECT * FROM users WHERE name='" + name + "'");
             foreach (List<string> entry in results)
             {

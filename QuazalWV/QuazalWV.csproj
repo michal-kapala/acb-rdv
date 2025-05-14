@@ -73,7 +73,6 @@
     <Compile Include="Classes\CommonData\ResultRange.cs" />
     <Compile Include="Classes\CommonData\StationUrl.cs" />
     <Compile Include="Classes\Enums\QError.cs" />
-    <Compile Include="Classes\Enums\DbPlayerRelationshipType.cs" />
     <Compile Include="Classes\Enums\DbRelationshipResult.cs" />
     <Compile Include="Classes\Enums\GameMode.cs" />
     <Compile Include="Classes\Enums\GameType.cs" />

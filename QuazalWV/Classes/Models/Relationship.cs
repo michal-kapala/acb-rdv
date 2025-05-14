@@ -4,7 +4,7 @@
     {
         public uint RequesterPid { get; set; }
         public uint RequesteePid { get; set; }
-        public DbPlayerRelationshipType Type { get; set; }
+        public PlayerRelationship Type { get; set; }
         public uint Details { get; set; }
 
         public Relationship()
@@ -16,7 +16,7 @@
         {
             RequesterPid = ownPid;
             RequesteePid = data.Pid;
-            Type = (DbPlayerRelationshipType)data.ByRelationship;
+            Type = (PlayerRelationship)data.ByRelationship;
             Details = data.Details;
         }
     }
