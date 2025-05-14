@@ -395,7 +395,7 @@ namespace QuazalWV
                             UserDBPid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             Password = reader.GetString(reader.GetOrdinal("password")),
-                            UserDBUbiId = reader.GetString(reader.GetOrdinal("pid")),
+                            UserDBUbiId = reader.GetString(reader.GetOrdinal("ubi_id")),
                             Email = reader.GetString(reader.GetOrdinal("email")),
                             CountryCode = reader.GetString(reader.GetOrdinal("country_code")),
                             PrefLang = reader.GetString(reader.GetOrdinal("pref_lang"))

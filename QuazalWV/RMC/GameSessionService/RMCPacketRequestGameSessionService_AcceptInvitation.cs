@@ -2,11 +2,13 @@
 
 namespace QuazalWV
 {
-	public class RMCPacketRequestGameSessionService_CancelInvitation : RMCPRequest
-	{
+    internal class RMCPacketRequestGameSessionService_AcceptInvitation : RMCPRequest
+    {
+        private Stream s;
+
 		public GameSessionInvitationReceived InvitationReceived { get; set; }
 
-		public RMCPacketRequestGameSessionService_CancelInvitation(Stream s)
+		public RMCPacketRequestGameSessionService_AcceptInvitation(Stream s)
 		{
 			InvitationReceived = new GameSessionInvitationReceived(s);
 		}

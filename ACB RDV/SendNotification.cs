@@ -25,16 +25,19 @@ namespace AcbRdv
             {
                 foreach (ClientInfo client in Global.Clients)
                 {
-                    NotificationQueue.AddNotification(
-                        new NotificationQueueEntry(client, 
-                            0,
-                            Convert.ToUInt32(textBox1.Text),
-                            Convert.ToUInt32(textBox2.Text),
-                            Convert.ToUInt32(textBox3.Text),
-                            Convert.ToUInt32(textBox4.Text),
-                            Convert.ToUInt32(textBox5.Text),
-                            Convert.ToUInt32(textBox6.Text),
-                            textBox7.Text));
+                    if (client.User.Name == "a")
+                    {
+                        NotificationQueue.AddNotification(
+                            new NotificationQueueEntry(client,
+                                0,
+                                Convert.ToUInt32(textBox1.Text),
+                                Convert.ToUInt32(textBox2.Text),
+                                Convert.ToUInt32(textBox3.Text),
+                                Convert.ToUInt32(textBox4.Text),
+                                Convert.ToUInt32(textBox5.Text),
+                                Convert.ToUInt32(textBox6.Text),
+                                textBox7.Text));
+                    }
                 }
             }
             catch { }

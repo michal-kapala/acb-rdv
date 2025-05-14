@@ -7,6 +7,7 @@
     {
         pending = 2,
         friend = 1,
+        incoming=0,
         blocked = 3,
         //Friend_Online=3
         /// 0 - incoming invitation request

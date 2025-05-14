@@ -24,6 +24,8 @@ namespace QuazalWV
 			switch (rmc.methodID)
 			{
 				case 1:
+					reply = new RMCPResponseEmpty();
+					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
 					break;
 				default:
 					Log.WriteLine(1, $"[RMC MessageDelivery] Error: Unknown Method {rmc.methodID}", Color.Red, client);

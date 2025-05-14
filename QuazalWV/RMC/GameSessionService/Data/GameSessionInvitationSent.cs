@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 
 namespace QuazalWV
 {
@@ -33,6 +34,14 @@ namespace QuazalWV
 			Helper.WriteU32(s, RecipientPid);
 			Helper.WriteString(s, Message);
 			CreationTime.ToBuffer(s);
+		}
+		public override string  ToString()
+        {
+			StringBuilder sb = new StringBuilder();
+			sb.Append($"Key of the game Invite : {Key}\n");
+			sb.Append($"Recipient pid : {string.Join(", ", RecipientPid)} \n");
+			sb.Append($"Message: {Message}");
+			return sb.ToString();
 		}
 	}
 }

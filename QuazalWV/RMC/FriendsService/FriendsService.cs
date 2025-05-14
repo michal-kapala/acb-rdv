@@ -84,7 +84,7 @@ namespace QuazalWV
                                     Log.WriteLine(1, $"[Accept Friend Attempt]:  sent notification to client {tempclient.User.Name}");
                                     NotificationQueue.AddNotification(
                                     new NotificationQueueEntry(tempclient,
-                                       0,
+                                       1,
                                        0,
                                        1,
                                        12,
@@ -119,7 +119,7 @@ namespace QuazalWV
                     var reqAcceptFriendship = (RMCPacketRequestFriendsService_AcceptFriendship)rmc.request;
 
                     DBHelper.RemoveRelationshipBoth(client.User.UserDBPid, reqAcceptFriendship.Pid, (byte)PlayerRelationship.pending);
-
+                    DBHelper.RemoveRelationshipBoth(client.User.UserDBPid, reqAcceptFriendship.Pid, (byte)PlayerRelationship.incoming);
                     invitee = DBHelper.GetUserByID(reqAcceptFriendship.Pid);
                     if (invitee == null)
                     {
@@ -142,7 +142,7 @@ namespace QuazalWV
                                 Log.WriteLine(1, $"[Accept Friend Attempt]:  sent notification to client {tempclient.User.Name}");
                                 NotificationQueue.AddNotification(
                                 new NotificationQueueEntry(tempclient,
-                                   0,
+                                   1,//time to send
                                    0,
                                    1,
                                    12,
@@ -187,7 +187,7 @@ namespace QuazalWV
                                     Log.WriteLine(1, $"[deny Friend Attempt]:  sent notification to client {tempclient.User.Name}");
                                     NotificationQueue.AddNotification(
                                     new NotificationQueueEntry(tempclient,
-                                       0,
+                                       1,
                                        0,
                                        1,
                                        12,
@@ -263,7 +263,7 @@ namespace QuazalWV
                                 Log.WriteLine(1, $"[cleared relationships]:  sent notification to client {tempclient.User.Name}");
                                 NotificationQueue.AddNotification(
                                 new NotificationQueueEntry(tempclient,
-                                   0,
+                                   1,
                                    0,
                                    1,
                                    12,
@@ -316,6 +316,7 @@ namespace QuazalWV
 
                 case 13:
                     reply = new RMCPacketResponseFriendsService_GetRelationships();
+                    Log.WriteLine(1, $"[RMC RelationshipList] Unknown relationship case found document when it happened",Color.RosyBrown);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
@@ -329,14 +330,6 @@ namespace QuazalWV
             FriendData tempfriend;
             User reluser;
             List<FriendData> friends = new List<FriendData>();
-            //friends.Add(new FriendData
-            //{
-            //    Pid = 5,
-            //    Name = "h",
-            //    Relationship = relationshipsearched,
-            //    Details = 0,
-            //    Status = "Online"
-            //});
             foreach (var relationship in rels)
             {
 

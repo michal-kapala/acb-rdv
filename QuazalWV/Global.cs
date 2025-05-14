@@ -21,6 +21,8 @@ namespace QuazalWV
         public static Stopwatch uptime = new Stopwatch();
         public static uint NextGameSessionId { get; set; } = 1;
         public static List<Session> Sessions { get; set; } = new List<Session>();
+
+        public static Dictionary<uint, OfflineNotificationEntry> UIDNotificationQueue = new Dictionary<uint, OfflineNotificationEntry>(); //this is supposed to get offline notifs to get when user signs in
         //public static List<GameSession> GameSessions { get; set; } = new List<GameSession>();
         public static void RemovebySignature( uint client_servergenSignature)
         {

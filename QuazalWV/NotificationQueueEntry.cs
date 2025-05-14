@@ -21,21 +21,38 @@ namespace QuazalWV
         public uint param3;
         public string paramStr;
 
-        public NotificationQueueEntry(ClientInfo c, uint time, uint src, uint t, uint st, uint p1, uint p2, uint p3, string ps)
+        public NotificationQueueEntry(ClientInfo client, uint time, uint src, uint type, uint subtype, uint parameter1, uint parameter2, uint parameter3, string parameterString)
         {
-            client = c;
+            this.client = client;
             timer = new Stopwatch();
             timer.Start();
             timeout = time;
             source = src;
-            type = t;
-            subType = st;
-            param1 = p1;
-            param2 = p2;
-            param3 = p3;
-            paramStr = ps;
+            this.type = type;
+            this.subType = subtype;
+            this.param1 = parameter1;
+            this.param2 = parameter2;
+            this.param3 = parameter3;
+            this.paramStr = parameterString;
         }
-
+        public NotificationQueueEntry(OfflineNotificationEntry offlinenotif , ClientInfo client, uint time )
+        {
+            this.client = client;
+            timer = new Stopwatch();
+            timer.Start();
+            timeout = time;
+            this.source = offlinenotif.source;
+            this.type = offlinenotif.type;
+            this.subType = offlinenotif.subType;
+            this.param1 = offlinenotif.param1;
+            this.param2 = offlinenotif.param2;
+            this.param3 = offlinenotif.param3;
+            this.paramStr = offlinenotif.paramStr;
+        }
+        public override string ToString()
+        {
+            return $"Notification type {type} subtype {subType} par1 {param1} par2 {param2} par3 {param3} paramstr {paramStr}";
+        }
         public void Execute()
         {
             RMC.SendNotification(client, source, type, subType, param1, param2, param3, paramStr);

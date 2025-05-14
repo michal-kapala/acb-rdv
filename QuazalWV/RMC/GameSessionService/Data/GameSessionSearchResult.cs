@@ -51,6 +51,10 @@ namespace QuazalWV
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
+			if (Key==null)
+            {
+				return "session uninitialized";
+            }
 			sb.AppendLine($"[Session ID: {Key.SessionId}]");
 			sb.AppendLine($"[Host: {HostPid}]");
 			foreach (var prop in Attributes)

@@ -28,6 +28,10 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestGameSessionService_LeaveSession(s);
                     Log.WriteLine(1, "[RMC GameSession] LeaveSession key:\n" + rmc.request.PayloadToString(), Color.Purple, client);
                     break;
+                case 6:
+                    rmc.request = new RMCPacketRequestGameSessionService_GetSession(s);
+                    Log.WriteLine(1, "[RMC GameSession] GetSession :\n" + rmc.request.PayloadToString(), Color.Purple, client);
+                    break;
                 case 7:
                     rmc.request = new RMCPacketRequestGameSessionService_SearchSessions(s);
                     Log.WriteLine(1, "[RMC GameSession] SearchSessions query props:\n" + rmc.request.PayloadToString(), Color.Orange, client);
@@ -44,6 +48,12 @@ namespace QuazalWV
                 case 14:
                     rmc.request = new RMCPacketRequestGameSessionService_GetInvitationsReceived(s);
                     break;
+                case 17:
+                    rmc.request = new RMCPacketRequestGameSessionService_AcceptInvitation(s);
+                    break;
+                case 18:
+                    rmc.request = new RMCPacketRequestGameSessionService_DenyInvitation(s);
+                    break;
                 case 19:
                     rmc.request = new RMCPacketRequestGameSessionService_CancelInvitation(s);
                     break;
@@ -58,7 +68,17 @@ namespace QuazalWV
                     break;
             }
         }
-
+        public static ClientInfo IsUserOnlinebyID(uint userID)
+        {
+            foreach (ClientInfo a in Global.Clients)
+            {
+                if (a.User.UserDBPid==userID)
+                {
+                    return a;
+                }
+            }
+            return null;
+        }
         public static void HandleRequest(QPacket p, RMCP rmc, ClientInfo client)
         {
             RMCPResponse reply;
@@ -178,6 +198,13 @@ namespace QuazalWV
                     client.InGameSession = false;
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
+                case 6:
+                    var reqGetSession = (RMCPacketRequestGameSessionService_GetSession)rmc.request;
+                    Log.WriteLine(1, $"[RMC GameSession] Get Session {reqGetSession.ToString()}");
+                    reply = new RMCPacketResponseGameSessionService_GetSession(reqGetSession.Key, client);
+                    
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
                 case 7:
                     var reqSearchSes = (RMCPacketRequestGameSessionService_SearchSessions)rmc.request;
                     Log.WriteLine(2, $"[RMC] SearchSessions query: {reqSearchSes.Query}", Color.Green, client);
@@ -238,12 +265,37 @@ namespace QuazalWV
                     break;
                 case 12:
                     var sendInvitation = (RMCPacketRequestGameSessionService_SendInvitation)rmc.request;
-                    Log.WriteLine(1, $"[RMC] GameSessionService SendInvitation \n${sendInvitation.ToString()}", Color.Blue);
+                    Log.WriteLine(1, $"[RMC] GameSessionService SendInvitation \n${sendInvitation.Invitation.ToString()}", Color.Blue);
                     List<User> invitedUsers = DBHelper.GetUsersByID(sendInvitation.Invitation.Recipients);
-                    //foreach(User user in invitedUsers)
-                    //{
-                    //    if Global.
-                    //}
+                    Log.WriteLine(1, $"[RMC] GameSessionService SendInvitation \n${invitedUsers.Count}", Color.Blue);
+                    Log.WriteLine(1, $"[RMC] GameSessionService SendInvitation \n${string.Join(",", sendInvitation.Invitation.Recipients)}", Color.Blue);
+                    foreach (uint recipient in sendInvitation.Invitation.Recipients)
+                    {
+                        
+                        ClientInfo tempClient = IsUserOnlinebyID(recipient);
+                        Log.WriteLine(1, $"SendInvitation  to client {tempClient}", Color.Red);
+                        if (tempClient != null )
+                            {
+                            var tempnotif = new NotificationQueueEntry(tempClient,
+                                   1,
+                                   0,
+                                   7,
+                                   5,
+                                   0,
+                                    sendInvitation.Invitation.Key.SessionId,
+                                   sendInvitation.Invitation.Key.TypeId,
+                                   sendInvitation.Invitation.Message);
+
+                            Log.WriteLine(1, $"Sending notification {tempnotif.ToString()} ",Color.Red);
+                            NotificationQueue.AddNotification(tempnotif);
+
+                        }
+                        else
+                        {
+                            Log.WriteLine(1, $" will send later notification about game invite");
+                            Global.UIDNotificationQueue[recipient] = new OfflineNotificationEntry(0,7,5, sendInvitation.Invitation.Key.TypeId, sendInvitation.Invitation.Key.SessionId,0, sendInvitation.Invitation.Message);
+                        }
+                            }
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
@@ -253,8 +305,21 @@ namespace QuazalWV
                     reply = new RMCPacketResponseGameSessionService_GetInvitationsReceived();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
+                case 17:
+                    var InvitationReceived = (RMCPacketRequestGameSessionService_AcceptInvitation)rmc.request; //this happens when u get invite and accept it
+                    Log.WriteLine(1, $"[RMC] GameSessionService GetInvitationsAccept {InvitationReceived.ToString()} ", Color.Blue);
+                    reply = new RMCPResponseEmpty();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 18:
+                    var DenyInvitation = (RMCPacketRequestGameSessionService_DenyInvitation)rmc.request; //this happens when u get invite and deny it
+                    Log.WriteLine(1, $"[RMC] GameSessionService GetInvitationsDenied {DenyInvitation.ToString()}", Color.Blue);
+                    reply = new RMCPResponseEmpty();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
                 case 19:
-                    Log.WriteLine(1, $"[RMC] GameSessionService Cancel Invitation ", Color.Blue);
+                    Log.WriteLine(1, $"[RMC] GameSessionService Cancel Invitation ", Color.Blue); // this happens when the host exits the game
+                    var CancelInvitation = (RMCPacketRequestGameSessionService_CancelInvitation)rmc.request;
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

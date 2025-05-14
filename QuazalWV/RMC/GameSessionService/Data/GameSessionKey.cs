@@ -17,6 +17,15 @@ namespace QuazalWV
         {
             FromStream(s);
         }
+        public override bool Equals(object obj)
+        {
+            // Check for null and compare run-time types.
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            GameSessionKey other = (GameSessionKey)obj;
+            return TypeId == other.TypeId && SessionId == other.SessionId;
+        }
 
         public void FromStream(Stream s)
         {

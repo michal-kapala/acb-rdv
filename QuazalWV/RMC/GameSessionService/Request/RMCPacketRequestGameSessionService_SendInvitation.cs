@@ -13,7 +13,7 @@ namespace QuazalWV
 
 		public override string ToString()
 		{
-			return "[SendInvitation Request]";
+			return $"[SendInvitation Request] {Invitation.ToString()}";
 		}
 
 		public override string PayloadToString()
