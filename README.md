@@ -49,8 +49,6 @@ CREATE TABLE relationships (
     details INTEGER,
     
     PRIMARY KEY (requester, requestee)
-    FOREIGN KEY (requester) REFERENCES users(id),
-    FOREIGN KEY (requestee) REFERENCES users(id)
 )
 ```
 3. Populate `users` table:
