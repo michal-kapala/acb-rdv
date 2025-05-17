@@ -219,13 +219,14 @@ namespace QuazalWV
             var fdata = new List<FriendData>();
             uint otherPid;
             User otherUser;
-            bool online;
+            bool online, inviteNotif;
             foreach (var rel in relationships)
             {
                 otherPid = rel.RequesterPid == pid ? rel.RequesteePid : rel.RequesterPid;
                 otherUser = GetUserByID(otherPid);
                 online = Global.Clients.Find(c => c.User.Pid == otherPid) != null;
-                fdata.Add(new FriendData(rel, otherUser, online));
+                inviteNotif = rel.Type == PlayerRelationship.Pending && otherPid == rel.RequesterPid;
+                fdata.Add(new FriendData(rel, otherUser, online, inviteNotif));
             }
             return fdata;
         }

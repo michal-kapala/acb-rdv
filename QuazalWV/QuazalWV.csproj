@@ -72,6 +72,10 @@
     <Compile Include="Classes\CommonData\QDateTime.cs" />
     <Compile Include="Classes\CommonData\ResultRange.cs" />
     <Compile Include="Classes\CommonData\StationUrl.cs" />
+    <Compile Include="Classes\Enums\Notifications\FriendsNotificationParam2.cs" />
+    <Compile Include="Classes\Enums\Notifications\GameSessionNotificationSubtype.cs" />
+    <Compile Include="Classes\Enums\Notifications\NotificationEventType.cs" />
+    <Compile Include="Classes\Enums\Notifications\ParticipationNotificationSubtype.cs" />
     <Compile Include="Classes\Enums\QError.cs" />
     <Compile Include="Classes\Enums\DbRelationshipResult.cs" />
     <Compile Include="Classes\Enums\GameMode.cs" />
@@ -164,6 +168,7 @@
     <Compile Include="RMC\NewsService\Response\RMCPacketResponseNewsService_GetNewsHeaders.cs" />
     <Compile Include="RMC\NewsService\Response\RMCPacketResponseNewsService_GetNumberOfNews.cs" />
     <Compile Include="RMC\NewsService\Response\RMCPacketResponseNewsService_GetChannelsByTypes.cs" />
+    <Compile Include="RMC\Notifications\NotificationManager.cs" />
     <Compile Include="RMC\PersistentStoreService\PersistentStoreService.cs" />
     <Compile Include="RMC\PersistentStoreService\Request\RMCPacketRequestPersistentStoreService_GetItem.cs" />
     <Compile Include="RMC\PersistentStoreService\Response\RMCPacketResponsePersistentStoreService_GetItem.cs" />
@@ -205,8 +210,8 @@
     <Compile Include="RMC\LocalizationService\LocalizationService.cs" />
     <Compile Include="RMC\LocalizationService\Request\RMCPacketRequestLocalizationService_SetLocaleCode.cs" />
     <Compile Include="RMC\NATTraversalService\NATTraversalService.cs" />
-    <Compile Include="NotificationQuene.cs" />
-    <Compile Include="NotificationQueneEntry.cs" />
+    <Compile Include="RMC\Notifications\NotificationQueue.cs" />
+    <Compile Include="RMC\Notifications\NotificationEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QPacket.cs" />
     <Compile Include="QPacketHandler.cs" />

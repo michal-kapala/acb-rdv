@@ -172,6 +172,15 @@ namespace QuazalWV
                         Log.WriteLine(1, $"[RMC Friends] GetDetailedList returned {friends.Count} friends for relationship {(PlayerRelationship)reqGetDetailedList.Relationship}", Color.Blue, client);
                         reply = new RMCPacketResponseFriendsService_GetDetailedList(friends);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                        // send invite notifs on logon
+                        if ((PlayerRelationship)reqGetDetailedList.Relationship == PlayerRelationship.Pending)
+                        {
+                            foreach (FriendData friend in friends)
+                            {
+                                if (friend != null && friend.InviteNotif)
+                                    NotificationManager.FriendInviteReceived(client, friend.Pid, friend.Name);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {

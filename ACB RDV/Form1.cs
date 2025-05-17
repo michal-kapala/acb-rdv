@@ -102,7 +102,7 @@ namespace AcbRdv
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            NotificationQuene.Update();
+            NotificationQueue.Update();
         }
 
         private void toolStripButton9_Click(object sender, EventArgs e)
