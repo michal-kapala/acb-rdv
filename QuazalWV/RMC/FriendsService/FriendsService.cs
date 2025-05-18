@@ -74,6 +74,10 @@ namespace QuazalWV
                                 default:
                                     reply = new RMCPacketResponseFriendsService_AddFriendByNameWithDetails(invitee.Pid, reqAddFriendByName.Invitee);
                                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                                    // send instant invite notif
+                                    var inviteeClient = Global.Clients.Find(c => c.User.Pid == invitee.Pid);
+                                    if (inviteeClient != null)
+                                        NotificationManager.FriendInviteReceived(inviteeClient, client.User.Pid, client.User.Name);
                                     break;
                             }
                         }
