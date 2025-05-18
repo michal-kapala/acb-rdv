@@ -104,6 +104,11 @@ namespace QuazalWV
                             dbResult = DBHelper.AddFriend(inviter.Pid, client.User.Pid, reqAcceptFriendship.Details);
                             reply = new RMCPacketResponseFriendsService_AcceptFriendship(dbResult == DbRelationshipResult.Succeeded);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                            // send instant invite update notif (friend list-only)
+                            var inviterClient = Global.Clients.Find(c => c.User.Pid == inviter.Pid);
+                            if (inviterClient != null)
+                                NotificationManager.FriendInviteAccepted(inviterClient, client.User.Pid, client.User.Name);
+                            break;
                         }
                     }
                     catch (Exception ex)
@@ -173,7 +178,6 @@ namespace QuazalWV
                     try
                     {
                         List<FriendData> friends = DBHelper.GetFriends(client.User.Pid, reqGetDetailedList.Relationship);
-                        Log.WriteLine(1, $"[RMC Friends] GetDetailedList returned {friends.Count} friends for relationship {(PlayerRelationship)reqGetDetailedList.Relationship}", Color.Blue, client);
                         reply = new RMCPacketResponseFriendsService_GetDetailedList(friends);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                         // send invite notifs on logon
@@ -196,7 +200,6 @@ namespace QuazalWV
                     try
                     {
                         List<RelationshipData> rels = DBHelper.GetRelationshipData(client.User.Pid, reqGetRels.ResultRange.Size);
-                        Log.WriteLine(1, $"[RMC Friends] GetRelationships returned {rels.Count} friend relationships", Color.Blue, client);
                         reply = new RMCPacketResponseFriendsService_GetRelationships(rels);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     }
