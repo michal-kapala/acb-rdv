@@ -108,7 +108,7 @@ namespace QuazalWV
                             var inviterClient = Global.Clients.Find(c => c.User.Pid == inviter.Pid);
                             if (inviterClient != null)
                             {
-                                // instant invite update notif 
+                                // instant invite update notif
                                 NotificationManager.FriendInviteAccepted(inviterClient, client.User.Pid, client.User.Name);
                                 // mark inviter as online
                                 NotificationManager.FriendStatusChanged(client, inviterClient.User.Pid, inviterClient.User.Name, true);

@@ -160,8 +160,8 @@ namespace QuazalWV
                         {
                             if (result.InGameSession == true)
                             {
-								Log.WriteLine(1, $"[RMC] {result.User.Name} already in session {result.GameSessionID} on AddParticipants for session {reqAddParticip.Key.SessionId}", Color.Orange, client);
-								var future_abandoned  = Global.Sessions.Find(session => session.Key.SessionId == result.GameSessionID);
+                                Log.WriteLine(1, $"[RMC] {result.User.Name} already in session {result.GameSessionID} on AddParticipants for session {reqAddParticip.Key.SessionId}", Color.Orange, client);
+                                var future_abandoned  = Global.Sessions.Find(session => session.Key.SessionId == result.GameSessionID);
                                 result.AbandoningSession = true;
                                 result.AbandonedSessionID = result.GameSessionID;
                                 // TODO: update old session
@@ -175,23 +175,23 @@ namespace QuazalWV
 
                     foreach (uint pid in reqAddParticip.PrivatePids)
                     {
-						ClientInfo result = Global.Clients.Find(cli => cli.PID == pid);
-						if (result != null)
-						{
-							if (result.InGameSession == true)
-							{
-								Log.WriteLine(1, $"[RMC] {result.User.Name} already in session {result.GameSessionID} on AddParticipants for session {reqAddParticip.Key.SessionId}", Color.Orange, client);
-								var future_abandoned = Global.Sessions.Find(session => session.Key.SessionId == result.GameSessionID);
-								result.AbandoningSession = true;
-								result.AbandonedSessionID = result.GameSessionID;
-								// TODO: update old session
-							}
-							result.GameSessionID = reqAddParticip.Key.SessionId;
-							result.InGameSession = true;
-						}
-						else
-							Log.WriteLine(1, $"[RMC GameSession] AddParticipants: player {pid} is not online", Color.Red, client);
-					}
+                        ClientInfo result = Global.Clients.Find(cli => cli.PID == pid);
+                        if (result != null)
+                        {
+                            if (result.InGameSession == true)
+                            {
+                                Log.WriteLine(1, $"[RMC] {result.User.Name} already in session {result.GameSessionID} on AddParticipants for session {reqAddParticip.Key.SessionId}", Color.Orange, client);
+                                var future_abandoned = Global.Sessions.Find(session => session.Key.SessionId == result.GameSessionID);
+                                result.AbandoningSession = true;
+                                result.AbandonedSessionID = result.GameSessionID;
+                                // TODO: update old session
+                            }
+                            result.GameSessionID = reqAddParticip.Key.SessionId;
+                            result.InGameSession = true;
+                        }
+                        else
+                            Log.WriteLine(1, $"[RMC GameSession] AddParticipants: player {pid} is not online", Color.Red, client);
+                    }
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
@@ -223,8 +223,8 @@ namespace QuazalWV
                     break;
                 case 23:
                     var reqAbandon = (RMCPacketRequestGameSessionService_AbandonSession)rmc.request;
-					Session abandonedSes;
-					if (client.AbandoningSession == true)
+                    Session abandonedSes;
+                    if (client.AbandoningSession == true)
                     {
                         client.AbandoningSession = false;
                         abandonedSes = Global.Sessions.Find(session => session.Key.SessionId == client.AbandonedSessionID);
