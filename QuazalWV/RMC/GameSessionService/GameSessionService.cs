@@ -203,6 +203,15 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 12:
+                    var reqSendInvitation = (RMCPacketRequestGameSessionService_SendInvitation)rmc.request;
+                    Log.WriteLine(1, $"[RMC GameSession] SendInvitation:\n{reqSendInvitation.Invitation}", Color.Blue, client);
+                    ClientInfo invitee;
+                    foreach (uint pid in reqSendInvitation.Invitation.Recipients)
+                    {
+                        invitee = Global.Clients.Find(c => c.User.Pid == pid);
+                        if (invitee != null)
+                            NotificationManager.GameInviteSent(invitee, client.User.Pid, reqSendInvitation.Invitation);
+                    }
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

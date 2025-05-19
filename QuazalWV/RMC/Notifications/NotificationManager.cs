@@ -85,5 +85,20 @@ namespace QuazalWV
                 senderName
                 ).Send();
         }
+
+        public static void GameInviteSent(ClientInfo receiverClient, uint senderPid, GameSessionInvitation invite)
+        {
+            new NotificationEvent(
+                receiverClient,
+                0,
+                senderPid,
+                (uint)NotificationEventType.GameSession,
+                (uint)GameSessionNotificationSubtype.GameSessionNotif5,
+                0,
+                invite.Key.SessionId,
+                invite.Key.TypeId,
+                invite.Message
+                ).Send();
+        }
     }
 }
