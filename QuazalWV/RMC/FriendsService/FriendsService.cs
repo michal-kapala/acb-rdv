@@ -74,6 +74,10 @@ namespace QuazalWV
                                 default:
                                     reply = new RMCPacketResponseFriendsService_AddFriendByNameWithDetails(invitee.Pid, reqAddFriendByName.Invitee);
                                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                                    // send instant invite notif
+                                    var inviteeClient = Global.Clients.Find(c => c.User.Pid == invitee.Pid);
+                                    if (inviteeClient != null)
+                                        NotificationManager.FriendInviteReceived(inviteeClient, client.User.Pid, client.User.Name);
                                     break;
                             }
                         }
@@ -100,6 +104,16 @@ namespace QuazalWV
                             dbResult = DBHelper.AddFriend(inviter.Pid, client.User.Pid, reqAcceptFriendship.Details);
                             reply = new RMCPacketResponseFriendsService_AcceptFriendship(dbResult == DbRelationshipResult.Succeeded);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                            // send friend list update notifs
+                            var inviterClient = Global.Clients.Find(c => c.User.Pid == inviter.Pid);
+                            if (inviterClient != null)
+                            {
+                                // instant invite update notif
+                                NotificationManager.FriendInviteAccepted(inviterClient, client.User.Pid, client.User.Name);
+                                // mark inviter as online
+                                NotificationManager.FriendStatusChanged(client, inviterClient.User.Pid, inviterClient.User.Name, true);
+                            }
+                            break;
                         }
                     }
                     catch (Exception ex)
@@ -169,9 +183,17 @@ namespace QuazalWV
                     try
                     {
                         List<FriendData> friends = DBHelper.GetFriends(client.User.Pid, reqGetDetailedList.Relationship);
-                        Log.WriteLine(1, $"[RMC Friends] GetDetailedList returned {friends.Count} friends for relationship {(PlayerRelationship)reqGetDetailedList.Relationship}", Color.Blue, client);
                         reply = new RMCPacketResponseFriendsService_GetDetailedList(friends);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                        // send invite notifs on logon
+                        if ((PlayerRelationship)reqGetDetailedList.Relationship == PlayerRelationship.Pending)
+                        {
+                            foreach (FriendData friend in friends)
+                            {
+                                if (friend != null && friend.InviteNotif)
+                                    NotificationManager.FriendInviteReceived(client, friend.Pid, friend.Name);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -183,7 +205,6 @@ namespace QuazalWV
                     try
                     {
                         List<RelationshipData> rels = DBHelper.GetRelationshipData(client.User.Pid, reqGetRels.ResultRange.Size);
-                        Log.WriteLine(1, $"[RMC Friends] GetRelationships returned {rels.Count} friend relationships", Color.Blue, client);
                         reply = new RMCPacketResponseFriendsService_GetRelationships(rels);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     }

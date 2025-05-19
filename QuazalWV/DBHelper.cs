@@ -71,7 +71,6 @@ namespace QuazalWV
                     string insertQuery = "INSERT INTO relationships (requester, requestee, type, details) VALUES (@requester, @requestee, @type, @details)";
                     using (var insertCommand = new SQLiteCommand(insertQuery, connection))
                     {
-                        Log.WriteLine(1, "[DB] Saved an invite", Color.Orange);
                         insertCommand.Parameters.AddWithValue("@requester", requester);
                         insertCommand.Parameters.AddWithValue("@requestee", requestee);
                         insertCommand.Parameters.AddWithValue("@type", PlayerRelationship.Pending);
@@ -169,7 +168,7 @@ namespace QuazalWV
                         relations.Add(relationship);
                         if (forbidden.Contains(relationship.Type))
                         {
-                            Log.WriteLine(1, "[DB] Already your friend", Color.Orange);
+                            Log.WriteLine(1, $"[DB] Players {requester} and {requestee} are already friends", Color.Orange);
                             return DbRelationshipResult.AlreadyPresent;
                         }
                     }
@@ -180,7 +179,6 @@ namespace QuazalWV
                     string sql = "UPDATE relationships SET type = @type, details = @details WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
                     using (var cmd = new SQLiteCommand(sql, connection))
                     {
-                        Log.WriteLine(1, $"[DB] Friendship from {requester} accepted by {requestee}", Color.Orange);
                         cmd.Parameters.AddWithValue("@type", PlayerRelationship.Friend);
                         cmd.Parameters.AddWithValue("@details", details);
                         cmd.Parameters.AddWithValue("@requester", requester);
@@ -219,13 +217,14 @@ namespace QuazalWV
             var fdata = new List<FriendData>();
             uint otherPid;
             User otherUser;
-            bool online;
+            bool online, inviteNotif;
             foreach (var rel in relationships)
             {
                 otherPid = rel.RequesterPid == pid ? rel.RequesteePid : rel.RequesterPid;
                 otherUser = GetUserByID(otherPid);
                 online = Global.Clients.Find(c => c.User.Pid == otherPid) != null;
-                fdata.Add(new FriendData(rel, otherUser, online));
+                inviteNotif = rel.Type == PlayerRelationship.Pending && otherPid == rel.RequesterPid;
+                fdata.Add(new FriendData(rel, otherUser, online, inviteNotif));
             }
             return fdata;
         }
@@ -272,7 +271,6 @@ namespace QuazalWV
                     }
                 }
             }
-            Log.WriteLine(1, $"[DB] Returning {relations.Count} invites for player {pid}");
             return relations;
         }
 
@@ -303,7 +301,6 @@ namespace QuazalWV
                     }
                 }
             }
-            Log.WriteLine(1, $"[DB] Returning {relations.Count} relationships for player {pid}");
             return relations;
         }
 
@@ -315,7 +312,6 @@ namespace QuazalWV
                 command.Parameters.AddWithValue("@requester", requester);
                 command.Parameters.AddWithValue("@requestee", requestee);
                 int rowsAffected = command.ExecuteNonQuery();
-                Log.WriteLine(1, $"[DB] Relationship between {requester} and {requestee} removed.", Color.Orange);
                 return rowsAffected > 0;
             }
         }

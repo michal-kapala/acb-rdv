@@ -9,6 +9,7 @@ namespace QuazalWV
         public byte Relationship { get; set; }
         public uint Details { get; set; }
         public string Status { get; set; }
+        public bool InviteNotif { get; set; }
 
         public FriendData()
         {
@@ -17,16 +18,18 @@ namespace QuazalWV
 
         public FriendData(Stream s)
         {
+            InviteNotif = false;
             FromStream(s);
         }
 
-        public FriendData(Relationship relationship, User otherUser, bool online)
+        public FriendData(Relationship relationship, User otherUser, bool online, bool inviteNotif)
         {
             Pid = otherUser.Pid;
             Name = otherUser.Name;
             Relationship = (byte)relationship.Type;
             Status = online ? "Online" : "Offline";
             Details = relationship.Details;
+            InviteNotif = inviteNotif;
         }
 
         public void FromStream(Stream s)
