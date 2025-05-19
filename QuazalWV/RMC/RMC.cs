@@ -115,8 +115,8 @@ namespace QuazalWV
                     break;
                 case RMCP.PROTOCOL.RichPresenceService:
                     RichPresenceService.HandleRequest(p, rmc, client);
-					break;
-				case RMCP.PROTOCOL.TrackingExtService:
+                    break;
+                case RMCP.PROTOCOL.TrackingExtService:
                     TrackingExtService.HandleRequest(p, rmc, client);
                     break;
                 case RMCP.PROTOCOL.GameInfoService:
@@ -391,21 +391,27 @@ namespace QuazalWV
             m.WriteByte(0);
             Helper.WriteU32(m, param3);
             byte[] payload = m.ToArray();
-            QPacket q = new QPacket();
-            q.m_oSourceVPort = new QPacket.VPort(0x31);
-            q.m_oDestinationVPort = new QPacket.VPort(0x3f);
-            q.type = QPacket.PACKETTYPE.DATA;
-            q.flags = new List<QPacket.PACKETFLAG>();
-            q.payload = new byte[0];
-            q.uiSeqId = (ushort)(++client.gameSeqId);
-            q.m_bySessionID = client.sessionID;
-            RMCP rmc = new RMCP();
-            rmc.proto = RMCP.PROTOCOL.GlobalNotificationEventService;
-            rmc.methodID = 1;
-            rmc.callID = ++client.callCounterRMC;
-            RMCPCustom reply = new RMCPCustom();
-            reply.buffer = payload;
-            RMC.SendRequestPacket(client.udp, q, rmc, client, reply, true, 0);
+            QPacket q = new QPacket
+            {
+                m_oSourceVPort = new QPacket.VPort(0x31),
+                m_oDestinationVPort = new QPacket.VPort(0x3f),
+                type = QPacket.PACKETTYPE.DATA,
+                flags = new List<QPacket.PACKETFLAG>(),
+                payload = new byte[0],
+                uiSeqId = ++client.gameSeqId,
+                m_bySessionID = client.sessionID
+            };
+            RMCP rmc = new RMCP
+            {
+                proto = RMCP.PROTOCOL.GlobalNotificationEventService,
+                methodID = 1,
+                callID = ++client.callCounterRMC
+            };
+            RMCPCustom reply = new RMCPCustom
+            {
+                buffer = payload
+            };
+            SendRequestPacket(client.udp, q, rmc, client, reply, true, 0);
         }
 
         private static void WriteLog(int priority, string s)

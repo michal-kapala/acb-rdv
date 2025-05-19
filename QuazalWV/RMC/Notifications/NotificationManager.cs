@@ -70,5 +70,20 @@ namespace QuazalWV
                 senderName
                 ).Send();
         }
+
+        public static void FriendStatusChanged(ClientInfo receiverClient, uint senderPid, string senderName, bool online)
+        {
+            new NotificationEvent(
+                receiverClient,
+                0,
+                senderPid,
+                (uint)NotificationEventType.FriendStatusChange,
+                1,
+                senderPid,
+                online ? 1u : 0u,
+                0,
+                senderName
+                ).Send();
+        }
     }
 }
