@@ -151,15 +151,27 @@ namespace QuazalWV
                     newSes = Global.Sessions.Find(session => session.Key.SessionId == reqGetSes.Key.SessionId);
                     if (newSes == null)
                     {
-                        Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} not found", Color.Red);
+                        Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} not found", Color.Red, client);
                         reply = new RMCPResponseEmpty();
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_InvalidSessionKey);
                     }
                     else if (newSes.IsJoinable())
                     {
-                        reply = new RMCPacketResponseGameSessionService_GetSession(newSes);
-                        Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} found", Color.Blue);
-                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                        ClientInfo host = Global.Clients.Find(c => c.PID == newSes.HostPid);
+                        if (host == null)
+                        {
+                            Log.WriteLine(1, $"[RMC GameSession] Session host {newSes.HostPid} not found", Color.Red, client);
+                            reply = new RMCPResponseEmpty();
+                            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_InvalidPID);
+                        }
+                        else
+                        {
+                            reply = new RMCPacketResponseGameSessionService_GetSession(newSes, host);
+                            Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} found", Color.Blue, client);
+                            foreach (var url in ((RMCPacketResponseGameSessionService_GetSession)reply).SearchResult.HostUrls)
+                                Log.WriteLine(1, $"[{url}]", Color.Blue, client);
+                            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                        }
                     }
                     else
                     {
@@ -167,12 +179,12 @@ namespace QuazalWV
                         var isPrivateSes = newSes.FindProp(SessionParam.IsPrivate);
                         if (isPrivateSes == null)
                         {
-                            Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} missing IsPrivate param", Color.Red);
+                            Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} missing IsPrivate param", Color.Red, client);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_Unknown);
                         }
                         else
                         {
-                            Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} is full", Color.Red);
+                            Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} is full", Color.Red, client);
                             QError error = isPrivateSes.Value == 0 ? QError.GameSession_NoPublicSlotLeft : QError.GameSession_NoPrivateSlotLeft;
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)error);
                         }

@@ -6,9 +6,9 @@ namespace QuazalWV
     {
         public GameSessionSearchResult SearchResult { get; set; }
 
-        public RMCPacketResponseGameSessionService_GetSession(Session ses)
+        public RMCPacketResponseGameSessionService_GetSession(Session ses, ClientInfo host)
         {
-            SearchResult = new GameSessionSearchResult(ses);
+            SearchResult = new GameSessionSearchResult(ses, host);
         }
 
         public override string ToString()

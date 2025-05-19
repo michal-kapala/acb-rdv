@@ -16,11 +16,11 @@ namespace QuazalWV
         
         }
 
-        public GameSessionSearchResult(Session s)
+        public GameSessionSearchResult(Session s, ClientInfo host)
         {
             Key = s.Key;
             HostPid = s.HostPid;
-            HostUrls = s.HostUrls;
+            HostUrls = host != null ? host.RegisteredUrls : new List<StationUrl>();
             Attributes = s.FilterAttributes();
         }
 
