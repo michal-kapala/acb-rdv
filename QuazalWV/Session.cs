@@ -118,9 +118,9 @@ namespace QuazalWV
         public void RemoveParticipants(List<uint> publicPids, List<uint> privatePids)
         {
             PublicPids.RemoveAll(item => publicPids.Contains(item));
-			PrivatePids.RemoveAll(item => privatePids.Contains(item));
-			UpdateCurrentSlots();			
-		}
+            PrivatePids.RemoveAll(item => privatePids.Contains(item));
+            UpdateCurrentSlots();			
+        }
 
         public void Leave(ClientInfo client)
         {
@@ -165,10 +165,38 @@ namespace QuazalWV
             if (currPrivateSlots == null)
             {
                 GameSession.Attributes.Add(new Property((uint)SessionParam.CurrentPrivateSlots, (uint)PrivatePids.Count));
-				Log.WriteLine(1, $"[Session] Session {Key.SessionId} missing private slots param", Color.Red);
-			}
+                Log.WriteLine(1, $"[Session] Session {Key.SessionId} missing private slots param", Color.Red);
+            }
             else
                 currPrivateSlots.Value = (uint)PrivatePids.Count;
+        }
+
+        public Property FindProp(SessionParam id)
+        {
+            return GameSession.Attributes.Find(prop => prop.Id == (uint)id);
+        }
+
+        public bool IsJoinable()
+        {
+            var isPrivateParam = FindProp(SessionParam.IsPrivate);
+            if (isPrivateParam == null)
+            {
+                Log.WriteLine(1, $"[Session] IsPrivate attribute missing in session {Key.SessionId}", Color.Red);
+                return false;
+            }
+            var maxSlots = FindProp(isPrivateParam.Value == 0 ? SessionParam.MaxPublicSlots : SessionParam.MaxPrivateSlots);
+            if (maxSlots == null)
+            {
+                Log.WriteLine(1, $"[Session] MaxSlots attribute missing in session {Key.SessionId}", Color.Red);
+                return false;
+            }
+            var currentSlots = FindProp(isPrivateParam.Value == 0 ? SessionParam.CurrentPublicSlots : SessionParam.CurrentPrivateSlots);
+            if (currentSlots == null)
+            {
+                Log.WriteLine(1, $"[Session] CurrentSlots attribute missing in session {Key.SessionId}", Color.Red);
+                return false;
+            }
+            return maxSlots.Value > currentSlots.Value;
         }
     }
 }

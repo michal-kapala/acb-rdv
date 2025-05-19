@@ -24,6 +24,9 @@ namespace QuazalWV
                 case 5:
                     rmc.request = new RMCPacketRequestGameSessionService_LeaveSession(s);
                     break;
+                case 6:
+                    rmc.request = new RMCPacketRequestGameSessionService_GetSession(s);
+                    break;
                 case 7:
                     rmc.request = new RMCPacketRequestGameSessionService_SearchSessions(s);
                     Log.WriteLine(1, "[RMC GameSession] SearchSessions query props:\n" + rmc.request.PayloadToString(), Color.Orange, client);
@@ -139,6 +142,38 @@ namespace QuazalWV
                     client.GameSessionID = 0;
                     client.InGameSession = false;
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 6:
+                    var reqGetSes = (RMCPacketRequestGameSessionService_GetSession)rmc.request;
+                    newSes = Global.Sessions.Find(session => session.Key.SessionId == reqGetSes.Key.SessionId);
+                    if (newSes == null)
+                    {
+                        Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} not found", Color.Red);
+                        reply = new RMCPResponseEmpty();
+                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_InvalidSessionKey);
+                    }
+                    else if (newSes.IsJoinable())
+                    {
+                        reply = new RMCPacketResponseGameSessionService_GetSession(newSes);
+                        Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} found", Color.Blue);
+                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    }
+                    else
+                    {
+                        reply = new RMCPResponseEmpty();
+                        var isPrivateSes = newSes.FindProp(SessionParam.IsPrivate);
+                        if (isPrivateSes == null)
+                        {
+                            Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} missing IsPrivate param", Color.Red);
+                            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_Unknown);
+                        }
+                        else
+                        {
+                            Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} is full", Color.Red);
+                            QError error = isPrivateSes.Value == 0 ? QError.GameSession_NoPublicSlotLeft : QError.GameSession_NoPrivateSlotLeft;
+                            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)error);
+                        }
+                    }
                     break;
                 case 7:
                     var reqSearchSes = (RMCPacketRequestGameSessionService_SearchSessions)rmc.request;
