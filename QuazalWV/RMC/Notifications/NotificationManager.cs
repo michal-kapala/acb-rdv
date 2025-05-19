@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace QuazalWV
+﻿namespace QuazalWV
 {
     public static class NotificationManager
     {
@@ -98,6 +92,21 @@ namespace QuazalWV
                 invite.Key.SessionId,
                 invite.Key.TypeId,
                 invite.Message
+                ).Send();
+        }
+
+        public static void GameInviteDeclined(ClientInfo receiverClient, uint senderPid, uint sessionId)
+        {
+            new NotificationEvent(
+                receiverClient,
+                0,
+                senderPid,
+                (uint)NotificationEventType.GameSession,
+                (uint)GameSessionNotificationSubtype.InviteDeclined,
+                0,
+                sessionId,
+                0,
+                ""
                 ).Send();
         }
     }

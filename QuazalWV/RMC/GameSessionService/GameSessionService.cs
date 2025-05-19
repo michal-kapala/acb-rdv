@@ -260,9 +260,12 @@ namespace QuazalWV
                     break;
                 case 18:
                     var reqDeclineInvite = (RMCPacketRequestGameSessionService_DeclineInvitation)rmc.request;
-                    // TODO: notify inviter
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    // invite declined notif
+                    ClientInfo inviter = Global.Clients.Find(c => c.User.Pid == reqDeclineInvite.InvitationRecv.SenderPid);
+                    if (inviter != null)
+                        NotificationManager.GameInviteDeclined(inviter, client.User.Pid, reqDeclineInvite.InvitationRecv.SessionKey.SessionId);
                     break;
                 case 19:
                     reply = new RMCPResponseEmpty();
