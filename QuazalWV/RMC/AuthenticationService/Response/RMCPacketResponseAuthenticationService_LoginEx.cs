@@ -1,13 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace QuazalWV
 {
-    public class RMCPacketResponseLoginCustomData : RMCPResponse
+    public class RMCPacketResponseAuthenticationService_LoginEx : RMCPResponse
     {
         public uint resultCode = 0x10001;
         public uint PID;
@@ -21,7 +17,7 @@ namespace QuazalWV
         public string specialProtoUrl = "";
         public string returnMsg = "";
         
-        public RMCPacketResponseLoginCustomData(uint pid, uint sPID, ushort sPort)
+        public RMCPacketResponseAuthenticationService_LoginEx(uint pid, uint sPID, ushort sPort)
         {
             PID = pid;
             serverID = sPID;

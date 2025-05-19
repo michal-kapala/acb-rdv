@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace QuazalWV
 {
-    public class RMCPacketRequestRequestTicket : RMCPRequest
+    public class RMCPacketRequestAuthenticationService_RequestTicket : RMCPRequest
     {
         public uint sourcePID;
         public uint targetPID;
 
-        public RMCPacketRequestRequestTicket()
+        public RMCPacketRequestAuthenticationService_RequestTicket()
         { 
         }
 
-        public RMCPacketRequestRequestTicket(Stream s)
+        public RMCPacketRequestAuthenticationService_RequestTicket(Stream s)
         {
             sourcePID = Helper.ReadU32(s);
             targetPID = Helper.ReadU32(s);

@@ -16,7 +16,7 @@ namespace QuazalWV
             {
                 string b = Helper.ReadString(s);
                 Urls.Add(new StationUrl(b));
-                Log.WriteLine(2, $"[RMC GameSession] RegisterURLs - host URL: {b}");
+                Log.WriteLine(1, $"[RMC GameSession] RegisterURLs - host URL: {b}");
             }
         }
 
