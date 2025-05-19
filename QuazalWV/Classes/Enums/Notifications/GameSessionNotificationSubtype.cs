@@ -4,7 +4,7 @@
     {
         InviteReceived = 5,
         InviteDeclined = 7,
-        GameSessionNotif8 = 8,
+        InviteAccepted = 8,
         GameSessionNotif9 = 9,
     }
 }

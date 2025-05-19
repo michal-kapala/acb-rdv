@@ -43,6 +43,9 @@ namespace QuazalWV
                 case 14:
                     rmc.request = new RMCPacketRequestGameSessionService_GetInvitationsReceived(s);
                     break;
+                case 17:
+                    rmc.request = new RMCPacketRequestGameSessionService_AcceptInvitation(s);
+                    break;
                 case 18:
                     rmc.request = new RMCPacketRequestGameSessionService_DeclineInvitation(s);
                     break;
@@ -67,6 +70,7 @@ namespace QuazalWV
             uint sesId;
             Property gameType, currPublicSlots, currPrivateSlots, accessibility;
             Session newSes, migrateFromSes;
+            ClientInfo inviter;
             switch (rmc.methodID)
             {
                 case 1:
@@ -270,12 +274,21 @@ namespace QuazalWV
                     reply = new RMCPacketResponseGameSessionService_GetInvitationsReceived();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
+                case 17:
+                    var reqAcceptInvite = (RMCPacketRequestGameSessionService_AcceptInvitation)rmc.request;
+                    reply = new RMCPResponseEmpty();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    // invite accepted notif
+                    inviter = Global.Clients.Find(c => c.User.Pid == reqAcceptInvite.InvitationRecv.SenderPid);
+                    if (inviter != null)
+                        NotificationManager.GameInviteAccepted(inviter, client.User.Pid, reqAcceptInvite.InvitationRecv.SessionKey.SessionId);
+                    break;
                 case 18:
                     var reqDeclineInvite = (RMCPacketRequestGameSessionService_DeclineInvitation)rmc.request;
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     // invite declined notif
-                    ClientInfo inviter = Global.Clients.Find(c => c.User.Pid == reqDeclineInvite.InvitationRecv.SenderPid);
+                    inviter = Global.Clients.Find(c => c.User.Pid == reqDeclineInvite.InvitationRecv.SenderPid);
                     if (inviter != null)
                         NotificationManager.GameInviteDeclined(inviter, client.User.Pid, reqDeclineInvite.InvitationRecv.SessionKey.SessionId);
                     break;
