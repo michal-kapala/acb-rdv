@@ -43,6 +43,9 @@ namespace QuazalWV
                 case 14:
                     rmc.request = new RMCPacketRequestGameSessionService_GetInvitationsReceived(s);
                     break;
+                case 18:
+                    rmc.request = new RMCPacketRequestGameSessionService_DeclineInvitation(s);
+                    break;
                 case 19:
                     rmc.request = new RMCPacketRequestGameSessionService_CancelInvitation(s);
                     break;
@@ -253,6 +256,12 @@ namespace QuazalWV
                 case 14:
                     var reqGetInvRecv = (RMCPacketRequestGameSessionService_GetInvitationsReceived)rmc.request;
                     reply = new RMCPacketResponseGameSessionService_GetInvitationsReceived();
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 18:
+                    var reqDeclineInvite = (RMCPacketRequestGameSessionService_DeclineInvitation)rmc.request;
+                    // TODO: notify inviter
+                    reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 19:

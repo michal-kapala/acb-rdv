@@ -93,7 +93,7 @@ namespace QuazalWV
                 0,
                 senderPid,
                 (uint)NotificationEventType.GameSession,
-                (uint)GameSessionNotificationSubtype.GameSessionNotif5,
+                (uint)GameSessionNotificationSubtype.InviteReceived,
                 0,
                 invite.Key.SessionId,
                 invite.Key.TypeId,
