@@ -177,9 +177,13 @@ namespace QuazalWV
                     var reqClearRel = (RMCPacketRequestFriendsService_ClearRelationship)rmc.request;
                     try
                     {
-                        result = DBHelper.RemoveRelationship(client.PID, reqClearRel.Pid);
+                        result = DBHelper.RemoveRelationship(client.User.Pid, reqClearRel.Pid);
                         reply = new RMCPacketResponseFriendsService_ClearRelationship(result);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                        // send removed from friends notif
+                        ClientInfo inviterClient = Global.Clients.Find(c => c.User.Pid == reqClearRel.Pid);
+                        if (inviterClient != null && result)
+                            NotificationManager.FriendRemoved(inviterClient, client.User.Pid, client.User.Name);
                     }
                     catch (Exception ex)
                     {
