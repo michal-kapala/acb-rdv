@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace QuazalWV
 {
@@ -319,20 +320,27 @@ namespace QuazalWV
         public static User GetUserByName(string name)
         {
             User result = null;
-            // TODO: this SQL injection angle should get fixed at some point
-            List<List<string>> results = GetQueryResults("SELECT * FROM users WHERE name='" + name + "'");
-            foreach (List<string> entry in results)
+            string query = @"SELECT * FROM users WHERE name = @name";
+            using (var command = new SQLiteCommand(query, connection))
             {
-                result = new User
+                command.Parameters.AddWithValue("@name", name);
+                using (var reader = command.ExecuteReader())
                 {
-                    Pid = Convert.ToUInt32(entry[1]),
-                    Name = name,
-                    Password = entry[3],
-                    UbiId = entry[4],
-                    Email = entry[5],
-                    CountryCode = entry[6],
-                    PrefLang = entry[7],
-                };
+                    while (reader.Read())
+                    {
+                        result = new User
+                        {
+                            Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
+                            Name = reader.GetString(reader.GetOrdinal("name")),
+                            Password = reader.GetString(reader.GetOrdinal("password")),
+                            UbiId = reader.GetString(reader.GetOrdinal("password")),
+                            Email = reader.GetString(reader.GetOrdinal("email")),
+                            CountryCode = reader.GetString(reader.GetOrdinal("country_code")),
+                            PrefLang = reader.GetString(reader.GetOrdinal("pref_lang"))
+                        };
+                        return result;
+                    }
+                }
             }
             return result;
         }
