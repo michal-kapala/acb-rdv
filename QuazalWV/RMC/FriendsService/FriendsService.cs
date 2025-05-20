@@ -162,6 +162,10 @@ namespace QuazalWV
                             dbResult = DBHelper.AddBlacklistRequest(client.User.Pid, blacklisted.Pid, reqBlacklist.Details);
                             reply = new RMCPacketResponseFriendsService_BlackList(dbResult == DbRelationshipResult.Succeeded);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                            // remove from friend list when blocked
+                            ClientInfo inviterClient = Global.Clients.Find(c => c.User.Pid == reqBlacklist.Pid);
+                            if (inviterClient != null && dbResult == DbRelationshipResult.Succeeded)
+                                NotificationManager.FriendRemoved(inviterClient, client.User.Pid, client.User.Name);
                         }
                     }
                     catch (Exception ex)
