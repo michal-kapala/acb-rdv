@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace QuazalWV
 {

@@ -3,12 +3,12 @@
     public static class NotificationManager
     {
         /// <summary>
-        /// Sends a friend invite denial notification.
+        /// Sends a friend/invite removal/denial notification.
         /// </summary>
         /// <param name="receiverClient"></param>
         /// <param name="senderPid"></param>
         /// <param name="senderName"></param>
-        public static void FriendInviteDeclined(ClientInfo receiverClient, uint senderPid, string senderName)
+        public static void FriendRemoved(ClientInfo receiverClient, uint senderPid, string senderName)
         {
             new NotificationEvent(
                 receiverClient,
