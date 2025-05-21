@@ -220,10 +220,10 @@
     <Compile Include="QPacket.cs" />
     <Compile Include="QPacketHandler.cs" />
     <Compile Include="RMC\AuthenticationService\AuthenticationService.cs" />
-    <Compile Include="RMC\AuthenticationService\Request\RMCPacketRequestLoginCustomData.cs" />
-    <Compile Include="RMC\AuthenticationService\Request\RMCPacketRequestRequestTicket.cs" />
-    <Compile Include="RMC\AuthenticationService\Response\RMCPacketResponseLoginCustomData.cs" />
-    <Compile Include="RMC\AuthenticationService\Response\RMCPacketResponseRequestTicket.cs" />
+    <Compile Include="RMC\AuthenticationService\Request\RMCPacketRequestAuthenticationService_LoginEx.cs" />
+    <Compile Include="RMC\AuthenticationService\Request\RMCPacketRequestAuthenticationService_RequestTicket.cs" />
+    <Compile Include="RMC\AuthenticationService\Response\RMCPacketResponseAuthenticationService_LoginEx.cs" />
+    <Compile Include="RMC\AuthenticationService\Response\RMCPacketResponseAuthenticationService_RequestTicket.cs" />
     <Compile Include="RMC\MatchMakingService\MatchMakingService.cs" />
     <Compile Include="RMC\MatchMakingService\Response\RMCPacketResponseMatchMakingService_GetParticipantsURLs.cs" />
     <Compile Include="RMC\RMC.cs" />

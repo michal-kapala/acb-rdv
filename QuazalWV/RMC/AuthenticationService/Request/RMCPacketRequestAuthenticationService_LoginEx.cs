@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuazalWV
 {
-    public class RMCPacketRequestLoginCustomData : RMCPRequest
+    public class RMCPacketRequestAuthenticationService_LoginEx : RMCPRequest
     {
         public string user;
         public string className;
@@ -15,11 +15,11 @@ namespace QuazalWV
         public string onlineKey;
         public string password;
 
-        public RMCPacketRequestLoginCustomData()
+        public RMCPacketRequestAuthenticationService_LoginEx()
         { 
         }
 
-        public RMCPacketRequestLoginCustomData(Stream s)
+        public RMCPacketRequestAuthenticationService_LoginEx(Stream s)
         {
             user = Helper.ReadString(s);
             className = Helper.ReadString(s);

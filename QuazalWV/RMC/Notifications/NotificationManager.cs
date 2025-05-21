@@ -3,12 +3,12 @@
     public static class NotificationManager
     {
         /// <summary>
-        /// Sends a friend invite denial notification.
+        /// Sends a friend/invite removal/denial notification.
         /// </summary>
         /// <param name="receiverClient"></param>
         /// <param name="senderPid"></param>
         /// <param name="senderName"></param>
-        public static void FriendInviteDeclined(ClientInfo receiverClient, uint senderPid, string senderName)
+        public static void FriendRemoved(ClientInfo receiverClient, uint senderPid, string senderName)
         {
             new NotificationEvent(
                 receiverClient,
@@ -118,6 +118,21 @@
                 senderPid,
                 (uint)NotificationEventType.GameSession,
                 (uint)GameSessionNotificationSubtype.InviteAccepted,
+                0,
+                sessionId,
+                0,
+                ""
+                ).Send();
+        }
+
+        public static void GameInviteSomething(ClientInfo receiverClient, uint senderPid, uint sessionId)
+        {
+            new NotificationEvent(
+                receiverClient,
+                0,
+                senderPid,
+                (uint)NotificationEventType.GameSession,
+                (uint)GameSessionNotificationSubtype.GameSessionNotif9,
                 0,
                 sessionId,
                 0,

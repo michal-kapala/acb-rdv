@@ -77,9 +77,7 @@ namespace QuazalWV
                     var reqCreateSes = (RMCPacketRequestGameSessionService_CreateSession)rmc.request;
                     sesId = Global.NextGameSessionId++;
                     client.GameSessionID = sesId;
-                    client.InGameSession = true;
                     newSes = new Session(sesId, reqCreateSes.Session, client);
-                    Log.WriteLine(1, $"[RMC GameSession] New session (id={newSes.Key.SessionId}) for client {client.User.Name}", Color.Blue, client);
                     // initialize params
                     gameType = newSes.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
                     if (gameType == null)
@@ -209,7 +207,7 @@ namespace QuazalWV
                     // update clients
                     foreach (uint pid in reqAddParticip.PublicPids)
                     {
-                        ClientInfo result = Global.Clients.Find(cli => cli.PID == pid);
+                        ClientInfo result = Global.Clients.Find(c => c.User.Pid == pid);
                         if (result != null)
                         {
                             if (result.InGameSession == true)
@@ -229,7 +227,7 @@ namespace QuazalWV
 
                     foreach (uint pid in reqAddParticip.PrivatePids)
                     {
-                        ClientInfo result = Global.Clients.Find(cli => cli.PID == pid);
+                        ClientInfo result = Global.Clients.Find(c => c.User.Pid == pid);
                         if (result != null)
                         {
                             if (result.InGameSession == true)

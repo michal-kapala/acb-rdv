@@ -14,10 +14,10 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestAuthenticationService_Login(s);
                     break;
                 case 2:
-                    rmc.request = new RMCPacketRequestLoginCustomData(s);
+                    rmc.request = new RMCPacketRequestAuthenticationService_LoginEx(s);
                     break;
                 case 3:
-                    rmc.request = new RMCPacketRequestRequestTicket(s);
+                    rmc.request = new RMCPacketRequestAuthenticationService_RequestTicket(s);
                     break;
                 default:
                     Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Method {rmc.methodID}", Color.Red);
@@ -32,15 +32,15 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 1:
-                    var loginReq = (RMCPacketRequestAuthenticationService_Login)rmc.request;
+                    var reqLogin = (RMCPacketRequestAuthenticationService_Login)rmc.request;
                     try
                     {
-                        User u = DBHelper.GetUserByName(loginReq.username);
+                        User u = DBHelper.GetUserByName(reqLogin.username);
                         // 'Tracking' account (telemetry) needs to exist, users call LoginCustomData
-                        if (u != null && loginReq.username == "Tracking")
+                        if (u != null && reqLogin.username == "Tracking")
                             client.TrackingUser = u;
                         else
-                            Log.WriteLine(1, $"[RMC Authentication] Login called for a non-existent user {loginReq.username}", Color.Red);
+                            Log.WriteLine(1, $"[RMC Authentication] Login called for a non-existent user {reqLogin.username}", Color.Red);
 
                         reply = new RMCPacketResponseAuthenticationService_Login(client);
                         //client.sessionKey = ((RMCPacketResponseAuthenticationService_Login)reply).ticket.sessionKey;
@@ -52,42 +52,40 @@ namespace QuazalWV
                     }
                     break;
                 case 2:
-                    RMCPacketRequestLoginCustomData h = (RMCPacketRequestLoginCustomData)rmc.request;
-                    switch (h.className)
+                    RMCPacketRequestAuthenticationService_LoginEx reqLoginEx = (RMCPacketRequestAuthenticationService_LoginEx)rmc.request;
+                    switch (reqLoginEx.className)
                     {
                         case "UbiAuthenticationLoginCustomData":
                             reply = new RMCPResponseEmpty();
-                            User user = DBHelper.GetUserByName(h.username);
+                            User user = DBHelper.GetUserByName(reqLoginEx.username);
                             if (user != null)
                             {
-                                if (user.Password == h.password)
+                                if (user.Password == reqLoginEx.password)
                                 {
-                                    reply = new RMCPacketResponseLoginCustomData(client.PID, client.sPID, client.sPort);
+                                    client.User = user;
+                                    reply = new RMCPacketResponseAuthenticationService_LoginEx(client.User.Pid, client.sPID, client.sPort);
+                                    client.sessionKey = ((RMCPacketResponseAuthenticationService_LoginEx)reply).ticket.sessionKey;
                                     Global.RemoveSessionsOnLogin(client);
                                     // TODO: kick everyone that has joined the sessions hosted by the guy who logged in again
-                                    client.User = user;
-                                    client.sessionKey = ((RMCPacketResponseLoginCustomData)reply).ticket.sessionKey;
                                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                                 }
                                 else
-                                {
-                                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, 0x80030065);
-                                }
+                                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.RendezVous_InvalidPassword);
                             }
                             else
                             {
-                                Log.WriteLine(1, $"[RMC Authentication] LoginCustomData called for a non-existent user {h.username}", Color.Red, client);
-                                RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, 0x80030064);
+                                Log.WriteLine(1, $"[RMC Authentication] LoginEx called for a non-existent user {reqLoginEx.username}", Color.Red, client);
+                                RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.RendezVous_InvalidUsername);
                             }
                             break;
                         default:
-                            Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Custom Data class {h.className}", Color.Red, client);
+                            Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Custom Data class {reqLoginEx.className}", Color.Red, client);
                             break;
                     }
                     break;
                 case 3:
-                    var reqTicket = (RMCPacketRequestRequestTicket)rmc.request;
-                    reply = new RMCPacketResponseRequestTicket(reqTicket.sourcePID, client);
+                    var reqTicket = (RMCPacketRequestAuthenticationService_RequestTicket)rmc.request;
+                    reply = new RMCPacketResponseAuthenticationService_RequestTicket(reqTicket.sourcePID, client);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     // reset sequence IDs for secure service connection
                     if (p.m_oSourceVPort.port == 15)
