@@ -194,7 +194,24 @@ namespace QuazalWV
                     var reqGetDetailedList = (RMCPacketRequestFriendsService_GetDetailedList)rmc.request;
                     try
                     {
-                        List<FriendData> friends = DBHelper.GetFriends(client.User.Pid, reqGetDetailedList.Relationship);
+                        var relationships = DBHelper.GetRelationships(client.User.Pid, reqGetDetailedList.Relationship);
+                        var friends = new List<FriendData>();
+                        uint otherPid;
+                        User otherUser;
+                        ClientInfo friendClient;
+                        bool online, inviteNotif;
+                        foreach (var rel in relationships)
+                        {
+                            otherPid = rel.RequesterPid == client.User.Pid ? rel.RequesteePid : rel.RequesterPid;
+                            otherUser = DBHelper.GetUserByID(otherPid);
+                            friendClient = Global.Clients.Find(c => c.User.Pid == otherPid);
+                            online = friendClient != null;
+                            inviteNotif = rel.Type == PlayerRelationship.Pending && otherPid == rel.RequesterPid;
+                            friends.Add(new FriendData(rel, otherUser, online, inviteNotif));
+                            // send 'is now online' notifs to friends
+                            if (online)
+                                NotificationManager.FriendStatusChanged(friendClient, client.User.Pid, client.User.Name, true);
+                        }
                         reply = new RMCPacketResponseFriendsService_GetDetailedList(friends);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                         // send invite notifs on logon
