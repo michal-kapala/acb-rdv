@@ -76,6 +76,8 @@
     <Compile Include="Classes\Enums\Notifications\GameSessionNotificationSubtype.cs" />
     <Compile Include="Classes\Enums\Notifications\NotificationEventType.cs" />
     <Compile Include="Classes\Enums\Notifications\ParticipationNotificationSubtype.cs" />
+    <Compile Include="Classes\Enums\Presence\PresencePropertyId.cs" />
+    <Compile Include="Classes\Enums\Presence\VariantType.cs" />
     <Compile Include="Classes\Enums\QError.cs" />
     <Compile Include="Classes\Enums\DbRelationshipResult.cs" />
     <Compile Include="Classes\Enums\GameMode.cs" />
@@ -184,6 +186,8 @@
     <Compile Include="RMC\PrivilegesService\Request\RMCPacketRequestPrivilegesService_GetPrivileges.cs" />
     <Compile Include="RMC\PrivilegesService\Response\RMCPacketResponsePrivilegesService_GetPrivileges.cs" />
     <Compile Include="RMC\RichPresenceService\Data\PresenceElement.cs" />
+    <Compile Include="RMC\RichPresenceService\Data\PresenceProperty.cs" />
+    <Compile Include="RMC\RichPresenceService\Data\PresencePropertyListParser.cs" />
     <Compile Include="RMC\RichPresenceService\Request\RMCPacketRequestRichPresenceService_GetPresence.cs" />
     <Compile Include="RMC\RichPresenceService\Request\RMCPacketRequestRichPresenceService_SetPresence.cs" />
     <Compile Include="RMC\RichPresenceService\Response\RMCPacketResponseRichPresenceService_GetPresence.cs" />

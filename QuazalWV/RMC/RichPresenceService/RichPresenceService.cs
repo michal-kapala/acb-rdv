@@ -3,41 +3,44 @@ using System.IO;
 
 namespace QuazalWV
 {
-	public static class RichPresenceService
-	{
-		public static void ProcessRequest(Stream s, RMCP rmc)
-		{
-			switch (rmc.methodID)
-			{
-				case 1:
-					rmc.request = new RMCPacketRequestRichPresenceService_SetPresence(s);
-					break;
-				case 2:
-					rmc.request = new RMCPacketRequestRichPresenceService_GetPresence(s);
-					break;
-				default:
-					Log.WriteLine(1, $"[RMC RichPresence] Error: Unknown Method {rmc.methodID}", Color.Red);
-					break;
-			}
-		}
+public static class RichPresenceService
+{
+    public static void ProcessRequest(Stream s, RMCP rmc)
+    {
+        switch (rmc.methodID)
+        {
+        case 1:
+            rmc.request = new RMCPacketRequestRichPresenceService_SetPresence(s);
+            break;
+        case 2:
+            rmc.request = new RMCPacketRequestRichPresenceService_GetPresence(s);
+            break;
+        default:
+            Log.WriteLine(1, $"[RMC RichPresence] Error: Unknown Method {rmc.methodID}", Color.Red);
+            break;
+        }
+    }
 
-		public static void HandleRequest(QPacket p, RMCP rmc, ClientInfo client)
-		{
-			RMCPResponse reply;
-			switch (rmc.methodID)
-			{
-				case 1:
-					reply = new RMCPResponseEmpty();
-					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
-					break;
-				case 2:
-					reply = new RMCPacketResponseRichPresenceService_GetPresence();
-					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
-					break;
-				default:
-					Log.WriteLine(1, $"[RMC RichPresence] Error: Unknown Method {rmc.methodID}", Color.Red, client);
-					break;
-			}
-		}
-	}
+    public static void HandleRequest(QPacket p, RMCP rmc, ClientInfo client)
+    {
+        RMCPResponse reply;
+        switch (rmc.methodID)
+        {
+        case 1:
+            var reqSetPresence = (RMCPacketRequestRichPresenceService_SetPresence)rmc.request;
+            foreach (var prop in reqSetPresence.Props)
+                Log.WriteLine(1, $"[RMC RichPresence] {prop}", Color.Blue, client);
+            reply = new RMCPResponseEmpty();
+            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+            break;
+        case 2:
+            reply = new RMCPacketResponseRichPresenceService_GetPresence();
+            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+            break;
+        default:
+            Log.WriteLine(1, $"[RMC RichPresence] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+            break;
+        }
+    }
+}
 }
