@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace QuazalWV
 {
@@ -35,6 +39,94 @@ namespace QuazalWV
             return result;
         }
 
+        public static int GetHighestId()
+        {
+            string query = "SELECT MAX(id) FROM YourTableName";
+
+            var command = new SQLiteCommand(query, connection);
+
+            object result = command.ExecuteScalar();
+
+            if (result != DBNull.Value && result != null)
+                return Convert.ToInt32(result);
+            else
+                return -1;
+        }
+        public static (bool Success, string Message) CheckDuplicateInformation(string Name, string Email, string UbiID, string Pid)
+        {
+            StringBuilder returnMessage = new StringBuilder();
+            bool returnState = false;
+            string query = @"
+            SELECT 
+            CASE WHEN EXISTS (SELECT 1 FROM Users WHERE name = @name) THEN 1 ELSE 0 END AS UserExists,
+            CASE WHEN EXISTS (SELECT 1 FROM Users WHERE email = @email) THEN 1 ELSE 0 END AS EmailExists,
+            CASE WHEN EXISTS (SELECT 1 FROM Users WHERE pid = @pid) THEN 1 ELSE 0 END AS pidExists,
+            CASE WHEN EXISTS (SELECT 1 FROM Users WHERE ubi_id = @UbiID) THEN 1 ELSE 0 END AS pidExists;";
+
+            using (SQLiteCommand cmd = new SQLiteCommand(query, connection))
+            {
+                cmd.Parameters.AddWithValue("@name", Name);
+                cmd.Parameters.AddWithValue("@email", Email);
+                cmd.Parameters.AddWithValue("@pid", Pid);
+                cmd.Parameters.AddWithValue("@UbiID", UbiID);
+
+                var reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    bool userExists = reader.GetInt32(0) == 1;
+                    bool emailExists = reader.GetInt32(1) == 1;
+                    bool pid = reader.GetInt32(2) == 1;
+                    bool ubi_id = reader.GetInt32(3) == 1;
+
+                    if (userExists)
+                    {
+                        returnMessage.Append("Username is already taken \n");
+                        returnState = true;
+                    }
+                    if (emailExists)
+                    {
+                        returnMessage.Append("Email is already taken \n");
+                        returnState = true;
+                    }
+                    if (pid)
+                    {
+                        returnMessage.Append("PID is already taken \n");
+                        returnState = true;
+                    }
+                    if (ubi_id)
+                    {
+                        returnMessage.Append("UbisoftID is already taken \n");
+                        returnState = true;
+                    }
+                }
+
+
+            }
+            if (returnState == true)
+            {
+                return (true, returnMessage.ToString());
+            }
+            else
+            {
+                return (false, "Everything is OK");
+
+            }
+
+        }
+
+        public static int GetHighestPid()
+        {
+            string query = "SELECT MAX(pid) FROM Users";
+
+            var command = new SQLiteCommand(query, connection);
+
+            object result = command.ExecuteScalar();
+
+            if (result != DBNull.Value && result != null)
+                return Convert.ToInt32(result);
+            else
+                return -1;
+        }
         public static DbRelationshipResult AddFriendRequest(uint requester, uint requestee, uint details)
         {
             // verify users exist beforehand
@@ -197,7 +289,7 @@ namespace QuazalWV
 
         public static List<Relationship> GetRelationships(uint pid, byte type)
         {
-            switch((PlayerRelationship)type)
+            switch ((PlayerRelationship)type)
             {
                 case PlayerRelationship.Friend:
                     return GetSymmetric(pid, (byte)PlayerRelationship.Friend);
@@ -313,8 +405,9 @@ namespace QuazalWV
                         {
                             Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
-                            Password = reader.GetString(reader.GetOrdinal("password")),
-                            UbiId = reader.GetString(reader.GetOrdinal("password")),
+                            Hash = reader.IsDBNull(reader.GetOrdinal("hash")) ? null : (byte[])reader.GetValue(reader.GetOrdinal("hash")),
+                            Salt = reader.IsDBNull(reader.GetOrdinal("salt")) ? null : (byte[])reader.GetValue(reader.GetOrdinal("salt")),
+                            UbiId = reader.GetString(reader.GetOrdinal("ubi_id")),
                             Email = reader.GetString(reader.GetOrdinal("email")),
                             CountryCode = reader.GetString(reader.GetOrdinal("country_code")),
                             PrefLang = reader.GetString(reader.GetOrdinal("pref_lang"))
@@ -341,8 +434,9 @@ namespace QuazalWV
                         {
                             Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
-                            Password = reader.GetString(reader.GetOrdinal("password")),
-                            UbiId = reader.GetString(reader.GetOrdinal("password")),
+                            Hash = reader.IsDBNull(reader.GetOrdinal("hash")) ? null : (byte[])reader.GetValue(reader.GetOrdinal("hash")),
+                            Salt = reader.IsDBNull(reader.GetOrdinal("salt")) ? null : (byte[])reader.GetValue(reader.GetOrdinal("salt")),
+                            UbiId = reader.GetString(reader.GetOrdinal("ubi_id")),
                             Email = reader.GetString(reader.GetOrdinal("email")),
                             CountryCode = reader.GetString(reader.GetOrdinal("country_code")),
                             PrefLang = reader.GetString(reader.GetOrdinal("pref_lang"))
@@ -425,6 +519,48 @@ namespace QuazalWV
                 Log.WriteLine(1, $"[DB] {e}", Color.Red);
                 return false;
             }
+        }
+        public static bool AddUser(string username, string password, string ubiID, string Email, string PID, string CountryCode, string PrefLang)
+        {
+            byte[] hash, salt;
+            (hash, salt) = PasswordHasher.HashPassword(password);
+
+            string query = @"
+        INSERT INTO Users (pid,name, hash, salt,ubi_id,email,country_code,pref_lang) 
+        VALUES (@pid,@Username, @Hash, @Salt,@ubiId,@email,@country_code,@pref_lang);";
+
+            var cmd = new SQLiteCommand(query, connection);
+            cmd.Parameters.AddWithValue("@Username", username);
+            cmd.Parameters.AddWithValue("@pid", PID);
+            cmd.Parameters.AddWithValue("@Hash", hash);
+            cmd.Parameters.AddWithValue("@Salt", salt);
+            cmd.Parameters.AddWithValue("@ubiId", ubiID);
+            cmd.Parameters.AddWithValue("@email", Email);
+            cmd.Parameters.AddWithValue("@country_code", CountryCode);
+            cmd.Parameters.AddWithValue("@pref_lang", PrefLang);
+            cmd.ExecuteNonQuery();
+            return true;
+        }
+        public static bool RemoveUser(string username)
+        {
+            try
+            {
+
+                string query = "DELETE FROM Users WHERE name = @Username";
+
+                var cmd = new SQLiteCommand(query, connection);
+                cmd.Parameters.AddWithValue("@Username", username);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+
+                return rowsAffected > 0; // true if user was deleted
+            }
+            catch(Exception e)
+            {
+                Log.WriteLine(1, $"exception {e}");
+                return false; // failure (e.g., SQL error)
+            }
+
         }
     }
 }

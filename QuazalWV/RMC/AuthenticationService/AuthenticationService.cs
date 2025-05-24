@@ -60,10 +60,11 @@ namespace QuazalWV
                             User user = DBHelper.GetUserByName(reqLoginEx.username);
                             if (user != null)
                             {
-                                if (user.Password == reqLoginEx.password)
+                                
+                                if (PasswordHasher.VerifyPassword(reqLoginEx.password, user.Hash,user.Salt))
                                 {
                                     client.User = user;
-                                    reply = new RMCPacketResponseAuthenticationService_LoginEx(client.User.Pid, client.sPID, client.sPort);
+                                    reply = new RMCPacketResponseAuthenticationService_LoginEx(client.PID, client.sPID, client.sPort);
                                     client.sessionKey = ((RMCPacketResponseAuthenticationService_LoginEx)reply).ticket.sessionKey;
                                     Global.RemoveSessionsOnLogin(client);
                                     // TODO: kick everyone that has joined the sessions hosted by the guy who logged in again

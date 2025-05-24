@@ -207,7 +207,7 @@ namespace QuazalWV
                     // update clients
                     foreach (uint pid in reqAddParticip.PublicPids)
                     {
-                        ClientInfo result = Global.Clients.Find(c => c.User.Pid == pid);
+                        ClientInfo result = Global.Clients.Find(c => c.PID == pid);
                         if (result != null)
                         {
                             if (result.InGameSession == true)
@@ -227,7 +227,7 @@ namespace QuazalWV
 
                     foreach (uint pid in reqAddParticip.PrivatePids)
                     {
-                        ClientInfo result = Global.Clients.Find(c => c.User.Pid == pid);
+                        ClientInfo result = Global.Clients.Find(c => c.PID == pid);
                         if (result != null)
                         {
                             if (result.InGameSession == true)

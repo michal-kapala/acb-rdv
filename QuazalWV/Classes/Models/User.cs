@@ -4,7 +4,8 @@
     {
         public uint Pid { get; set; }
         public string Name { get; set; }
-        public string Password { get; set; }
+        public byte[] Hash { get; set; }
+        public byte[] Salt { get; set; }
         public string UbiId { get; set; }
         public string Email { get; set; }
         public string CountryCode { get; set; }

@@ -109,5 +109,26 @@ namespace AcbRdv
         {
             Log.enablePacketLogging = toolStripButton9.Checked;
         }
+
+        private void toolStripButton10_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton10_Click_1(object sender, EventArgs e)
+        {
+            new AddUser().Show();
+        }
+
+        private void toolStripButton11_Click(object sender, EventArgs e)
+        {
+            new RemoveUser().Show();
+        }
+
+        private void toolStripButton12_Click(object sender, EventArgs e)
+        {
+            toolStrip2.Visible = !toolStrip2.Visible;
+
+        }
     }
 }
