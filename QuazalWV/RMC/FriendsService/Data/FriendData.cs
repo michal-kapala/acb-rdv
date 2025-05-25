@@ -24,7 +24,7 @@ namespace QuazalWV
 
         public FriendData(Relationship relationship, User otherUser, bool online, bool inviteNotif)
         {
-            Pid = otherUser.Pid;
+            Pid = otherUser.UserDBPid;
             Name = otherUser.Name;
             Relationship = (byte)relationship.Type;
             Status = online ? "Online" : "Offline";

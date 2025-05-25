@@ -2,7 +2,7 @@
 {
     public class User : DbModel
     {
-        public uint Pid { get; set; }
+        public uint UserDBPid { get; set; }
         public string Name { get; set; }
         public byte[] Hash { get; set; }
         public byte[] Salt { get; set; }

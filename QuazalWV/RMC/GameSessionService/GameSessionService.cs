@@ -139,7 +139,7 @@ namespace QuazalWV
                     if (leftSes.NbParticipants() == 1)
                     {
                         Global.Sessions.Remove(leftSes);
-                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.User.Pid}", Color.Gray, client);
+                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.User.UserDBPid}", Color.Gray, client);
                     }
                     else
                         leftSes.Leave(client);
@@ -159,7 +159,7 @@ namespace QuazalWV
                     }
                     else if (newSes.IsJoinable())
                     {
-                        ClientInfo host = Global.Clients.Find(c => c.PID == newSes.HostPid);
+                        ClientInfo host = Global.Clients.Find(c => c.User.UserDBPid == newSes.HostPid);
                         if (host == null)
                         {
                             Log.WriteLine(1, $"[RMC GameSession] Session host {newSes.HostPid} not found", Color.Red, client);
@@ -207,7 +207,7 @@ namespace QuazalWV
                     // update clients
                     foreach (uint pid in reqAddParticip.PublicPids)
                     {
-                        ClientInfo result = Global.Clients.Find(c => c.PID == pid);
+                        ClientInfo result = Global.Clients.Find(c => c.User.UserDBPid == pid);
                         if (result != null)
                         {
                             if (result.InGameSession == true)
@@ -227,7 +227,7 @@ namespace QuazalWV
 
                     foreach (uint pid in reqAddParticip.PrivatePids)
                     {
-                        ClientInfo result = Global.Clients.Find(c => c.PID == pid);
+                        ClientInfo result = Global.Clients.Find(c => c.User.UserDBPid == pid);
                         if (result != null)
                         {
                             if (result.InGameSession == true)
@@ -260,9 +260,9 @@ namespace QuazalWV
                     ClientInfo invitee;
                     foreach (uint pid in reqSendInvitation.Invitation.Recipients)
                     {
-                        invitee = Global.Clients.Find(c => c.User.Pid == pid);
+                        invitee = Global.Clients.Find(c => c.User.UserDBPid == pid);
                         if (invitee != null)
-                            NotificationManager.GameInviteSent(invitee, client.User.Pid, reqSendInvitation.Invitation);
+                            NotificationManager.GameInviteSent(invitee, client.User.UserDBPid, reqSendInvitation.Invitation);
                     }
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
@@ -277,18 +277,18 @@ namespace QuazalWV
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     // invite accepted notif
-                    inviter = Global.Clients.Find(c => c.User.Pid == reqAcceptInvite.InvitationRecv.SenderPid);
+                    inviter = Global.Clients.Find(c => c.User.UserDBPid == reqAcceptInvite.InvitationRecv.SenderPid);
                     if (inviter != null)
-                        NotificationManager.GameInviteAccepted(inviter, client.User.Pid, reqAcceptInvite.InvitationRecv.SessionKey.SessionId);
+                        NotificationManager.GameInviteAccepted(inviter, client.User.UserDBPid, reqAcceptInvite.InvitationRecv.SessionKey.SessionId);
                     break;
                 case 18:
                     var reqDeclineInvite = (RMCPacketRequestGameSessionService_DeclineInvitation)rmc.request;
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     // invite declined notif
-                    inviter = Global.Clients.Find(c => c.User.Pid == reqDeclineInvite.InvitationRecv.SenderPid);
+                    inviter = Global.Clients.Find(c => c.User.UserDBPid == reqDeclineInvite.InvitationRecv.SenderPid);
                     if (inviter != null)
-                        NotificationManager.GameInviteDeclined(inviter, client.User.Pid, reqDeclineInvite.InvitationRecv.SessionKey.SessionId);
+                        NotificationManager.GameInviteDeclined(inviter, client.User.UserDBPid, reqDeclineInvite.InvitationRecv.SessionKey.SessionId);
                     break;
                 case 19:
                     reply = new RMCPResponseEmpty();
@@ -315,16 +315,16 @@ namespace QuazalWV
                         if (abandonedSes.NbParticipants() == 1)
                         {
                             Global.Sessions.Remove(abandonedSes);
-                            Log.WriteLine(1, $"[RMC GameSession] Session {abandonedSes.Key.SessionId} deleted on abandon from player {client.User.Pid}", Color.Gray, client);
+                            Log.WriteLine(1, $"[RMC GameSession] Session {abandonedSes.Key.SessionId} deleted on abandon from player {client.User.UserDBPid}", Color.Gray, client);
                             client.GameSessionID = 0;
                             client.InGameSession = false;
                         }
                         else
                         {
-                            if (abandonedSes.PublicPids.Contains(client.PID))
-                                abandonedSes.PublicPids.Remove(client.PID);
-                            if (abandonedSes.PrivatePids.Contains(client.PID))
-                                abandonedSes.PrivatePids.Remove(client.PID);
+                            if (abandonedSes.PublicPids.Contains(client.User.UserDBPid))
+                                abandonedSes.PublicPids.Remove(client.User.UserDBPid);
+                            if (abandonedSes.PrivatePids.Contains(client.User.UserDBPid))
+                                abandonedSes.PrivatePids.Remove(client.User.UserDBPid);
                         }
                     }
                     else

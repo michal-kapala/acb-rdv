@@ -4,16 +4,40 @@
     /// Quazal OSDK error names and codes found in the ACB binary's 'Quazal::BackEndServices::FormatQErrorCodeString' method.
     /// <seealso cref="https://github.com/kinnay/NintendoClients/blob/master/nintendo/nex/errors.py"/>
     /// </summary>
+  /* 0x8064000b
+        
+        0x8006000c
+        0x8064000a
+        0x80030001
+        0x80010001
+        0x80050003
+        0x80050001 -> 0x8005000F //UPNP THREAD
+        0x80050008
+        0x80030065
+        0x8003006a
+
+        0x800A0001-0x800A000B//POPULATECONFIG ERROR CODES
+
+
+        0x80640001 - 0x8064000e//JOIN SESSION
+        0x60002
+        0x60001
+        0x80060001
+
+        //Core_Unknown =                                      0x00010001,*/
     public enum QError : uint
     {
-        Core_Unknown =                                      0x00010001,
+        UNK_1 = 0x80010002,
+        UNK_2 = 0x8001000d,
+        
+
         Core_OperationAborted =                             0x80010004,
         Core_Exception =                                    0x80010005,
         Core_AccessDenied =                                 0x80010006,
         Core_InvalidArgument =                              0x8001000A,
         Core_Timeout =                                      0x8001000B,
         Core_InitializationFailure =                        0x8001000C,
-
+        
         RendezVous_ConnectionFailure =                      0x80030001,
         RendezVous_NotAuthenticated =                       0x80030002,
         RendezVous_InvalidUsername =                        0x80030064,

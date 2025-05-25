@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Drawing;
 using System;
+using System.Security.Cryptography.X509Certificates;
 
 namespace QuazalWV
 {
@@ -25,9 +26,10 @@ namespace QuazalWV
             }
         }
 
-
+        public static uint temp_counter=0;
         public static void HandleRequest(QPacket p, RMCP rmc, ClientInfo client)
         {
+            
             RMCPResponse reply;
             switch (rmc.methodID)
             {
@@ -64,7 +66,7 @@ namespace QuazalWV
                                 if (PasswordHasher.VerifyPassword(reqLoginEx.password, user.Hash,user.Salt))
                                 {
                                     client.User = user;
-                                    reply = new RMCPacketResponseAuthenticationService_LoginEx(client.PID, client.sPID, client.sPort);
+                                    reply = new RMCPacketResponseAuthenticationService_LoginEx(client.ClientInfoConnPid, client.ServerConstID, client.sPort);
                                     client.sessionKey = ((RMCPacketResponseAuthenticationService_LoginEx)reply).ticket.sessionKey;
                                     Global.RemoveSessionsOnLogin(client);
                                     // TODO: kick everyone that has joined the sessions hosted by the guy who logged in again
@@ -76,7 +78,7 @@ namespace QuazalWV
                             else
                             {
                                 Log.WriteLine(1, $"[RMC Authentication] LoginEx called for a non-existent user {reqLoginEx.username}", Color.Red, client);
-                                RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.RendezVous_InvalidUsername);
+                                RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, 0x80010002);
                             }
                             break;
                         default:

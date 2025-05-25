@@ -22,7 +22,7 @@ namespace QuazalWV
             };
             PublicPids = new List<uint>();
             PrivatePids = new List<uint>();
-            HostPid = host.PID;
+            HostPid = host.User.UserDBPid;
             foreach (var url in host.Urls)
                 Log.WriteLine(2, $"[Session] Host URL added: ${url}", Color.Green);
             HostUrls = host.Urls;
@@ -50,7 +50,7 @@ namespace QuazalWV
             }
 
             // self-hosted
-            if (client.PID == HostPid)
+            if (client.ClientInfoConnPid == HostPid)
             {
                 Log.WriteLine(1, $"[Session] Ignoring a self-hosted session", Color.Gray, client);
                 return false;
@@ -124,18 +124,18 @@ namespace QuazalWV
 
         public void Leave(ClientInfo client)
         {
-            PublicPids.Remove(client.PID);
-            PrivatePids.Remove(client.PID);
+            PublicPids.Remove(client.User.UserDBPid);
+            PrivatePids.Remove(client.User.UserDBPid);
             UpdateCurrentSlots();
             // host left - assign new host (migrate?)
-            if (client.PID == HostPid)
+            if (client.User.UserDBPid == HostPid)
             {
                 if (PublicPids.Count > 0)
                     HostPid = PublicPids[0];
                 else
                     HostPid = PrivatePids[0];
-                Log.WriteLine(1, $"[Session] On-leave host migration from {client.PID} to {HostPid}", Color.Orange);
-                var newHost = Global.Clients.Find(c => c.PID == HostPid);
+                Log.WriteLine(1, $"[Session] On-leave host migration from {client.User.UserDBPid} to {HostPid}", Color.Orange);
+                var newHost = Global.Clients.Find(c => c.User.UserDBPid == HostPid);
                 if (newHost == null)
                 {
                     Log.WriteLine(1, $"[Session] On-leave host migration elected non-existent host {HostPid}", Color.Red);

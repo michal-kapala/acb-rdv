@@ -26,7 +26,7 @@ namespace QuazalWV
 
         public RelationshipData(Relationship relationship, User otherUser, bool online)
         {
-            Pid = otherUser.Pid;
+            Pid = otherUser.UserDBPid;
             Name = otherUser.Name;
             ByRelationship = (byte)relationship.Type;
             Details = relationship.Details;

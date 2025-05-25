@@ -54,7 +54,7 @@ namespace QuazalWV
             client.TrackingUserUrls = trackingUrls;
 
             // Just-in-case update for the global list
-            ClientInfo listClient = Global.Clients.Find(c => c.PID == client.PID);
+            ClientInfo listClient = Global.Clients.Find(c => c.User.UserDBPid == client.User.UserDBPid);
             if (listClient == null)
             {
                 Log.WriteLine(1, "[RMC Secure] Register: the client wasn't found in global list, adding", Color.Red, client);

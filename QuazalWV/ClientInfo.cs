@@ -1,16 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
+using System.Text;
 
 namespace QuazalWV
 {
     public class ClientInfo
     {
+        public IPAddress IPaddress;
+        public bool Playersignout = false;
+        public bool Trackingsignout = false;
         public static System.Random rand = new System.Random();
-        public uint PID;
-        public uint sPID;
+        public uint ClientInfoConnPid;
+        public uint ServerConstID;
         public ushort sPort;
-        public uint IDrecv;
+        public uint ServerIncrementedGeneratedConnSignature;
         public uint rvCID = (uint)rand.Next();
         public uint IDsend;
         public byte sessionID;
@@ -57,5 +61,11 @@ namespace QuazalWV
         public bool InGameSession = false;
         public uint AbandonedSessionID = 0;
         public bool AbandoningSession = false;
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($" gamesessid {GameSessionID} user {User} sessionID {sessionID} pid {ClientInfoConnPid} spid {ServerIncrementedGeneratedConnSignature} ");
+            return sb.ToString();
+        }
     }
 }

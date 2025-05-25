@@ -57,7 +57,7 @@ namespace QuazalWV
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.AppendLine($"\t[Pid: {Pid}]");
+			sb.AppendLine($"\t[UserDBPid: {Pid}]");
 			sb.AppendLine($"\t[Session ID: {SessionID}]");
 			sb.AppendLine($"\t[Date begin: {Begin.Time}]");
 			sb.AppendLine($"\t[Date end: {End.Time}]");

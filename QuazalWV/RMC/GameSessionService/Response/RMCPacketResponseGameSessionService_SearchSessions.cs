@@ -16,7 +16,7 @@ namespace QuazalWV
 			{
 				if (ses.CheckQuery(query, client))
 				{
-					var host = Global.Clients.Find(c => c.PID == ses.HostPid);
+					var host = Global.Clients.Find(c => c.User.UserDBPid == ses.HostPid);
 					if (host == null)
 						Log.WriteLine(1, $"[RMC GameSession] Error: host {ses.HostPid} not found for SearchSessions result", Color.Red, client);
 

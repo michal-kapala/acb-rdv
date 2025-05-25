@@ -65,7 +65,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(53, 13);
             this.label2.TabIndex = 1;
-            this.label2.Text = "Game Pid";
+            this.label2.Text = "Game UserDBPid";
             // 
             // label3
             // 

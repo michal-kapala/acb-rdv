@@ -42,7 +42,7 @@ namespace QuazalWV
             string localhost = "127.0.0.1";
             address = client.ep.Address.ToString() == localhost ? localhost : GetConfigAddress();
             // Only Tracking user calls Login
-            PID = client.TrackingUser.Pid;
+            PID = client.TrackingUser.UserDBPid;
             port = client.sPort;
             // unused
             ticket = new KerberosTicket(serverID)

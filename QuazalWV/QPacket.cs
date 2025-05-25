@@ -82,13 +82,64 @@ namespace QuazalWV
         public byte checkSum;
         public bool usesCompression = true;
         public uint realSize;
-        
+        public ushort listenPort;
+        public ushort replyPort;
         public QPacket()
         {
         }
 
+        public QPacket(byte[] data, ushort listenPort, ushort replyPort)
+        {
+            this.listenPort = listenPort;
+            this.replyPort = replyPort;
+            MemoryStream m = new MemoryStream(data);
+            m_oSourceVPort = new VPort(Helper.ReadU8(m));
+            m_oDestinationVPort = new VPort(Helper.ReadU8(m));
+            m_byPacketTypeFlags = Helper.ReadU8(m);
+            type = (PACKETTYPE)(m_byPacketTypeFlags & 0x7);
+            flags = new List<PACKETFLAG>();
+            ExtractFlags();
+            m_bySessionID = Helper.ReadU8(m);
+            m_uiSignature = Helper.ReadU32(m);
+            uiSeqId = Helper.ReadU16(m);
+            if (type == PACKETTYPE.SYN || type == PACKETTYPE.CONNECT)
+                m_uiConnectionSignature = Helper.ReadU32(m);
+            if (type == PACKETTYPE.DATA)
+                m_byPartNumber = Helper.ReadU8(m);
+            if (flags.Contains(PACKETFLAG.FLAG_HAS_SIZE))
+                payloadSize = Helper.ReadU16(m);
+            else
+                payloadSize = (ushort)(m.Length - m.Position - 1);
+            MemoryStream pl = new MemoryStream();
+            if (payloadSize != 0)
+                for (int i = 0; i < payloadSize; i++)
+                    pl.WriteByte(Helper.ReadU8(m));
+            payload = pl.ToArray();
+            if (payload != null && payload.Length > 0 && type != PACKETTYPE.SYN && m_oSourceVPort.type != STREAMTYPE.NAT)
+            {
+                if (m_oSourceVPort.type == STREAMTYPE.OldRVSec)
+                    payload = Helper.Decrypt(Global.keyDATA, payload);
+                usesCompression = payload[0] != 0;
+                if (usesCompression)
+                {
+                    MemoryStream m2 = new MemoryStream();
+                    m2.Write(payload, 1, payload.Length - 1);
+                    payload = Helper.Decompress(m2.ToArray());
+                }
+                else
+                {
+                    MemoryStream m2 = new MemoryStream();
+                    m2.Write(payload, 1, payload.Length - 1);
+                    payload = m2.ToArray();
+                }
+                payloadSize = (ushort)payload.Length;
+            }
+            checkSum = Helper.ReadU8(m);
+            realSize = (uint)m.Position;
+        }
         public QPacket(byte[] data)
         {
+
             MemoryStream m = new MemoryStream(data);
             m_oSourceVPort = new VPort(Helper.ReadU8(m));
             m_oDestinationVPort = new VPort(Helper.ReadU8(m));

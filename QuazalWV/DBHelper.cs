@@ -315,7 +315,7 @@ namespace QuazalWV
             {
                 otherPid = rel.RequesterPid == pid ? rel.RequesteePid : rel.RequesterPid;
                 otherUser = GetUserByID(otherPid);
-                online = Global.Clients.Find(c => c.User.Pid == otherPid) != null;
+                online = Global.Clients.Find(c => c.User.UserDBPid == otherPid) != null;
                 rdata.Add(new RelationshipData(rel, otherUser, online));
                 if (rdata.Count == maxSize)
                     break;
@@ -403,7 +403,7 @@ namespace QuazalWV
                     {
                         result = new User
                         {
-                            Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
+                            UserDBPid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             Hash = reader.IsDBNull(reader.GetOrdinal("hash")) ? null : (byte[])reader.GetValue(reader.GetOrdinal("hash")),
                             Salt = reader.IsDBNull(reader.GetOrdinal("salt")) ? null : (byte[])reader.GetValue(reader.GetOrdinal("salt")),
@@ -432,7 +432,7 @@ namespace QuazalWV
                     {
                         result = new User
                         {
-                            Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
+                            UserDBPid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             Hash = reader.IsDBNull(reader.GetOrdinal("hash")) ? null : (byte[])reader.GetValue(reader.GetOrdinal("hash")),
                             Salt = reader.IsDBNull(reader.GetOrdinal("salt")) ? null : (byte[])reader.GetValue(reader.GetOrdinal("salt")),
