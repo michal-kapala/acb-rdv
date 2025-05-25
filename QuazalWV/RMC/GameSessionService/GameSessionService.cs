@@ -77,7 +77,9 @@ namespace QuazalWV
                     var reqCreateSes = (RMCPacketRequestGameSessionService_CreateSession)rmc.request;
                     sesId = Global.NextGameSessionId++;
                     client.GameSessionID = sesId;
+                    client.InGameSession = true;
                     newSes = new Session(sesId, reqCreateSes.Session, client);
+                    Log.WriteLine(1, $"[RMC GameSession] New session (id={newSes.Key.SessionId}) for client {client.User.Name}", Color.Blue, client);
                     // initialize params
                     gameType = newSes.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
                     if (gameType == null)
@@ -139,7 +141,7 @@ namespace QuazalWV
                     if (leftSes.NbParticipants() == 1)
                     {
                         Global.Sessions.Remove(leftSes);
-                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.User.UserDBPid}", Color.Gray, client);
+                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.User.Pid}", Color.Gray, client);
                     }
                     else
                         leftSes.Leave(client);

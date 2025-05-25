@@ -136,10 +136,6 @@ namespace QuazalWV
                             result = DBHelper.RemoveRelationship(reqDeclineFriendship.Pid, client.User.UserDBPid);
                             reply = new RMCPacketResponseFriendsService_DeclineFriendship(result);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
-                            // send invite declined notif
-                            ClientInfo inviterClient = Global.Clients.Find(c => c.User.UserDBPid == reqDeclineFriendship.Pid);
-                            if (inviterClient != null)
-                                NotificationManager.FriendRemoved(inviterClient, client.User.UserDBPid, client.User.Name);
                         }
                     }
                     catch (Exception ex)

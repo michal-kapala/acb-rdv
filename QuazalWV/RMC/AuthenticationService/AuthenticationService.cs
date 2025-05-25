@@ -70,6 +70,8 @@ namespace QuazalWV
                                     client.sessionKey = ((RMCPacketResponseAuthenticationService_LoginEx)reply).ticket.sessionKey;
                                     Global.RemoveSessionsOnLogin(client);
                                     // TODO: kick everyone that has joined the sessions hosted by the guy who logged in again
+                                    client.User = user;
+                                    client.sessionKey = ((RMCPacketResponseLoginCustomData)reply).ticket.sessionKey;
                                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                                 }
                                 else

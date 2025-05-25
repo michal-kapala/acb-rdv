@@ -303,6 +303,24 @@ namespace QuazalWV
             }
         }
 
+        public static List<FriendData> GetFriends(uint pid, byte type)
+        {
+            var relationships = GetRelationships(pid, type);
+            var fdata = new List<FriendData>();
+            uint otherPid;
+            User otherUser;
+            bool online, inviteNotif;
+            foreach (var rel in relationships)
+            {
+                otherPid = rel.RequesterPid == pid ? rel.RequesteePid : rel.RequesterPid;
+                otherUser = GetUserByID(otherPid);
+                online = Global.Clients.Find(c => c.User.Pid == otherPid) != null;
+                inviteNotif = rel.Type == PlayerRelationship.Pending && otherPid == rel.RequesterPid;
+                fdata.Add(new FriendData(rel, otherUser, online, inviteNotif));
+            }
+            return fdata;
+        }
+
         public static List<RelationshipData> GetRelationshipData(uint pid, uint maxSize)
         {
             // TODO: check type
