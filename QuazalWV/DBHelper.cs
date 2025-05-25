@@ -314,7 +314,7 @@ namespace QuazalWV
             {
                 otherPid = rel.RequesterPid == pid ? rel.RequesteePid : rel.RequesterPid;
                 otherUser = GetUserByID(otherPid);
-                online = Global.Clients.Find(c => c.User.Pid == otherPid) != null;
+                online = Global.Clients.Find(c => c.User.UserDBPid == otherPid) != null;
                 inviteNotif = rel.Type == PlayerRelationship.Pending && otherPid == rel.RequesterPid;
                 fdata.Add(new FriendData(rel, otherUser, online, inviteNotif));
             }

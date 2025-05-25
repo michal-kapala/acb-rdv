@@ -141,7 +141,7 @@ namespace QuazalWV
                     if (leftSes.NbParticipants() == 1)
                     {
                         Global.Sessions.Remove(leftSes);
-                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.User.Pid}", Color.Gray, client);
+                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.User.UserDBPid}", Color.Gray, client);
                     }
                     else
                         leftSes.Leave(client);
