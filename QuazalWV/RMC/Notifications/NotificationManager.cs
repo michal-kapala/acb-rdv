@@ -109,6 +109,20 @@
                 ""
                 ).Send();
         }
+        public static void KickDuplicateSession(ClientInfo receiverClient)
+        {
+            new NotificationEvent(
+                receiverClient,
+                0,
+                0,
+                (uint)NotificationEventType.ForceDisconnect,
+                2,
+                0,
+                0,
+                0,
+                "x"
+                ).Send();
+        }
 
         public static void GameInviteAccepted(ClientInfo receiverClient, uint senderPid, uint sessionId)
         {

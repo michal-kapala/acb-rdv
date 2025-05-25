@@ -7,7 +7,6 @@ namespace QuazalWV
 {
     public class ClientInfo
     {
-        public IPAddress IPaddress;
         public bool Playersignout = false;
         public bool Trackingsignout = false;
         public static System.Random rand = new System.Random();

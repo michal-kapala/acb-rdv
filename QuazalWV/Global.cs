@@ -3,6 +3,8 @@ using System.Net;
 using System.Diagnostics;
 using System.Configuration;
 using System;
+using System.Linq;
+using System.Drawing;
 
 namespace QuazalWV
 {
@@ -59,7 +61,21 @@ namespace QuazalWV
         {
             Log.WriteLine(priority, "[Global] " + s);
         }
+        internal static void KickoutDuplicateSessionByUsername(string userName, IPEndPoint ep)
+        {
 
+            foreach (ClientInfo client in Clients)
+            {
+                if (client.User!=null && client.User.Name == userName)
+                {
+                    Log.WriteLine(1, $"kicked out user {client.User.Name} for having the same session twice", Color.Red);
+                    NotificationManager.KickDuplicateSession(client);
+                    
+                }
+            }
+            //Clients.RemoveAll(s => s.User!=null && s.User.Name == userName);
+
+        }
         internal static void RemoveSessionsOnLogin(ClientInfo client)
         {
             client.RegisteredUrls.Clear();
@@ -86,14 +102,15 @@ namespace QuazalWV
             }
             Clients.RemoveAll(item => item.ServerIncrementedGeneratedConnSignature == client_servergenSignature);
         }
-        public static void RemovebyIP(IPAddress ipval)
+        public static void RemovebyIP(String ipval)
         {
             List<uint> pids = new List<uint> { };
             foreach (ClientInfo client in Clients)
             {
-                if (client.IPaddress == ipval)
+                if (client.ep.Address!=null && client.ep.Address.ToString() == ipval)
                 {
                     pids.Add(client.ServerIncrementedGeneratedConnSignature);
+                    Log.WriteLine(1, $"Will remove {ipval}");
                 }
             }
             if (pids.Count > 1)
@@ -104,8 +121,7 @@ namespace QuazalWV
             {
                 Log.WriteLine(1, "Unable to remove it is not present");
             }
-            Clients.RemoveAll(item => item.IPaddress == ipval);
-
+            Clients.RemoveAll(item => item.ep != null && item.ep.Address.ToString() == ipval);
 
         }
     }
