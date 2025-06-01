@@ -80,7 +80,7 @@ namespace QuazalWV
                     client.GameSessionID = sesId;
                     client.InGameSession = true;
                     newSes = new Session(sesId, reqCreateSes.Session, client);
-                    Log.WriteLine(1, $"[RMC GameSession] New session (id={newSes.Key.SessionId}) for client {client.User.Name}", Color.Blue, client);
+                    Log.WriteLine(1, $"[RMC GameSession] New session (id={newSes.Key.SessionId}) for client {client.User.Name} \n session is {newSes}", Color.Blue, client);
                     // initialize params
                     gameType = newSes.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
                     if (gameType == null)
@@ -102,8 +102,26 @@ namespace QuazalWV
                     break;
                 case 2:
                     var reqUpdateSes = (RMCPacketRequestGameSessionService_UpdateSession)rmc.request;
-                    Global.Sessions.Find(session => session.Key.SessionId == reqUpdateSes.SessionUpdate.Key.SessionId)
-                        .GameSession.Attributes = reqUpdateSes.SessionUpdate.Attributes;
+                    newSes = Global.Sessions.Find(session => session.Key.SessionId == reqUpdateSes.SessionUpdate.Key.SessionId);
+                    if (newSes==null)
+                    {
+                        Log.WriteLine(1, $"[RMC GameSession] Update session not existant WTF is hapening", Color.Blue, client);
+                    }
+                    Log.WriteLine(1, $"[RMC GameSession] before Updating  session {newSes}", Color.Blue, client);
+                    foreach (var newParam in reqUpdateSes.SessionUpdate.Attributes)
+                    {
+                        var existing = newSes.GameSession.Attributes.FirstOrDefault(attr => attr.Id == newParam.Id);
+                        if (existing != null)
+                        {
+                            existing.Value = newParam.Value; 
+                        }
+                        else
+                        {
+                            newSes.GameSession.Attributes.Add(newParam);  
+                        }
+                    }
+                    //newSes.GameSession.Attributes = reqUpdateSes.SessionUpdate.Attributes;
+                    Log.WriteLine(1, $"[RMC GameSession] after Updating  session {newSes}", Color.Blue, client);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
@@ -113,6 +131,8 @@ namespace QuazalWV
                     {
                         Log.WriteLine(1, $"[RMC GameSession] Migrating from session {reqMigrate.Key.SessionId}", Color.Blue, client);
                         migrateFromSes = Global.Sessions.Find(session => session.Key.SessionId == reqMigrate.Key.SessionId);
+                        if (migrateFromSes != null)
+                            Log.WriteLine(1, $"[RMC GameSession] Migrating from session {migrateFromSes}", Color.Blue, client);
                         sesId = Global.NextGameSessionId++;
                         newSes = new Session(sesId, migrateFromSes.GameSession, client);
                         client.GameSessionID = sesId;
@@ -121,7 +141,10 @@ namespace QuazalWV
                             Log.WriteLine(1, $"[RMC GameSession] Current session not found", Color.Red, client);
                         gameType = newSes.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
                         if (gameType == null)
-                            Log.WriteLine(1, $"[RMC GameSession] Inconsistent session state (id={newSes.Key.SessionId}), missing game type", Color.Red, client);
+                        {
+                            //gameType = newSes.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.Type);
+                            Log.WriteLine(1, $"[RMC GameSession] Inconsistent session state (id={newSes.Key.SessionId}), missing game type session params {SessionParam.GameType}", Color.Red, client);
+                        }
                         currPublicSlots = new Property() { Id = (uint)SessionParam.CurrentPublicSlots, Value = 0 };
                         currPrivateSlots = new Property() { Id = (uint)SessionParam.CurrentPrivateSlots, Value = 0 };
                         accessibility = new Property() { Id = (uint)SessionParam.Accessibility, Value = 0 };
@@ -138,7 +161,7 @@ namespace QuazalWV
                 case 5:
                     var reqLeaveSes = (RMCPacketRequestGameSessionService_LeaveSession)rmc.request;
                     var leftSes = Global.Sessions.Find(session => session.Key.SessionId == reqLeaveSes.Key.SessionId);
-                    // delete the session if empty
+                    Log.WriteLine(1, $"[RMC LeaveGameSession] Leave Session {reqLeaveSes.Key.SessionId} player {client.ClientInfoConnPid}", Color.Gray, client);
                     if (leftSes.NbParticipants() == 1)
                     {
                         Global.Sessions.Remove(leftSes);
@@ -205,9 +228,11 @@ namespace QuazalWV
                 case 8:
                     var reqAddParticip = (RMCPacketRequestGameSessionService_AddParticipants)rmc.request;
                     // update session
+                    Log.WriteLine(1, $"[RMC] Addparticipands query: public {string.Join(",", reqAddParticip.PublicPids)} private {string.Join(",", reqAddParticip.PrivatePids)}", Color.Green, client);
                     Global.Sessions.Find(session => session.Key.SessionId == reqAddParticip.Key.SessionId)
                         .AddParticipants(reqAddParticip.PublicPids, reqAddParticip.PrivatePids);
                     // update clients
+                    Log.WriteLine(1, $"[RMC] Clients client connids: {string.Join(",", Global.Clients.Select(c => c.ClientInfoConnPid))} client hostids {string.Join(",", Global.Clients.Select(c => c.User.UserDBPid))}", Color.Green, client);
                     foreach (uint pid in reqAddParticip.PublicPids)
                     {
                         ClientInfo result = Global.Clients.Find(c => c.ClientInfoConnPid == pid);
@@ -252,6 +277,8 @@ namespace QuazalWV
                     break;
                 case 9:
                     var reqRemoveParticip = (RMCPacketRequestGameSessionService_RemoveParticipants)rmc.request;
+                    Log.WriteLine(1, $"[RMC] RemoveParticipants query: public {string.Join(",", reqRemoveParticip.PublicPids)} private {string.Join(",", reqRemoveParticip.PrivatePids)}", Color.Green, client);
+
                     Global.Sessions.Find(session => session.Key.SessionId == reqRemoveParticip.Key.SessionId)
                         .RemoveParticipants(reqRemoveParticip.PublicPids, reqRemoveParticip.PrivatePids);
                     reply = new RMCPResponseEmpty();

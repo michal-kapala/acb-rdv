@@ -7,9 +7,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
-
 namespace QuazalWV
 {
+    
     public static class DBHelper
     {
         public static SQLiteConnection connection = new SQLiteConnection();

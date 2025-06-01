@@ -78,6 +78,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddUser.Designer.cs">
+      <DependentUpon>AddUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="DecryptTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -102,6 +108,12 @@
     <Compile Include="PacketGenerator.Designer.cs">
       <DependentUpon>PacketGenerator.cs</DependentUpon>
     </Compile>
+    <Compile Include="RemoveUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RemoveUser.Designer.cs">
+      <DependentUpon>RemoveUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="SendNotification.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -119,6 +131,9 @@
     <Compile Include="UDPProcessor.Designer.cs">
       <DependentUpon>UDPProcessor.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AddUser.resx">
+      <DependentUpon>AddUser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DecryptTool.resx">
       <DependentUpon>DecryptTool.cs</DependentUpon>
     </EmbeddedResource>
@@ -141,6 +156,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="RemoveUser.resx">
+      <DependentUpon>RemoveUser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SendNotification.resx">
       <DependentUpon>SendNotification.cs</DependentUpon>
     </EmbeddedResource>

@@ -91,6 +91,7 @@
     <Compile Include="Classes\Models\Relationship.cs" />
     <Compile Include="Classes\Models\TelemetryTag.cs" />
     <Compile Include="ExpiringLockManager.cs" />
+    <Compile Include="PasswordHasher.cs" />
     <Compile Include="RMC\FriendsService\Data\FriendData.cs" />
     <Compile Include="RMC\FriendsService\Data\RelationshipData.cs" />
     <Compile Include="RMC\FriendsService\FriendsService.cs" />
