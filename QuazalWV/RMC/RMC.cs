@@ -379,7 +379,7 @@ namespace QuazalWV
                                          + param1.ToString("X8") + " "
                                          + param2.ToString("X8") + " "
                                          + param3.ToString("X8") + " \""
-                                         + paramStr + "\"]");
+                                         + paramStr + $"\"] to client {client.User.Name}");
             MemoryStream m = new MemoryStream();
             Helper.WriteU32(m, source);
             Helper.WriteU32(m, type * 1000 + subType);

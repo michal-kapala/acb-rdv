@@ -64,7 +64,7 @@ namespace QuazalWV
                         }
                         else
                         {
-                            dbResult = DBHelper.AddFriendRequest(client.User.Pid, invitee.Pid, reqAddFriendByName.Details);
+                            dbResult = DBHelper.AddFriendRequest(client.User.UserDBPid, invitee.UserDBPid, reqAddFriendByName.Details);
                             switch (dbResult)
                             {
                                 case DbRelationshipResult.UserBlocked:
@@ -72,12 +72,12 @@ namespace QuazalWV
                                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.Friends_CannotAddBlacklistedPlayer);
                                     break;
                                 default:
-                                    reply = new RMCPacketResponseFriendsService_AddFriendByNameWithDetails(invitee.Pid, reqAddFriendByName.Invitee);
+                                    reply = new RMCPacketResponseFriendsService_AddFriendByNameWithDetails(invitee.UserDBPid, reqAddFriendByName.Invitee);
                                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                                     // send instant invite notif
-                                    var inviteeClient = Global.Clients.Find(c => c.User.Pid == invitee.Pid);
+                                    var inviteeClient = Global.Clients.Find(c => c.User.UserDBPid == invitee.UserDBPid);
                                     if (inviteeClient != null)
-                                        NotificationManager.FriendInviteReceived(inviteeClient, client.User.Pid, client.User.Name);
+                                        NotificationManager.FriendInviteReceived(inviteeClient, client.User.UserDBPid, client.User.Name);
                                     break;
                             }
                         }
@@ -101,17 +101,17 @@ namespace QuazalWV
                         }
                         else
                         {
-                            dbResult = DBHelper.AddFriend(inviter.Pid, client.User.Pid, reqAcceptFriendship.Details);
+                            dbResult = DBHelper.AddFriend(inviter.UserDBPid, client.User.UserDBPid, reqAcceptFriendship.Details);
                             reply = new RMCPacketResponseFriendsService_AcceptFriendship(dbResult == DbRelationshipResult.Succeeded);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                             // send friend list update notifs
-                            var inviterClient = Global.Clients.Find(c => c.User.Pid == inviter.Pid);
+                            var inviterClient = Global.Clients.Find(c => c.User.UserDBPid == inviter.UserDBPid);
                             if (inviterClient != null)
                             {
                                 // instant invite update notif
-                                NotificationManager.FriendInviteAccepted(inviterClient, client.User.Pid, client.User.Name);
+                                NotificationManager.FriendInviteAccepted(inviterClient, client.User.UserDBPid, client.User.Name);
                                 // mark inviter as online
-                                NotificationManager.FriendStatusChanged(client, inviterClient.User.Pid, inviterClient.User.Name, true);
+                                NotificationManager.FriendStatusChanged(client, inviterClient.User.UserDBPid, inviterClient.User.Name, true);
                             }
                             break;
                         }
@@ -133,13 +133,9 @@ namespace QuazalWV
                         }
                         else
                         {
-                            result = DBHelper.RemoveRelationship(reqDeclineFriendship.Pid, client.User.Pid);
+                            result = DBHelper.RemoveRelationship(reqDeclineFriendship.Pid, client.User.UserDBPid);
                             reply = new RMCPacketResponseFriendsService_DeclineFriendship(result);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
-                            // send invite declined notif
-                            ClientInfo inviterClient = Global.Clients.Find(c => c.User.Pid == reqDeclineFriendship.Pid);
-                            if (inviterClient != null)
-                                NotificationManager.FriendRemoved(inviterClient, client.User.Pid, client.User.Name);
                         }
                     }
                     catch (Exception ex)
@@ -159,13 +155,13 @@ namespace QuazalWV
                         }
                         else
                         {
-                            dbResult = DBHelper.AddBlacklistRequest(client.User.Pid, blacklisted.Pid, reqBlacklist.Details);
+                            dbResult = DBHelper.AddBlacklistRequest(client.User.UserDBPid, blacklisted.UserDBPid, reqBlacklist.Details);
                             reply = new RMCPacketResponseFriendsService_BlackList(dbResult == DbRelationshipResult.Succeeded);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                             // remove from friend list when blocked
-                            ClientInfo inviterClient = Global.Clients.Find(c => c.User.Pid == reqBlacklist.Pid);
+                            ClientInfo inviterClient = Global.Clients.Find(c => c.User.UserDBPid == reqBlacklist.Pid);
                             if (inviterClient != null && dbResult == DbRelationshipResult.Succeeded)
-                                NotificationManager.FriendRemoved(inviterClient, client.User.Pid, client.User.Name);
+                                NotificationManager.FriendRemoved(inviterClient, client.User.UserDBPid, client.User.Name);
                         }
                     }
                     catch (Exception ex)
@@ -177,13 +173,13 @@ namespace QuazalWV
                     var reqClearRel = (RMCPacketRequestFriendsService_ClearRelationship)rmc.request;
                     try
                     {
-                        result = DBHelper.RemoveRelationship(client.User.Pid, reqClearRel.Pid);
+                        result = DBHelper.RemoveRelationship(client.User.UserDBPid, reqClearRel.Pid);
                         reply = new RMCPacketResponseFriendsService_ClearRelationship(result);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                         // send removed from friends notif
-                        ClientInfo inviterClient = Global.Clients.Find(c => c.User.Pid == reqClearRel.Pid);
+                        ClientInfo inviterClient = Global.Clients.Find(c => c.User.UserDBPid == reqClearRel.Pid);
                         if (inviterClient != null && result)
-                            NotificationManager.FriendRemoved(inviterClient, client.User.Pid, client.User.Name);
+                            NotificationManager.FriendRemoved(inviterClient, client.User.UserDBPid, client.User.Name);
                     }
                     catch (Exception ex)
                     {
@@ -194,7 +190,7 @@ namespace QuazalWV
                     var reqGetDetailedList = (RMCPacketRequestFriendsService_GetDetailedList)rmc.request;
                     try
                     {
-                        var relationships = DBHelper.GetRelationships(client.User.Pid, reqGetDetailedList.Relationship);
+                        var relationships = DBHelper.GetRelationships(client.User.UserDBPid, reqGetDetailedList.Relationship);
                         var friends = new List<FriendData>();
                         uint otherPid;
                         User otherUser;
@@ -202,15 +198,15 @@ namespace QuazalWV
                         bool online, inviteNotif;
                         foreach (var rel in relationships)
                         {
-                            otherPid = rel.RequesterPid == client.User.Pid ? rel.RequesteePid : rel.RequesterPid;
+                            otherPid = rel.RequesterPid == client.User.UserDBPid ? rel.RequesteePid : rel.RequesterPid;
                             otherUser = DBHelper.GetUserByID(otherPid);
-                            friendClient = Global.Clients.Find(c => c.User.Pid == otherPid);
+                            friendClient = Global.Clients.Find(c => c.User.UserDBPid == otherPid);
                             online = friendClient != null;
                             inviteNotif = rel.Type == PlayerRelationship.Pending && otherPid == rel.RequesterPid;
                             friends.Add(new FriendData(rel, otherUser, online, inviteNotif));
                             // send 'is now online' notifs to friends
                             if (online)
-                                NotificationManager.FriendStatusChanged(friendClient, client.User.Pid, client.User.Name, true);
+                                NotificationManager.FriendStatusChanged(friendClient, client.User.UserDBPid, client.User.Name, true);
                         }
                         reply = new RMCPacketResponseFriendsService_GetDetailedList(friends);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
@@ -233,7 +229,7 @@ namespace QuazalWV
                     var reqGetRels = (RMCPacketRequestFriendsService_GetRelationships)rmc.request;
                     try
                     {
-                        List<RelationshipData> rels = DBHelper.GetRelationshipData(client.User.Pid, reqGetRels.ResultRange.Size);
+                        List<RelationshipData> rels = DBHelper.GetRelationshipData(client.User.UserDBPid, reqGetRels.ResultRange.Size);
                         reply = new RMCPacketResponseFriendsService_GetRelationships(rels);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     }

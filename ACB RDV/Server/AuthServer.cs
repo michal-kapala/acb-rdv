@@ -53,7 +53,7 @@ namespace AcbRdv
 
         public static void ProcessPacket(byte[] data, IPEndPoint ep)
         {
-            QPacketHandler.ProcessPacket("Auth", data, ep, listener, RdvServer.serverPID, RdvServer.listenPort);
+            QPacketHandler.ProcessPacket("Auth", data, ep, listener, RdvServer.serverPID,  RdvServer.listenPort,AuthServer.listenPort);
         }
 
         private static void WriteLog(int priority, string s)

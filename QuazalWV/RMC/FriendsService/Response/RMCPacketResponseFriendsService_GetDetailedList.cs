@@ -13,7 +13,7 @@ namespace QuazalWV
                 //Friends.Add(
                 //    new FriendData
                 //    {
-                //        Pid = 4661,
+                //        UserDBPid = 4661,
                 //        Name = "Fwiend",
                 //        Relationship = 1,
                 //        Details = 0,

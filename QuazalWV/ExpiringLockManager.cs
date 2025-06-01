@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Drawing;
 using System.Threading;
-
+using System.Net;
 namespace QuazalWV
 {
     public class ExpiringLockManager<TKey>
@@ -37,8 +37,22 @@ namespace QuazalWV
             {
                 if (now - kvp.Value.LastUsed > _expiration)
                 {
-                    Log.WriteLine(1, "[PRUDP LockManager] Removed lock which was no longer used", Color.Red);
-                    _locks.TryRemove(kvp.Key, out _);
+                    Log.WriteLine(1, $"[PRUDP LockManager] Removed lock which was no longer used {kvp.Key}", Color.Red);
+                    bool success = false;
+                    try
+                    {
+                        Global.RemovebyIP(kvp.Key.ToString());
+                        success=_locks.TryRemove(kvp.Key, out _);
+                       
+                    }
+                    catch(Exception e)
+                    {
+                        Log.WriteLine(1, $"[PRUDP LockManager] Error Removing key {e}", Color.Red);
+                    }
+                    if (success==false)
+                    {
+                        Log.WriteLine(1, $"[PRUDP LockManager] got status {success} when trying to remove a lock", Color.Red);
+                    }
                 }
             }
         }

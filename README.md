@@ -19,15 +19,17 @@ As of now the database file is excluded from git tracking. Once a proper schema 
 - `users`
 
 ```sql
-CREATE TABLE "users" (
-    "id"    INTEGER PRIMARY KEY AUTOINCREMENT,
-    "pid"    BIGINT,
-    "name"    TEXT,
-    "password"    TEXT,
-    "ubi_id"    TEXT,
-    "email"    TEXT,
-    "country_code"    TEXT,
-    "pref_lang"    TEXT
+CREATE TABLE "Users" (
+	"id"	INTEGER,
+	"pid"	INTEGER,
+	"name"	TEXT,
+	hash BLOB NOT NULL,
+    salt BLOB NOT NULL,
+	"ubi_id"	TEXT,
+	"email"	TEXT,
+	"country_code"	TEXT,
+	"pref_lang"	TEXT,
+	PRIMARY KEY("id" AUTOINCREMENT)
 )
 ```
 

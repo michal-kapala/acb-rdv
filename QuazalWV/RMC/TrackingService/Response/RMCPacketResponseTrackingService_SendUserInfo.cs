@@ -13,7 +13,7 @@ namespace QuazalWV
             // dumped from the original traffic
             TrackingInfo = new TrackingInformation()
             {
-                Ipn = client.TrackingUser.Pid,
+                Ipn = client.TrackingUser.UserDBPid,
                 UserId = "",
                 MachineId = "e8de277b6f25",
                 VisitorId = "95E866FC-1685-41E3-9DE9-D78227FD61F9",

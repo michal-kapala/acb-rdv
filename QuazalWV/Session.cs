@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace QuazalWV
 {
@@ -22,12 +23,15 @@ namespace QuazalWV
             };
             PublicPids = new List<uint>();
             PrivatePids = new List<uint>();
-            HostPid = host.PID;
+            HostPid = host.User.UserDBPid;
             foreach (var url in host.Urls)
                 Log.WriteLine(2, $"[Session] Host URL added: ${url}", Color.Green);
             HostUrls = host.Urls;
         }
-
+        public override string ToString()
+        {
+            return $"Session type {Key.TypeId} sessid {Key.SessionId} public pids {string.Join(", ", PublicPids)} and private pids {string.Join(", ", PrivatePids)} hostpid {HostPid} session attributes {string.Join("\n", GameSession.Attributes)}";
+        }
         public void AddParticipants(List<uint> publicPids, List<uint> privatePids)
         {
             PublicPids.AddRange(publicPids);
@@ -50,7 +54,7 @@ namespace QuazalWV
             }
 
             // self-hosted
-            if (client.PID == HostPid)
+            if (client.User.UserDBPid == HostPid)
             {
                 Log.WriteLine(1, $"[Session] Ignoring a self-hosted session", Color.Gray, client);
                 return false;
@@ -115,27 +119,39 @@ namespace QuazalWV
             return attrs;
         }
 
-        public void RemoveParticipants(List<uint> publicPids, List<uint> privatePids)
+        public void RemoveParticipants(List<uint> rempublicPids, List<uint> remprivatePids)
         {
-            PublicPids.RemoveAll(item => publicPids.Contains(item));
-            PrivatePids.RemoveAll(item => privatePids.Contains(item));
-            UpdateCurrentSlots();			
+            Log.WriteLine(1, $"[RMC] RemoveParticipants before: public {string.Join(",", rempublicPids)} private {string.Join(",", remprivatePids)} from {PublicPids} {PrivatePids}", Color.Green);
+
+            PublicPids.RemoveAll(item => rempublicPids.Contains(item));
+            PrivatePids.RemoveAll(item => remprivatePids.Contains(item));
+            UpdateCurrentSlots();
+            Log.WriteLine(1, $"[RMC] RemoveParticipants after: public {string.Join(",", PublicPids)} private {string.Join(",", PrivatePids)} ", Color.Green);
+
         }
 
         public void Leave(ClientInfo client)
         {
-            PublicPids.Remove(client.PID);
-            PrivatePids.Remove(client.PID);
+            Log.WriteLine(1, $"[Session] On-leave pids before public {string.Join(",", PublicPids)} private {string.Join(",", PrivatePids)}", Color.Orange);
+            PublicPids.Remove(client.ClientInfoConnPid);
+            PrivatePids.Remove(client.ClientInfoConnPid);
+            Log.WriteLine(1, $"[Session] On-leave pids after public {string.Join(",", PublicPids)} private {string.Join(",", PrivatePids)}", Color.Orange);
             UpdateCurrentSlots();
             // host left - assign new host (migrate?)
-            if (client.PID == HostPid)
+            if (client.User.UserDBPid == HostPid)
             {
                 if (PublicPids.Count > 0)
-                    HostPid = PublicPids[0];
-                else
+                { HostPid = Global.Clients.FirstOrDefault(x => x.ClientInfoConnPid==PublicPids[0]).User.UserDBPid;
+                  if (HostPid==0)
+                        Log.WriteLine(1, $"[Session] This should not be hapening diagnose gamesession set new host", Color.Orange);
+
+                }
+                else {
+                    Log.WriteLine(1, $"[Session] This should not be hapening diagnose", Color.Orange);
                     HostPid = PrivatePids[0];
-                Log.WriteLine(1, $"[Session] On-leave host migration from {client.PID} to {HostPid}", Color.Orange);
-                var newHost = Global.Clients.Find(c => c.PID == HostPid);
+                }
+                Log.WriteLine(1, $"[Session] On-leave host migration from {client.User.UserDBPid} to {HostPid}", Color.Orange);
+                var newHost = Global.Clients.Find(c => c.User.UserDBPid == HostPid);
                 if (newHost == null)
                 {
                     Log.WriteLine(1, $"[Session] On-leave host migration elected non-existent host {HostPid}", Color.Red);

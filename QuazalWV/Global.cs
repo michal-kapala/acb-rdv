@@ -3,6 +3,8 @@ using System.Net;
 using System.Diagnostics;
 using System.Configuration;
 using System;
+using System.Linq;
+using System.Drawing;
 
 namespace QuazalWV
 {
@@ -41,7 +43,7 @@ namespace QuazalWV
         public static ClientInfo GetClientByIDrecv(uint id)
         {
             foreach (ClientInfo c in Clients)
-                if (c.IDrecv == id)
+                if (c.ServerIncrementedGeneratedConnSignature == id)
                     return c;
             WriteLog(1, "Error : Cant find client for id : 0x" + id.ToString("X8"));
             return null;
@@ -59,12 +61,68 @@ namespace QuazalWV
         {
             Log.WriteLine(priority, "[Global] " + s);
         }
+        internal static void KickoutDuplicateSessionByUsername(string userName, IPEndPoint ep)
+        {
 
+            foreach (ClientInfo client in Clients)
+            {
+                if (client.User!=null && client.User.Name == userName)
+                {
+                    Log.WriteLine(1, $"kicked out user {client.User.Name} for having the same session twice", Color.Red);
+                    NotificationManager.KickDuplicateSession(client);
+                    
+                }
+            }
+            //Clients.RemoveAll(s => s.User!=null && s.User.Name == userName);
+
+        }
         internal static void RemoveSessionsOnLogin(ClientInfo client)
         {
             client.RegisteredUrls.Clear();
             client.Urls.Clear();
-            Sessions.RemoveAll(s => s.HostPid == client.PID);
+            Sessions.RemoveAll(s => s.HostPid == client.User.UserDBPid);
+        }
+        public static void RemovebySignature(uint client_servergenSignature)
+        {
+            List<uint> pids = new List<uint> { };
+            foreach (ClientInfo client in Clients)
+            {
+                if (client.ServerIncrementedGeneratedConnSignature == client_servergenSignature)
+                {
+                    pids.Add(client.User.UserDBPid);
+                }
+            }
+            if (pids.Count > 1)
+            {
+                Log.WriteLine(1, "There are multiple clients with the same IP this should not be hapening");
+            }
+            if (pids.Count == 0)
+            {
+                Log.WriteLine(1, "Unable to remove it is not present");
+            }
+            Clients.RemoveAll(item => item.ServerIncrementedGeneratedConnSignature == client_servergenSignature);
+        }
+        public static void RemovebyIP(String ipval)
+        {
+            List<uint> pids = new List<uint> { };
+            foreach (ClientInfo client in Clients)
+            {
+                if (client.ep.Address!=null && client.ep.Address.ToString() == ipval)
+                {
+                    pids.Add(client.ServerIncrementedGeneratedConnSignature);
+                    Log.WriteLine(1, $"Will remove {ipval}");
+                }
+            }
+            if (pids.Count > 1)
+            {
+                Log.WriteLine(1, "There are multiple clients with the same IP this should not be hapening");
+            }
+            if (pids.Count == 0)
+            {
+                Log.WriteLine(1, "Unable to remove it is not present");
+            }
+            Clients.RemoveAll(item => item.ep != null && item.ep.Address.ToString() == ipval);
+
         }
     }
 }
