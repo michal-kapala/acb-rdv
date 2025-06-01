@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace QuazalWV
 {
@@ -183,7 +184,7 @@ namespace QuazalWV
                         var isPrivateSes = newSes.FindProp(SessionParam.IsPrivate);
                         if (isPrivateSes == null)
                         {
-                            Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} missing IsPrivate param", Color.Red, client);
+                            Log.WriteLine(1, $"[RMC GameSession] Session {reqGetSes.Key.SessionId} missing IsPrivate param {Global.Sessions.FirstOrDefault(f => f.Key.SessionId == reqGetSes.Key.SessionId)}", Color.Red, client);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_Unknown);
                         }
                         else
@@ -209,7 +210,7 @@ namespace QuazalWV
                     // update clients
                     foreach (uint pid in reqAddParticip.PublicPids)
                     {
-                        ClientInfo result = Global.Clients.Find(c => c.User.UserDBPid == pid);
+                        ClientInfo result = Global.Clients.Find(c => c.ClientInfoConnPid == pid);
                         if (result != null)
                         {
                             if (result.InGameSession == true)
@@ -229,7 +230,7 @@ namespace QuazalWV
 
                     foreach (uint pid in reqAddParticip.PrivatePids)
                     {
-                        ClientInfo result = Global.Clients.Find(c => c.User.UserDBPid == pid);
+                        ClientInfo result = Global.Clients.Find(c => c.ClientInfoConnPid == pid);
                         if (result != null)
                         {
                             if (result.InGameSession == true)

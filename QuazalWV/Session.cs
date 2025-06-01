@@ -27,7 +27,10 @@ namespace QuazalWV
                 Log.WriteLine(2, $"[Session] Host URL added: ${url}", Color.Green);
             HostUrls = host.Urls;
         }
-
+        public override string ToString()
+        {
+            return $"Session type {Key.TypeId} sessid {Key.SessionId} public pids {string.Join(", ", PublicPids)} and private pids {string.Join(", ", PrivatePids)} hostpid {HostPid} {}";
+        }
         public void AddParticipants(List<uint> publicPids, List<uint> privatePids)
         {
             PublicPids.AddRange(publicPids);
@@ -50,7 +53,7 @@ namespace QuazalWV
             }
 
             // self-hosted
-            if (client.ClientInfoConnPid == HostPid)
+            if (client.User.UserDBPid == HostPid)
             {
                 Log.WriteLine(1, $"[Session] Ignoring a self-hosted session", Color.Gray, client);
                 return false;
