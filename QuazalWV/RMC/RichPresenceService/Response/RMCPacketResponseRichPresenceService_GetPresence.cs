@@ -7,9 +7,9 @@ namespace QuazalWV
     {
         public List<PresenceElement> Elements {  get; set; }
 
-        public RMCPacketResponseRichPresenceService_GetPresence()
+        public RMCPacketResponseRichPresenceService_GetPresence(List<PresenceElement> elements)
         {
-            Elements = new List<PresenceElement>();
+            Elements = elements;
         }
 
         public override string ToString()

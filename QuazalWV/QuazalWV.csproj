@@ -188,6 +188,7 @@
     <Compile Include="RMC\RichPresenceService\Data\PresenceElement.cs" />
     <Compile Include="RMC\RichPresenceService\Data\PresenceProperty.cs" />
     <Compile Include="RMC\RichPresenceService\Data\PresencePropertyListParser.cs" />
+    <Compile Include="RMC\RichPresenceService\Data\PresencePropertyListSerializer.cs" />
     <Compile Include="RMC\RichPresenceService\Request\RMCPacketRequestRichPresenceService_GetPresence.cs" />
     <Compile Include="RMC\RichPresenceService\Request\RMCPacketRequestRichPresenceService_SetPresence.cs" />
     <Compile Include="RMC\RichPresenceService\Response\RMCPacketResponseRichPresenceService_GetPresence.cs" />

@@ -2,37 +2,37 @@
 
 namespace QuazalWV
 {
-	public class PresenceElement : IData
-	{
-		public uint UnkInt1 {  get; set; }
-		public bool UnkBool {  get; set; }
-		public uint UnkInt2 { get; set; }
-		public QBuffer Buffer { get; set; }
+    public class PresenceElement : IData
+    {
+        public uint Pid { get; set; }
+        public bool OverrideStatus {  get; set; } // IsPlaying?
+        public uint UnkInt2 { get; set; } // SessionId?
+        public QBuffer PropsBuffer { get; set; }
 
-		public PresenceElement()
-		{
-			Buffer = new QBuffer();
-		}
+        public PresenceElement()
+        {
+            PropsBuffer = new QBuffer();
+        }
 
-		public PresenceElement(Stream s)
-		{
-			FromStream(s);
-		}
+        public PresenceElement(Stream s)
+        {
+            FromStream(s);
+        }
 
-		public void FromStream(Stream s)
-		{
-			UnkInt1 = Helper.ReadU32(s);
-			UnkBool = Helper.ReadBool(s);
-			UnkInt2 = Helper.ReadU32(s);
-			Buffer = new QBuffer(s);
-		}
+        public void FromStream(Stream s)
+        {
+            Pid = Helper.ReadU32(s);
+            OverrideStatus = Helper.ReadBool(s);
+            UnkInt2 = Helper.ReadU32(s);
+            PropsBuffer = new QBuffer(s);
+        }
 
-		public void ToBuffer(Stream s)
-		{
-			Helper.WriteU32(s, UnkInt1);
-			Helper.WriteBool(s, UnkBool);
-			Helper.WriteU32(s, UnkInt2);
-			Buffer.ToBuffer(s);
-		}
-	}
+        public void ToBuffer(Stream s)
+        {
+            Helper.WriteU32(s, Pid);
+            Helper.WriteBool(s, OverrideStatus);
+            Helper.WriteU32(s, UnkInt2);
+            PropsBuffer.ToBuffer(s);
+        }
+    }
 }

@@ -53,9 +53,13 @@ namespace QuazalWV
         /// <summary>
         /// Current game session ID.
         /// </summary>
-        public uint GameSessionID = 0;
-        public bool InGameSession = false;
-        public uint AbandonedSessionID = 0;
-        public bool AbandoningSession = false;
+        public uint GameSessionID { get; set; } = 0;
+        public bool InGameSession { get; set; } = false;
+        public uint AbandonedSessionID { get; set; } = 0;
+        public bool AbandoningSession { get; set; } = false;
+        /// <summary>
+        /// Rich presence info.
+        /// </summary>
+        public List<PresenceProperty> PresenceProps { get; set; } = new List<PresenceProperty>();
     }
 }

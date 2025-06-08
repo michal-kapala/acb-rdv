@@ -46,8 +46,8 @@ namespace QuazalWV
         public override string ToString()
         {
             switch (Id) {
-                case PresencePropertyId.IsIdle:
-                    string value = Value > 10 ? "yes" : "no";
+                case PresencePropertyId.IsInSession:
+                    string value = Value == 10 ? "yes" : "no";
                     return $"{Id}: {value}";
                 case PresencePropertyId.Map:
                     return $"{Id}: {(Map)Value}";
@@ -55,7 +55,7 @@ namespace QuazalWV
                     return $"{Id}: {(GameMode)Value}";
                 case PresencePropertyId.GameType:
                     return $"{Id}: {(GameType)Value}";
-                case PresencePropertyId.Flags:
+                case PresencePropertyId.SessionDLCMask:
                     return $"{Id}: {Value}";
                 default:
                     Log.WriteLine(1, $"[PresenceProperty] Unknown presence property {(uint)Id}", Color.Red);
