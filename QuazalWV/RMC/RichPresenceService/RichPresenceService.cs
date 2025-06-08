@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Text;
 
 namespace QuazalWV
 {
@@ -63,14 +62,14 @@ namespace QuazalWV
                         // expose private sessions for friends to join
                         else if ((GameType)gameType.Value == GameType.PRIVATE)
                             gameType.Value = (uint)GameType.PUBLIC;
+                        foreach (var prop in props)
+                            Log.WriteLine(1, $"[RMC RichPresence] {prop}", Color.Blue, client);
                         serializedProps = new PresencePropertyListSerializer(props).Serialize();
-                        Log.WriteLine(1, $"GetPresence for player {pid}:", Color.Blue, client);
-                        Log.WriteLine(1, Encoding.ASCII.GetString(serializedProps), Color.Blue, client);
                         elem = new PresenceElement()
                         {
                             Pid = pid,
                             OverrideStatus = true,
-                            UnkInt2 = 2,
+                            UnkInt2 = 0x69,
                             PropsBuffer = new QBuffer(serializedProps)
                         };
                         presenceElements.Add(elem);

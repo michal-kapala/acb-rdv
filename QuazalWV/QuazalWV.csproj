@@ -91,6 +91,10 @@
     <Compile Include="Classes\Models\Relationship.cs" />
     <Compile Include="Classes\Models\TelemetryTag.cs" />
     <Compile Include="ExpiringLockManager.cs" />
+    <Compile Include="RMC\ContactsService\ContactsService.cs" />
+    <Compile Include="RMC\ContactsService\Data\GameSessionByPlayerInfo.cs" />
+    <Compile Include="RMC\ContactsService\Request\RMCPacketRequestContactsService_RetrieveGameSessionFromContact.cs" />
+    <Compile Include="RMC\ContactsService\Response\RMCPacketResponseContactsService_RetrieveGameSessionFromContact.cs" />
     <Compile Include="RMC\FriendsService\Data\FriendData.cs" />
     <Compile Include="RMC\FriendsService\Data\RelationshipData.cs" />
     <Compile Include="RMC\FriendsService\FriendsService.cs" />

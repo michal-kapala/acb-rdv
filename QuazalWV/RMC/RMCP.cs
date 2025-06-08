@@ -31,7 +31,7 @@ namespace QuazalWV
             GameSessionService = 0x2A,
             GameSessionAdminService = 0x2B,
             MatchMakingExtService = 0x32,
-            PlayerStatsService = 0x65,
+            SinglePlayerStatsService = 0x65,
             HermesPlayerStatsService = 0x6C,
             RichPresenceService = 0x6D,
             ClansService = 0x6E,
@@ -42,9 +42,9 @@ namespace QuazalWV
             HermesAchievementsService = 0x74,
             SocialNetworksService = 0x75,
             VirginService = 0x76,
-            LeaderboardService = 0x77,
+            Ac2RomeLeaderboardService = 0x77,
             UplayWinService = 0x78,
-            FacebookService = 0x79,
+            AcbProxyGameProfileService = 0x79,
             ShopRentingService = 0x7A,
         }
 

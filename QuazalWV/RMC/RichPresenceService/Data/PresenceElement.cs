@@ -5,8 +5,8 @@ namespace QuazalWV
     public class PresenceElement : IData
     {
         public uint Pid { get; set; }
-        public bool OverrideStatus {  get; set; } // IsPlaying?
-        public uint UnkInt2 { get; set; } // SessionId?
+        public bool OverrideStatus {  get; set; }
+        public uint UnkInt2 { get; set; } // ?
         public QBuffer PropsBuffer { get; set; }
 
         public PresenceElement()
