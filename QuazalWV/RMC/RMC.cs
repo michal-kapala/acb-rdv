@@ -122,6 +122,9 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.GameInfoService:
                     GameInfoService.HandleRequest(p, rmc, client);
                     break;
+                case RMCP.PROTOCOL.ContactsExtensionsService:
+                    ContactsService.HandleRequest(p, rmc, client);
+                    break;
                 case RMCP.PROTOCOL.UplayWinService:
                     UplayWinService.HandleRequest(p, rmc, client);
                     break;
@@ -154,6 +157,8 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.FriendsService:
                     FriendsService.ProcessRequest(m, rmc);
                     break;
+                case RMCP.PROTOCOL.MatchMakingService:
+                    break;
                 case RMCP.PROTOCOL.MessagingService:
                     MessagingService.ProcessRequest(m, rmc);
                     break;
@@ -181,9 +186,6 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.LocalizationService:
                     LocalizationService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.VirginService:
-                    VirginService.ProcessRequest(m, rmc, client);
-                    break;
                 case RMCP.PROTOCOL.GameSessionService:
                     GameSessionService.ProcessRequest(m, rmc, client);
                     break;
@@ -199,10 +201,14 @@ namespace QuazalWV
                 case RMCP.PROTOCOL.GameInfoService:
                     GameInfoService.ProcessRequest(m, rmc);
                     break;
+                case RMCP.PROTOCOL.ContactsExtensionsService:
+                    ContactsService.ProcessRequest(m, rmc);
+                    break;
+                case RMCP.PROTOCOL.VirginService:
+                    VirginService.ProcessRequest(m, rmc, client);
+                    break;
                 case RMCP.PROTOCOL.UplayWinService:
                     UplayWinService.ProcessRequest(m, rmc);
-                    break;
-                case RMCP.PROTOCOL.MatchMakingService:
                     break;
                 default:
                     WriteLog(1, "Error: No request reader implemented for packet protocol " + rmc.proto);
