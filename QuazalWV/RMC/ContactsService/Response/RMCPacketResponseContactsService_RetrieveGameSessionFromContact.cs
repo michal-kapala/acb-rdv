@@ -7,9 +7,9 @@ namespace QuazalWV
     {
         public List<GameSessionByPlayerInfo> GameSessions { get; set; }
 
-        public RMCPacketResponseContactsService_RetrieveGameSessionFromContact()
+        public RMCPacketResponseContactsService_RetrieveGameSessionFromContact(List<GameSessionByPlayerInfo> gameSessions)
         {
-            GameSessions = new List<GameSessionByPlayerInfo>();
+            GameSessions = gameSessions;
         }
 
         public override string PayloadToString()

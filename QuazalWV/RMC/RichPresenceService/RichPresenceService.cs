@@ -46,22 +46,6 @@ namespace QuazalWV
                     {
                         friend = Global.Clients.Find(c => c.User.Pid == pid);
                         props = friend == null ? new List<PresenceProperty>() : friend.PresenceProps;
-                        var gameType = props.Find(prop => prop.Id == PresencePropertyId.GameType);
-                        // missing game type prop
-                        if (gameType == null)
-                        {
-                            var inSes = props.Find(prop => prop.Id == PresencePropertyId.IsInSession);
-                            if (inSes == null)
-                                Log.WriteLine(1, $"GetPresence: missing IsInSession property", Color.Red, client);
-                            else if (inSes.Value == 10)
-                            {
-                                Log.WriteLine(1, $"GetPresence: missing GameType property", Color.Red, client);
-                                props.Add(new PresenceProperty() { Id = PresencePropertyId.GameType, DataType = VariantType.Int32, Value = (uint)GameType.PUBLIC });
-                            }
-                        }
-                        // expose private sessions for friends to join
-                        else if ((GameType)gameType.Value == GameType.PRIVATE)
-                            gameType.Value = (uint)GameType.PUBLIC;
                         foreach (var prop in props)
                             Log.WriteLine(1, $"[RMC RichPresence] {prop}", Color.Blue, client);
                         serializedProps = new PresencePropertyListSerializer(props).Serialize();
