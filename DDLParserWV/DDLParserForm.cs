@@ -1,12 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Be.Windows.Forms;
 
@@ -39,8 +34,9 @@ namespace DDLParserWV
                     while (m.Position < data.Length)
                         Parse(m);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Log(ex.ToString());
                     Log("Position = 0x" + m.Position.ToString("X8"));
                 }
                 rtb1.Text = sb.ToString();
