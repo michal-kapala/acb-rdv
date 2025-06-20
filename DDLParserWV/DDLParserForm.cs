@@ -10,6 +10,10 @@ namespace DDLParserWV
     public partial class DDLParserForm : Form
     {
         public StringBuilder sb;
+        /// <summary>
+        /// Magic number at the beginning of a DDL binary parse tree (BPT).
+        /// </summary>
+        public const uint BPT_MAGIC = 0xCD652312;
 
         public DDLParserForm()
         {
@@ -32,7 +36,7 @@ namespace DDLParserWV
                 try
                 {
                     while (m.Position < data.Length)
-                        Parse(m);
+                        ParseNameSpace(m);
                 }
                 catch (Exception ex)
                 {
@@ -55,19 +59,11 @@ namespace DDLParserWV
                 try
                 {
                     while (m.Position < data.Length)
-                    {
-                        uint magic = ReadU32(m);
-                        if (magic == 0xCD652312)
-                        {
-                            m.Seek(17, SeekOrigin.Current);
-                            Parse(m);
-                            while ((m.Position % 4) != 0)
-                                m.ReadByte();
-                        }
-                    }
+                        ParseBPT(m);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Log(ex.ToString());
                     Log("Position = 0x" + m.Position.ToString("X8"));
                 }
                 rtb1.Text = sb.ToString();
@@ -109,7 +105,25 @@ namespace DDLParserWV
             return tabs;
         }
 
-        public void Parse(Stream m, int depth = 0)
+        public void ParseBPT(Stream m)
+        {
+            uint magic = ReadU32(m);
+            if (magic == BPT_MAGIC)
+            {
+                // unused, usually 0
+                byte _ = (byte)m.ReadByte();
+                uint major = ReadU32(m);
+                uint minor = ReadU32(m);
+                uint patch = ReadU32(m);
+                uint build = ReadU32(m);
+                Log($"BPT version: {major}.{minor}.{patch}.{build}");
+                ParseNameSpace(m);
+                while ((m.Position % 4) != 0)
+                    m.ReadByte();
+            }
+        }
+
+        public void ParseNameSpace(Stream m, int depth = 0)
         {
             uint count;
             string tabs = MakeTabs(depth);
@@ -188,7 +202,7 @@ namespace DDLParserWV
             string tabs = MakeTabs(depth);
             Log(tabs + "[Declaration]");
             ParseNamespaceItem(m, depth + 1);
-            ParseNamespace(m, depth + 1);
+            ParseDeclarationNamespace(m, depth + 1);
         }
 
         public void ParseNamespaceItem(Stream m, int depth = 0)
@@ -199,12 +213,12 @@ namespace DDLParserWV
             Log(tabs + "\t[" + ReadString(m) + "]");
         }
 
-        public void ParseNamespace(Stream m, int depth = 0)
+        public void ParseDeclarationNamespace(Stream m, int depth = 0)
         {
             string tabs = MakeTabs(depth);
             Log(tabs + "[Namespace]");
             Log(tabs + "\t[" + ReadString(m) + "]");
-            Parse(m, depth + 1);
+            ParseNameSpace(m, depth + 1);
         }
 
         public void ParseTemplateInstance(Stream m, int depth = 0)
@@ -232,7 +246,7 @@ namespace DDLParserWV
             string tabs = MakeTabs(depth);
             Log(tabs + "[Class Declaration]");
             ParseDeclaration(m, depth + 1);
-            ParseNamespace(m, depth + 1);
+            ParseDeclarationNamespace(m, depth + 1);
         }
 
         public void ParsePropertyDeclaration(Stream m, int depth = 0)
@@ -240,7 +254,7 @@ namespace DDLParserWV
             string tabs = MakeTabs(depth);
             Log(tabs + "[Property Declaration]");
             ParseNamespaceItem(m, depth + 1);
-            ParseNamespace(m, depth + 1);
+            ParseDeclarationNamespace(m, depth + 1);
             Log(tabs + "\t[0x" + ReadU32(m).ToString("X8") + "]");
             Log(tabs + "\t[0x" + ReadU32(m).ToString("X8") + "]");
         }
@@ -284,7 +298,7 @@ namespace DDLParserWV
             string tabs = MakeTabs(depth);
             Log(tabs + "[Protocol Declaration]");
             ParseDeclaration(m, depth + 1);
-            Parse(m, depth + 1);
+            ParseNameSpace(m, depth + 1);
         }
 
         public void ParseRMC(Stream m, int depth = 0)
@@ -292,7 +306,7 @@ namespace DDLParserWV
             string tabs = MakeTabs(depth);
             Log(tabs + "[RMC]");
             ParseProtocolDeclaration(m, depth + 1);
-            Parse(m, depth + 1);
+            ParseNameSpace(m, depth + 1);
         }
 
         public void ParseParameter(Stream m, int depth = 0)
@@ -334,8 +348,8 @@ namespace DDLParserWV
             string tabs = MakeTabs(depth);
             Log(tabs + "[Dataset Declaration]");
             ParseNamespaceItem(m, depth + 1);
-            ParseNamespace(m, depth + 1);
-            Parse(m, depth + 1);
+            ParseDeclarationNamespace(m, depth + 1);
+            ParseNameSpace(m, depth + 1);
         }
 
         public void ParseDOClassDeclaration(Stream m, int depth = 0)
@@ -343,10 +357,10 @@ namespace DDLParserWV
             string tabs = MakeTabs(depth);
             Log(tabs + "[DO Class Declaration]");
             ParseNamespaceItem(m, depth + 1);
-            ParseNamespace(m, depth + 1);
+            ParseDeclarationNamespace(m, depth + 1);
             Log(tabs + "\t[" + ReadString(m) + "]");
             Log(tabs + "\t[0x" + ReadU32(m).ToString("X8") + "]");
-            Parse(m, depth + 1);
+            ParseNameSpace(m, depth + 1);
         }
 
         public void ParseAdapterDeclaration(Stream m, int depth = 0)
@@ -368,7 +382,7 @@ namespace DDLParserWV
             string tabs = MakeTabs(depth);
             Log(tabs + "[Action]");
             ParseProtocolDeclaration(m, depth + 1);
-            Parse(m, depth + 1);
+            ParseNameSpace(m, depth + 1);
         }
     }
 }
