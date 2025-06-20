@@ -12,11 +12,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuazalWV", "QuazalWV\Quazal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuazalSharkWV", "QuazalSharkWV\QuazalSharkWV.csproj", "{E3D7B61E-6CF7-4373-B30B-7135365DE9F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NamespaceParserWV", "NamespaceParserWV\NamespaceParserWV.csproj", "{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACB RDV", "ACB RDV\ACB RDV.csproj", "{AB87FC0F-1A7C-4846-911F-A15ED83E7EEA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Be.Windows.Forms.HexBox", "Be.Windows.Forms.HexBox\Be.Windows.Forms.HexBox.csproj", "{26C5F25F-B450-4CAF-AD8B-B8D11AE73457}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDLParserWV", "DDLParserWV\DDLParserWV.csproj", "{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,10 +36,6 @@ Global
 		{E3D7B61E-6CF7-4373-B30B-7135365DE9F3}.Debug|Win32.Build.0 = Debug|x86
 		{E3D7B61E-6CF7-4373-B30B-7135365DE9F3}.Release|Win32.ActiveCfg = Release|x86
 		{E3D7B61E-6CF7-4373-B30B-7135365DE9F3}.Release|Win32.Build.0 = Release|x86
-		{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}.Debug|Win32.ActiveCfg = Debug|x86
-		{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}.Debug|Win32.Build.0 = Debug|x86
-		{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}.Release|Win32.ActiveCfg = Release|x86
-		{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}.Release|Win32.Build.0 = Release|x86
 		{AB87FC0F-1A7C-4846-911F-A15ED83E7EEA}.Debug|Win32.ActiveCfg = Debug|x86
 		{AB87FC0F-1A7C-4846-911F-A15ED83E7EEA}.Debug|Win32.Build.0 = Debug|x86
 		{AB87FC0F-1A7C-4846-911F-A15ED83E7EEA}.Release|Win32.ActiveCfg = Release|x86
@@ -48,6 +44,10 @@ Global
 		{26C5F25F-B450-4CAF-AD8B-B8D11AE73457}.Debug|Win32.Build.0 = Debug|x86
 		{26C5F25F-B450-4CAF-AD8B-B8D11AE73457}.Release|Win32.ActiveCfg = Release|x86
 		{26C5F25F-B450-4CAF-AD8B-B8D11AE73457}.Release|Win32.Build.0 = Release|x86
+		{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}.Debug|Win32.ActiveCfg = Debug|x86
+		{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}.Debug|Win32.Build.0 = Debug|x86
+		{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}.Release|Win32.ActiveCfg = Release|x86
+		{AD68E5AD-5306-4B36-8D11-13B9D0A439D1}.Release|Win32.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

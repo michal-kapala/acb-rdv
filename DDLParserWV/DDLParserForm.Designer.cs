@@ -1,16 +1,9 @@
-﻿namespace NamespaceParserWV
+﻿namespace DDLParserWV
 {
-    partial class Form1
+    partial class DDLParserForm
     {
-        /// <summary>
-        /// Erforderliche Designervariable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Verwendete Ressourcen bereinigen.
-        /// </summary>
-        /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,10 +15,6 @@
 
         #region Vom Windows Form-Designer generierter Code
 
-        /// <summary>
-        /// Erforderliche Methode für die Designerunterstützung.
-        /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
-        /// </summary>
         private void InitializeComponent()
         {
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -35,7 +24,7 @@
             this.hb1 = new Be.Windows.Forms.HexBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.rtb1 = new System.Windows.Forms.RichTextBox();
-            this.scanDLLEXEToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scanBinaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -46,7 +35,7 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
-            this.scanDLLEXEToolStripMenuItem});
+            this.scanBinaryToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(515, 24);
@@ -122,14 +111,14 @@
             this.rtb1.Text = "";
             this.rtb1.WordWrap = false;
             // 
-            // scanDLLEXEToolStripMenuItem
+            // scanBinaryToolStripMenuItem
             // 
-            this.scanDLLEXEToolStripMenuItem.Name = "scanDLLEXEToolStripMenuItem";
-            this.scanDLLEXEToolStripMenuItem.Size = new System.Drawing.Size(84, 20);
-            this.scanDLLEXEToolStripMenuItem.Text = "Scan DLL/EXE";
-            this.scanDLLEXEToolStripMenuItem.Click += new System.EventHandler(this.scanDLLEXEToolStripMenuItem_Click);
+            this.scanBinaryToolStripMenuItem.Name = "scanBinaryToolStripMenuItem";
+            this.scanBinaryToolStripMenuItem.Size = new System.Drawing.Size(84, 20);
+            this.scanBinaryToolStripMenuItem.Text = "Scan binary";
+            this.scanBinaryToolStripMenuItem.Click += new System.EventHandler(this.scanBinaryToolStripMenuItem_Click);
             // 
-            // Form1
+            // DDLParserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -137,8 +126,8 @@
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
-            this.Text = "Namespace Parser by Warranty Voider";
+            this.Name = "DDLParserForm";
+            this.Text = "Quazal DDL Parser";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
@@ -158,7 +147,7 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.RichTextBox rtb1;
         private Be.Windows.Forms.HexBox hb1;
-        private System.Windows.Forms.ToolStripMenuItem scanDLLEXEToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scanBinaryToolStripMenuItem;
     }
 }
 

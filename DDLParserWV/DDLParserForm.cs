@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Be.Windows.Forms;
 
-namespace NamespaceParserWV
+namespace DDLParserWV
 {
-    public partial class Form1 : Form
+    public partial class DDLParserForm : Form
     {
         public StringBuilder sb;
 
-        public Form1()
+        public DDLParserForm()
         {
             InitializeComponent();
             tabControl1.SelectedTab = tabPage2;
@@ -24,9 +24,11 @@ namespace NamespaceParserWV
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog d = new OpenFileDialog();
-            d.Filter = "*.hex|*.hex";
-            if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            OpenFileDialog d = new OpenFileDialog
+            {
+                Filter = "*.hex|*.hex"
+            };
+            if (d.ShowDialog() == DialogResult.OK)
             {
                 byte[] data = File.ReadAllBytes(d.FileName);
                 hb1.ByteProvider = new DynamicByteProvider(data);
@@ -45,11 +47,10 @@ namespace NamespaceParserWV
             }
         }
 
-        private void scanDLLEXEToolStripMenuItem_Click(object sender, EventArgs e)
+        private void scanBinaryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog d = new OpenFileDialog();
-            d.Filter = "*.exe,*.dll|*.exe;*.dll";
-            if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (d.ShowDialog() == DialogResult.OK)
             {
                 byte[] data = File.ReadAllBytes(d.FileName);
                 hb1.ByteProvider = new DynamicByteProvider(data);
@@ -57,7 +58,6 @@ namespace NamespaceParserWV
                 sb = new StringBuilder();
                 try
                 {
-
                     while (m.Position < data.Length)
                     {
                         uint magic = ReadU32(m);
@@ -76,7 +76,6 @@ namespace NamespaceParserWV
                 }
                 rtb1.Text = sb.ToString();
             }
-
         }
 
         public string ReadString(Stream s)
@@ -265,9 +264,9 @@ namespace NamespaceParserWV
         {
             string tabs = MakeTabs(depth);
             byte b = (byte)m.ReadByte();
-            ENamespaceItem type = (ENamespaceItem)b;
+            EDDLItem type = (EDDLItem)b;
             Log(tabs + $"[{type:G}]");
-            if ((ENamespaceItem)b == ENamespaceItem.TemplateInstance)
+            if ((EDDLItem)b == EDDLItem.TemplateInstance)
                 ParseTemplateDeclarationUse(m, depth + 1);
             else
                 Log(tabs + "\t[" + ReadString(m) + "]");
