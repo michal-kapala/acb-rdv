@@ -1,6 +1,6 @@
 ﻿namespace DDLParserWV
 {
-    public enum EDDLItem
+    public enum EParseTreeElement
     {
         ParseTreeItem,
         NameSpaceItem,
