@@ -103,6 +103,8 @@
     <Compile Include="DDLParserForm.Designer.cs">
       <DependentUpon>DDLParserForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="DebugParser.cs" />
+    <Compile Include="MarkdownRenderer.cs" />
     <Compile Include="Tree\Elements\Action.cs" />
     <Compile Include="Tree\Elements\AdapterDeclaration.cs" />
     <Compile Include="Tree\Elements\ClassDeclaration.cs" />

@@ -44,5 +44,25 @@ namespace DDLParserWV
             log.AppendLine($"{tabs}\t[direction: {Direction}]");
             return this;
         }
+
+        public bool IsRequest()
+        {
+            return Flags == 1 || Flags == 3;
+        }
+
+        public bool IsResponse()
+        {
+            return Flags == 2 || Flags == 3;
+        }
+
+        public string GetName()
+        {
+            return Variable.NsItem.NsItemName;
+        }
+
+        public string GetFullType()
+        {
+            return DeclarationUse.TypeName;
+        }
     }
 }
