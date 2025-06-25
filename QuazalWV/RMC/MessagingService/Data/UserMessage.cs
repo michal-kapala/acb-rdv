@@ -5,14 +5,15 @@ namespace QuazalWV
     public class UserMessage : IData
     {
         public uint Id { get; set; }
+        public uint RecipientId { get; set; }
+        public uint RecipientType { get; set; }
         public uint ParentId { get; set; }
-        public uint PidSender { get; set; }
-        public MessageRecipient Recipient { get; set; }
+        public uint SenderId { get; set; }
         public QDateTime ReceptionTime { get; set; }
         public uint Lifetime { get; set; }
         public uint Flags { get; set; }
         public string Subject { get; set; }
-        public string Sender { get; set; }
+        public string SenderName { get; set; }
 
         public UserMessage()
         {
@@ -27,27 +28,29 @@ namespace QuazalWV
         public void FromStream(Stream s)
         {
             Id = Helper.ReadU32(s);
+            RecipientId = Helper.ReadU32(s);
+            RecipientType = Helper.ReadU32(s);
             ParentId = Helper.ReadU32(s);
-            PidSender = Helper.ReadU32(s);
-            Recipient = new MessageRecipient(s);
+            SenderId = Helper.ReadU32(s);
             ReceptionTime = new QDateTime(s);
             Lifetime = Helper.ReadU32(s);
             Flags = Helper.ReadU32(s);
             Subject = Helper.ReadString(s);
-            Sender = Helper.ReadString(s);
+            SenderName = Helper.ReadString(s);
         }
 
         public void ToBuffer(Stream s)
         {
             Helper.WriteU32(s, Id);
+            Helper.WriteU32(s, RecipientId);
+            Helper.WriteU32(s, RecipientType);
             Helper.WriteU32(s, ParentId);
-            Helper.WriteU32(s, PidSender);
-            Recipient.ToBuffer(s);
+            Helper.WriteU32(s, SenderId);
             ReceptionTime.ToBuffer(s);
             Helper.WriteU32(s, Lifetime);
             Helper.WriteU32(s, Flags);
             Helper.WriteString(s, Subject);
-            Helper.WriteString(s, Sender);
+            Helper.WriteString(s, SenderName);
         }
     }
 }

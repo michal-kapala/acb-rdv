@@ -8,6 +8,11 @@ namespace QuazalWV
         public uint Pid { get; set; }
         public uint GatheringId { get; set; }
 
+        public MessageRecipient()
+        {
+            
+        }
+
         public MessageRecipient(Stream s)
         {
             FromStream(s);

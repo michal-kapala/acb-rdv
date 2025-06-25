@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Drawing;
 
 namespace QuazalWV
 {
@@ -246,9 +247,7 @@ namespace QuazalWV
         {
             MemoryStream m = new MemoryStream();
             if ((ushort)rmc.proto < 0x7F)
-            {
                 Helper.WriteU8(m, (byte)rmc.proto);
-            }
             else
             {
                 Helper.WriteU8(m, 0x7F);
@@ -283,7 +282,7 @@ namespace QuazalWV
             MakeAndSend(client, np, m.ToArray());
         }
         
-        public static void SendRequestPacket(UdpClient udp, QPacket p, RMCP rmc, ClientInfo client, RMCPResponse packet, bool useCompression, uint error)
+        public static void SendRequestPacket(QPacket p, RMCP rmc, ClientInfo client, RMCPResponse packet, bool useCompression, uint error)
         {
             MemoryStream m = new MemoryStream();
             if ((ushort)rmc.proto < 0x7F)
@@ -417,7 +416,33 @@ namespace QuazalWV
             {
                 buffer = payload
             };
-            SendRequestPacket(client.udp, q, rmc, client, reply, true, 0);
+            SendRequestPacket(q, rmc, client, reply, true, 0);
+        }
+
+        public static void SendRequest(ClientInfo client, RMCPRequest req, RMCP.PROTOCOL protocol, uint methodId)
+        {
+            byte[] payload = req.ToBuffer();
+            QPacket q = new QPacket
+            {
+                m_oSourceVPort = new QPacket.VPort(0x31),
+                m_oDestinationVPort = new QPacket.VPort(0x3f),
+                type = QPacket.PACKETTYPE.DATA,
+                flags = new List<QPacket.PACKETFLAG>(),
+                payload = new byte[0],
+                uiSeqId = ++client.gameSeqId,
+                m_bySessionID = client.sessionID
+            };
+            RMCP rmc = new RMCP
+            {
+                proto = protocol,
+                methodID = methodId,
+                callID = ++client.callCounterRMC
+            };
+            RMCPCustom reply = new RMCPCustom
+            {
+                buffer = payload
+            };
+            SendRequestPacket(q, rmc, client, reply, true, 0);
         }
 
         private static void WriteLog(int priority, string s)

@@ -26,8 +26,21 @@ namespace QuazalWV
                 case 1:
                     reply = new RMCPResponseEmpty();
                     var reqDeliver = (RMCPacketRequestMessageDeliveryService_DeliverMessage)rmc.request;
-                    Log.WriteLine(1, $"[RMC MessageDelivery] '{reqDeliver.Message.Body}' from {reqDeliver.Message.SenderName} to {reqDeliver.Message.RecipientId}", Color.Blue, client);
+                    reqDeliver.Message.SenderId = client.User.Pid;
+                    reqDeliver.Message.SenderName = client.User.Name;
+                    Log.WriteLine(1, $"[RMC MessageDelivery] '{reqDeliver.Message.Body}' from {client.User.Pid} to {reqDeliver.Message.RecipientId}", Color.Blue, client);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    if (reqDeliver.Message.Subject != "Notification")
+                    {
+                        DBHelper.AddMessage(reqDeliver.Message);
+                        var recipient = Global.Clients.Find(c => c.User.Pid == reqDeliver.Message.RecipientId);
+                        if (recipient != null)
+                        {
+                            Log.WriteLine(1, $"[RMC MessageDelivery] Relaying message to {recipient.User.Name}", Color.Blue, client);
+                            //RMC.SendRequest(recipient, reqDeliver, RMCP.PROTOCOL.MessageDeliveryService, 1);
+                            NotificationManager.MessageReceived(recipient, client.User.Pid, reqDeliver.Message.Body);
+                        }
+                    }
                     break;
                 default:
                     Log.WriteLine(1, $"[RMC MessageDelivery] Error: Unknown Method {rmc.methodID}", Color.Red, client);

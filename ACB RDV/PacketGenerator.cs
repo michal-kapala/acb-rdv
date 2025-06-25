@@ -61,21 +61,27 @@ namespace AcbRdv
             byte[] payload = m.ToArray();
             foreach (ClientInfo client in Global.Clients)
             {
-                QPacket q = new QPacket();
-                q.m_oSourceVPort = new QPacket.VPort(0x31);
-                q.m_oDestinationVPort = new QPacket.VPort(0x3f);
-                q.type = QPacket.PACKETTYPE.DATA;
-                q.flags = new List<QPacket.PACKETFLAG>();
-                q.payload = new byte[0];
-                q.uiSeqId = (ushort)(++client.gameSeqId);
-                q.m_bySessionID = client.sessionID;
-                RMCP rmc = new RMCP();
-                rmc.proto = (RMCP.PROTOCOL)protoIDs[toolStripComboBox1.SelectedIndex];
-                rmc.methodID = Convert.ToUInt32(toolStripTextBox1.Text);
-                rmc.callID = ++client.callCounterRMC;
-                RMCPCustom reply = new RMCPCustom();
-                reply.buffer = payload;
-                RMC.SendRequestPacket(client.udp, q, rmc, client, reply, true, 0);
+                QPacket q = new QPacket
+                {
+                    m_oSourceVPort = new QPacket.VPort(0x31),
+                    m_oDestinationVPort = new QPacket.VPort(0x3f),
+                    type = QPacket.PACKETTYPE.DATA,
+                    flags = new List<QPacket.PACKETFLAG>(),
+                    payload = new byte[0],
+                    uiSeqId = (ushort)(++client.gameSeqId),
+                    m_bySessionID = client.sessionID
+                };
+                RMCP rmc = new RMCP
+                {
+                    proto = (RMCP.PROTOCOL)protoIDs[toolStripComboBox1.SelectedIndex],
+                    methodID = Convert.ToUInt32(toolStripTextBox1.Text),
+                    callID = ++client.callCounterRMC
+                };
+                RMCPCustom reply = new RMCPCustom
+                {
+                    buffer = payload
+                };
+                RMC.SendRequestPacket(q, rmc, client, reply, true, 0);
             }
         }
     }

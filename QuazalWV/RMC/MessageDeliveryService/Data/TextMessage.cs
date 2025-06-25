@@ -58,5 +58,22 @@ namespace QuazalWV
             Helper.WriteString(s, SenderName);
             Helper.WriteString(s, Body);
         }
+
+        public UserMessage ToHeader()
+        {
+            return new UserMessage
+            {
+                Id = Id,
+                RecipientId = RecipientId,
+                RecipientType = RecipientType,
+                ParentId = ParentId,
+                SenderId = SenderId,
+                ReceptionTime = ReceptionTime,
+                Lifetime = Lifetime,
+                Flags = Flags,
+                Subject = Subject,
+                SenderName = SenderName
+            };
+        }
     }
 }

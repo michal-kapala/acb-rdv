@@ -139,5 +139,20 @@
                 ""
                 ).Send();
         }
+
+        public static void MessageReceived(ClientInfo receiverClient, uint senderPid, string msg)
+        {
+            new NotificationEvent(
+                receiverClient,
+                0,
+                senderPid,
+                (uint)NotificationEventType.FirstUserNotification,
+                0,
+                senderPid,
+                senderPid,
+                0,
+                msg
+                ).Send();
+        }
     }
 }

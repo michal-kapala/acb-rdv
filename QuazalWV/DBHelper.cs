@@ -426,5 +426,132 @@ namespace QuazalWV
                 return false;
             }
         }
+
+        public static bool AddMessage(TextMessage msg)
+        {
+            int rowsAffected;
+            string sql = $"INSERT INTO messages (recipient_pid, recipient_type, parent_id, sender_pid, reception_time, lifetime, flags, subject, sender_name, body) VALUES (@recipient_pid, @recipient_type, @parent_id, @sender_pid, @reception_time, @lifetime, @flags, @subject, @sender_name, @body)";
+            using (var insertCommand = new SQLiteCommand(sql, connection))
+            {
+                insertCommand.Parameters.AddWithValue("@id", msg.Id);
+                insertCommand.Parameters.AddWithValue("@recipient_pid", msg.RecipientId);
+                insertCommand.Parameters.AddWithValue("@recipient_type", msg.RecipientType);
+                insertCommand.Parameters.AddWithValue("@parent_id", msg.ParentId);
+                insertCommand.Parameters.AddWithValue("@sender_pid", msg.SenderId);
+                // 0
+                insertCommand.Parameters.AddWithValue("@reception_time", msg.ReceptionTime.RawTime);
+                insertCommand.Parameters.AddWithValue("@lifetime", msg.Lifetime);
+                insertCommand.Parameters.AddWithValue("@flags", msg.Flags);
+                insertCommand.Parameters.AddWithValue("@subject", msg.Subject);
+                insertCommand.Parameters.AddWithValue("@sender_name", msg.SenderName);
+                insertCommand.Parameters.AddWithValue("@body", msg.Body);
+                try
+                {
+                    rowsAffected = insertCommand.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Log.WriteLine(1, $"[DB] {ex}", Color.Red);
+                    return false;
+                }
+            }
+            return rowsAffected > 0;
+        }
+
+        public static List<TextMessage> GetMessagesByIds(List<uint> ids)
+        {
+            List<TextMessage> result = new List<TextMessage>();
+            var placeholders = new List<string>();
+            for (int i = 0; i < ids.Count; i++)
+                placeholders.Add($"@id{i}");
+            
+            string sql = $"SELECT * FROM messages WHERE id IN ({string.Join(", ", placeholders)})";
+            using (var cmd = new SQLiteCommand(sql, connection))
+            {
+                for (int i = 0; i < ids.Count; i++)
+                    cmd.Parameters.AddWithValue($"@id{i}", ids[i]);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var msg = new TextMessage()
+                        {
+                            Id = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("id"))),
+                            RecipientId = (uint)(reader.GetInt32(reader.GetOrdinal("recipient_pid"))),
+                            RecipientType = (uint)(reader.GetInt32(reader.GetOrdinal("recipient_type"))),
+                            ParentId = (uint)(reader.GetInt32(reader.GetOrdinal("parent_id"))),
+                            SenderId = (uint)(reader.GetInt32(reader.GetOrdinal("sender_pid"))),
+                            // reception time assigned later
+                            Lifetime = (uint)(reader.GetInt32(reader.GetOrdinal("lifetime"))),
+                            Flags = (uint)(reader.GetInt32(reader.GetOrdinal("flags"))),
+                            Subject = reader.GetString(reader.GetOrdinal("subject")),
+                            SenderName = reader.GetString(reader.GetOrdinal("sender_name")),
+                            Body = reader.GetString(reader.GetOrdinal("body"))
+                        };
+                        result.Add(msg);
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static List<TextMessage> GetMessagesByRecipient(MessageRecipient recipient)
+        {
+            List<TextMessage> result = new List<TextMessage>();
+            string sql = "SELECT * FROM messages WHERE recipient_pid = @recipient_pid AND reception_time = 0";
+            using (var cmd = new SQLiteCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("@recipient_pid", recipient.Pid);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var header = new TextMessage
+                        {
+                            Id = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("id"))),
+                            RecipientId = (uint)(reader.GetInt32(reader.GetOrdinal("recipient_pid"))),
+                            RecipientType = (uint)(reader.GetInt32(reader.GetOrdinal("recipient_type"))),
+                            ParentId = (uint)(reader.GetInt32(reader.GetOrdinal("parent_id"))),
+                            SenderId = (uint)(reader.GetInt32(reader.GetOrdinal("sender_pid"))),
+                            // ReceptionTime assigned later
+                            Lifetime = (uint)(reader.GetInt32(reader.GetOrdinal("lifetime"))),
+                            Flags = (uint)(reader.GetInt32(reader.GetOrdinal("flags"))),
+                            Subject = reader.GetString(reader.GetOrdinal("subject")),
+                            SenderName = reader.GetString(reader.GetOrdinal("sender_name")),
+                            Body = reader.GetString(reader.GetOrdinal("body")),
+                        };
+                        result.Add(header);
+                    }
+                }
+            }
+            return result;
+        }
+
+        public static bool UpdateDeliveredMessages(List<uint> ids, DateTime time)
+        {
+            int rowsAffected;
+            var placeholders = new List<string>();
+            for (int i = 0; i < ids.Count; i++)
+                placeholders.Add($"@id{i}");
+
+            string sql = $"UPDATE messages SET reception_time = @timestamp WHERE id IN ({string.Join(", ", placeholders)})";
+            long timestamp = ((DateTimeOffset)time.ToUniversalTime()).ToUnixTimeSeconds();
+            using (var cmd = new SQLiteCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("@timestamp", timestamp);
+                for (int i = 0; i < ids.Count; i++)
+                    cmd.Parameters.AddWithValue($"@id{i}", ids[i]);
+                try
+                {
+                    rowsAffected = cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Log.WriteLine(1, $"[DB] {ex}", Color.Red);
+                    return false;
+                }
+            }
+            return rowsAffected == ids.Count;
+        }
     }
 }
