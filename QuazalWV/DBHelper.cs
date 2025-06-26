@@ -430,7 +430,7 @@ namespace QuazalWV
         public static bool AddMessage(TextMessage msg)
         {
             int rowsAffected;
-            string sql = $"INSERT INTO messages (recipient_pid, recipient_type, parent_id, sender_pid, reception_time, lifetime, flags, subject, sender_name, body) VALUES (@recipient_pid, @recipient_type, @parent_id, @sender_pid, @reception_time, @lifetime, @flags, @subject, @sender_name, @body)";
+            string sql = $"INSERT INTO messages (recipient_pid, recipient_type, parent_id, sender_pid, reception_time, lifetime, flags, subject, sender_name, body, delivered) VALUES (@recipient_pid, @recipient_type, @parent_id, @sender_pid, @reception_time, @lifetime, @flags, @subject, @sender_name, @body, @delivered)";
             using (var insertCommand = new SQLiteCommand(sql, connection))
             {
                 insertCommand.Parameters.AddWithValue("@id", msg.Id);
@@ -438,13 +438,13 @@ namespace QuazalWV
                 insertCommand.Parameters.AddWithValue("@recipient_type", msg.RecipientType);
                 insertCommand.Parameters.AddWithValue("@parent_id", msg.ParentId);
                 insertCommand.Parameters.AddWithValue("@sender_pid", msg.SenderId);
-                // 0
                 insertCommand.Parameters.AddWithValue("@reception_time", msg.ReceptionTime.RawTime);
                 insertCommand.Parameters.AddWithValue("@lifetime", msg.Lifetime);
                 insertCommand.Parameters.AddWithValue("@flags", msg.Flags);
                 insertCommand.Parameters.AddWithValue("@subject", msg.Subject);
                 insertCommand.Parameters.AddWithValue("@sender_name", msg.SenderName);
                 insertCommand.Parameters.AddWithValue("@body", msg.Body);
+                insertCommand.Parameters.AddWithValue("@delivered", false);
                 try
                 {
                     rowsAffected = insertCommand.ExecuteNonQuery();
@@ -481,13 +481,14 @@ namespace QuazalWV
                             RecipientType = (uint)(reader.GetInt32(reader.GetOrdinal("recipient_type"))),
                             ParentId = (uint)(reader.GetInt32(reader.GetOrdinal("parent_id"))),
                             SenderId = (uint)(reader.GetInt32(reader.GetOrdinal("sender_pid"))),
-                            // reception time assigned later
+                            ReceptionTime = new QDateTime(Convert.ToUInt64(reader.GetInt64(reader.GetOrdinal("reception_time")))),
                             Lifetime = (uint)(reader.GetInt32(reader.GetOrdinal("lifetime"))),
                             Flags = (uint)(reader.GetInt32(reader.GetOrdinal("flags"))),
                             Subject = reader.GetString(reader.GetOrdinal("subject")),
                             SenderName = reader.GetString(reader.GetOrdinal("sender_name")),
                             Body = reader.GetString(reader.GetOrdinal("body"))
                         };
+                        msg.Header = new AnyDataHeader("TextMessage", msg.GetSize());
                         result.Add(msg);
                     }
                 }
@@ -495,10 +496,10 @@ namespace QuazalWV
             return result;
         }
 
-        public static List<TextMessage> GetMessagesByRecipient(MessageRecipient recipient)
+        public static List<TextMessage> GetPendingMessages(MessageRecipient recipient)
         {
             List<TextMessage> result = new List<TextMessage>();
-            string sql = "SELECT * FROM messages WHERE recipient_pid = @recipient_pid AND reception_time = 0";
+            string sql = "SELECT * FROM messages WHERE recipient_pid = @recipient_pid AND delivered = 0";
             using (var cmd = new SQLiteCommand(sql, connection))
             {
                 cmd.Parameters.AddWithValue("@recipient_pid", recipient.Pid);
@@ -513,7 +514,7 @@ namespace QuazalWV
                             RecipientType = (uint)(reader.GetInt32(reader.GetOrdinal("recipient_type"))),
                             ParentId = (uint)(reader.GetInt32(reader.GetOrdinal("parent_id"))),
                             SenderId = (uint)(reader.GetInt32(reader.GetOrdinal("sender_pid"))),
-                            // ReceptionTime assigned later
+                            ReceptionTime = new QDateTime(Convert.ToUInt64(reader.GetInt64(reader.GetOrdinal("reception_time")))),
                             Lifetime = (uint)(reader.GetInt32(reader.GetOrdinal("lifetime"))),
                             Flags = (uint)(reader.GetInt32(reader.GetOrdinal("flags"))),
                             Subject = reader.GetString(reader.GetOrdinal("subject")),
@@ -527,18 +528,16 @@ namespace QuazalWV
             return result;
         }
 
-        public static bool UpdateDeliveredMessages(List<uint> ids, DateTime time)
+        public static bool UpdateDeliveredMessages(List<uint> ids)
         {
             int rowsAffected;
             var placeholders = new List<string>();
             for (int i = 0; i < ids.Count; i++)
                 placeholders.Add($"@id{i}");
 
-            string sql = $"UPDATE messages SET reception_time = @timestamp WHERE id IN ({string.Join(", ", placeholders)})";
-            long timestamp = ((DateTimeOffset)time.ToUniversalTime()).ToUnixTimeSeconds();
+            string sql = $"UPDATE messages SET delivered = 1 WHERE id IN ({string.Join(", ", placeholders)})";
             using (var cmd = new SQLiteCommand(sql, connection))
             {
-                cmd.Parameters.AddWithValue("@timestamp", timestamp);
                 for (int i = 0; i < ids.Count; i++)
                     cmd.Parameters.AddWithValue($"@id{i}", ids[i]);
                 try

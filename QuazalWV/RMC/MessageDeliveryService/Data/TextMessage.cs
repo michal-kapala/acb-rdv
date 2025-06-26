@@ -68,12 +68,28 @@ namespace QuazalWV
                 RecipientType = RecipientType,
                 ParentId = ParentId,
                 SenderId = SenderId,
-                ReceptionTime = ReceptionTime,
+                ReceptionTime = new QDateTime(ReceptionTime.RawTime),
                 Lifetime = Lifetime,
                 Flags = Flags,
                 Subject = Subject,
                 SenderName = SenderName
             };
+        }
+
+        public uint GetSize()
+        {
+            // Id: 4
+            // RecipientId: 4
+            // RecipientType: 4
+            // ParentId: 4
+            // SenderId: 4
+            // ReceptionTime: 8
+            // LifeTime: 4
+            // Flags: 4
+            // Subject: 2 (size) + (uint)Subject.Length + 1 (null-terminator)
+            // SenderName: 3 + (uint)SenderName.Length
+            // Body: 3 + (uint)Body.Length
+            return (uint)(45 + Subject.Length + SenderName.Length + Body.Length);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.IO;
 
 namespace QuazalWV
@@ -32,14 +33,14 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     if (reqDeliver.Message.Subject != "Notification")
                     {
+                        reqDeliver.Message.ReceptionTime = new QDateTime(DateTime.Now);
                         DBHelper.AddMessage(reqDeliver.Message);
+                    }
+                    else if (reqDeliver.Message.Body == "Check for new Messages")
+                    {
                         var recipient = Global.Clients.Find(c => c.User.Pid == reqDeliver.Message.RecipientId);
                         if (recipient != null)
-                        {
-                            Log.WriteLine(1, $"[RMC MessageDelivery] Relaying message to {recipient.User.Name}", Color.Blue, client);
-                            //RMC.SendRequest(recipient, reqDeliver, RMCP.PROTOCOL.MessageDeliveryService, 1);
-                            NotificationManager.MessageReceived(recipient, client.User.Pid, reqDeliver.Message.Body);
-                        }
+                            RMC.SendRequest(recipient, reqDeliver, RMCP.PROTOCOL.MessageDeliveryService, 1);
                     }
                     break;
                 default:

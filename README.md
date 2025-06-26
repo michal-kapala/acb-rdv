@@ -51,6 +51,24 @@ CREATE TABLE relationships (
     PRIMARY KEY (requester, requestee)
 )
 ```
+- `messages`
+```sql
+CREATE TABLE "messages" (
+    id INTEGER,
+    recipient_pid INTEGER NOT NULL,
+    recipient_type INTEGER,
+    parent_id INTEGER,
+    sender_pid INTEGER,
+    reception_time INTEGER,
+    lifetime INTEGER,
+    flags INTEGER,
+    subject TEXT,
+    sender_name TEXT,
+    body TEXT,
+    delivered INTEGER,
+    PRIMARY KEY(id)
+)
+```
 3. Populate `users` table:
 - add `Tracking` user for the game's telemetry service
 ```sql
