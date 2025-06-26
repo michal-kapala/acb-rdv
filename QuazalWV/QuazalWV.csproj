@@ -185,7 +185,9 @@
     <Compile Include="RMC\MessagingService\Data\UserMessage.cs" />
     <Compile Include="RMC\MessagingService\MessagingService.cs" />
     <Compile Include="RMC\MessagingService\Request\RMCPacketRequestMessagingService_GetMessagesHeaders.cs" />
+    <Compile Include="RMC\MessagingService\Request\RMCPacketRequestMessagingService_RetrieveMessages.cs" />
     <Compile Include="RMC\MessagingService\Response\RMCPacketResponseMessagingService_GetMessagesHeaders.cs" />
+    <Compile Include="RMC\MessagingService\Response\RMCPacketResponseMessagingService_RetrieveMessages.cs" />
     <Compile Include="RMC\NATTraversalService\Request\RMCPacketRequestNATTraversalService_RequestProbeInitiation.cs" />
     <Compile Include="RMC\NewsService\Data\NewsChannel.cs" />
     <Compile Include="RMC\NewsService\Data\NewsHeader.cs" />

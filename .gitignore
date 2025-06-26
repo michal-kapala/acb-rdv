@@ -20,6 +20,7 @@ nupkg/
 *.txt
 *.bin
 *.config
+!App.config
 *.ipch
 *.cache
 *.resources
@@ -45,8 +46,8 @@ msbuild.wrn
 # Visual Studio 2015
 .vs/*
 
-# very important not to track the db (ubi prod credentials are needed)
 *.sqlite
 ACB RDV/bin/x86/Release/ACBRDV.exe
 ACB RDV/bin/x86/Release/QuazalWV.dll
 QuazalWV/bin/x86/Release/QuazalWV.dll
+DDLParserWV/bin/*

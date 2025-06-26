@@ -124,20 +124,5 @@
                 ""
                 ).Send();
         }
-
-        public static void GameInviteSomething(ClientInfo receiverClient, uint senderPid, uint sessionId)
-        {
-            new NotificationEvent(
-                receiverClient,
-                0,
-                senderPid,
-                (uint)NotificationEventType.GameSession,
-                (uint)GameSessionNotificationSubtype.GameSessionNotif9,
-                0,
-                sessionId,
-                0,
-                ""
-                ).Send();
-        }
     }
 }

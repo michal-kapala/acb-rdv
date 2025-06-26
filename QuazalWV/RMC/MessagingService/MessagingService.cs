@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 
 namespace QuazalWV
@@ -12,6 +13,9 @@ namespace QuazalWV
                 case 3:
                     rmc.request = new RMCPacketRequestMessagingService_GetMessagesHeaders(s);
                     break;
+                case 5:
+                    rmc.request = new RMCPacketRequestMessagingService_RetrieveMessages(s);
+                    break;
                 default:
                     Log.WriteLine(1, $"[RMC Messaging] Error: Unknown Method {rmc.methodID}", Color.Red);
                     break;
@@ -24,8 +28,20 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 3:
-                    reply = new RMCPacketResponseMessagingService_GetMessagesHeaders();
+                    var reqGetHeaders = (RMCPacketRequestMessagingService_GetMessagesHeaders)rmc.request;
+                    var msgs = DBHelper.GetPendingMessages(reqGetHeaders.Recipient);
+                    var headers = new List<UserMessage>();
+                    foreach (var msg in msgs)
+                        headers.Add(msg.ToHeader());
+                    reply = new RMCPacketResponseMessagingService_GetMessagesHeaders(headers);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
+                case 5:
+                    var reqRecvMsgs = (RMCPacketRequestMessagingService_RetrieveMessages)rmc.request;
+                    var messages = DBHelper.GetMessagesByIds(reqRecvMsgs.MessageIds);
+                    reply = new RMCPacketResponseMessagingService_RetrieveMessages(messages);
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    DBHelper.UpdateDeliveredMessages(reqRecvMsgs.MessageIds);
                     break;
                 default:
                     Log.WriteLine(1, $"[RMC Messaging] Error: Unknown Method {rmc.methodID}", Color.Red, client);

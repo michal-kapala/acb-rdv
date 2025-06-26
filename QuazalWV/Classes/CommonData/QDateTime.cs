@@ -20,6 +20,12 @@ namespace QuazalWV
             RawTime = ToU64(Time);
         }
 
+        public QDateTime(ulong rawTime)
+        {
+            RawTime = rawTime;
+            Time = ToDateTime(rawTime);
+        }
+
         public QDateTime(Stream s)
         {
             FromStream(s);
@@ -42,7 +48,7 @@ namespace QuazalWV
             Helper.WriteU64(s, RawTime);
         }
 
-        private DateTime ToDateTime(ulong raw)
+        private static DateTime ToDateTime(ulong raw)
         {
             var year = (int)(raw >> 26);
             var month = (int)((raw & MonthMask) >> 22);
@@ -56,11 +62,11 @@ namespace QuazalWV
         private ulong ToU64(DateTime time)
         {
             ulong result = 0;
-            result += (ulong)(time.Year << 26);
-            result += (ulong)(time.Month << 22);
-            result += (ulong)(time.Day << 17);
-            result += (ulong)(time.Hour << 12);
-            result += (ulong)(time.Minute << 6);
+            result += (ulong)time.Year << 26;
+            result += (ulong)time.Month << 22;
+            result += (ulong)time.Day << 17;
+            result += (ulong)time.Hour << 12;
+            result += (ulong)time.Minute << 6;
             result += (ulong)time.Second;
             return result;
         }

@@ -8,9 +8,9 @@ namespace QuazalWV
     {
         public List<UserMessage> Messages { get; set; }
 
-        public RMCPacketResponseMessagingService_GetMessagesHeaders()
+        public RMCPacketResponseMessagingService_GetMessagesHeaders(List<UserMessage> headers)
         {
-            Messages = new List<UserMessage>();
+            Messages = headers;
         }
 
         public override string ToString()
