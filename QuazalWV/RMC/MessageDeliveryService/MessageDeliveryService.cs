@@ -29,7 +29,6 @@ namespace QuazalWV
                     var reqDeliver = (RMCPacketRequestMessageDeliveryService_DeliverMessage)rmc.request;
                     reqDeliver.Message.SenderId = client.User.Pid;
                     reqDeliver.Message.SenderName = client.User.Name;
-                    Log.WriteLine(1, $"[RMC MessageDelivery] '{reqDeliver.Message.Body}' from {client.User.Pid} to {reqDeliver.Message.RecipientId}", Color.Blue, client);
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     if (reqDeliver.Message.Subject != "Notification")
                     {

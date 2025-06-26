@@ -3,6 +3,7 @@ using System.Net;
 using System.Diagnostics;
 using System.Configuration;
 using System;
+using System.Drawing;
 
 namespace QuazalWV
 {
@@ -25,7 +26,7 @@ namespace QuazalWV
             foreach (ClientInfo c in Clients)
                 if (c.ep.Address.ToString() == ep.Address.ToString() && c.ep.Port == ep.Port)
                     return c;
-            WriteLog(1, "Error : Cant find client for end point : " + ep.ToString());
+            WriteLog(1, $"Cant find client for endpoint: {ep}");
             return null;
         }
 
@@ -57,7 +58,7 @@ namespace QuazalWV
 
         private static void WriteLog(int priority, string s)
         {
-            Log.WriteLine(priority, "[Global] " + s);
+            Log.WriteLine(priority, "[Global] " + s, Color.Orange);
         }
 
         internal static void RemoveSessionsOnLogin(ClientInfo client)

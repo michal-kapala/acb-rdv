@@ -31,7 +31,7 @@ namespace QuazalWV
                     var reqSetPresence = (RMCPacketRequestRichPresenceService_SetPresence)rmc.request;
                     client.PresenceProps = reqSetPresence.Props;
                     foreach (var prop in reqSetPresence.Props)
-                        Log.WriteLine(1, $"[RMC RichPresence] {prop}", Color.Blue, client);
+                        Log.WriteLine(2, $"[RMC RichPresence] {prop}", Color.Blue, client);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
