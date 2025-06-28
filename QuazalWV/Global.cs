@@ -2,7 +2,6 @@
 using System.Net;
 using System.Diagnostics;
 using System.Configuration;
-using System;
 using System.Drawing;
 
 namespace QuazalWV
@@ -26,7 +25,7 @@ namespace QuazalWV
             foreach (ClientInfo c in Clients)
                 if (c.ep.Address.ToString() == ep.Address.ToString() && c.ep.Port == ep.Port)
                     return c;
-            WriteLog(1, $"Cant find client for endpoint: {ep}");
+            WriteLog(2, $"Cant find client for endpoint: {ep}");
             return null;
         }
 
@@ -35,7 +34,7 @@ namespace QuazalWV
             foreach (ClientInfo c in Clients)
                 if (c.IDsend == id)
                     return c;
-            WriteLog(1, "Error : Cant find client for id : 0x" + id.ToString("X8"));
+            WriteLog(2, "Cant find client for id : 0x" + id.ToString("X8"));
             return null;
         }
 
@@ -44,7 +43,7 @@ namespace QuazalWV
             foreach (ClientInfo c in Clients)
                 if (c.IDrecv == id)
                     return c;
-            WriteLog(1, "Error : Cant find client for id : 0x" + id.ToString("X8"));
+            WriteLog(2, "Cant find client for id : 0x" + id.ToString("X8"));
             return null;
         }
 
