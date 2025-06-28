@@ -37,8 +37,23 @@ namespace QuazalWV
             {
                 if (now - kvp.Value.LastUsed > _expiration)
                 {
-                    Log.WriteLine(1, "[PRUDP LockManager] Removed lock which was no longer used", Color.Red);
                     _locks.TryRemove(kvp.Key, out _);
+                    var client = Global.Clients.Find(c => c.ep.Address.ToString() == kvp.Key.ToString());
+                    if (client != null)
+                    {
+                        Log.WriteLine(1, $"[PRUDP] TIMEOUT", Color.Gray, client);
+                        var rels = DBHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
+                        uint friendPid;
+                        ClientInfo friend;
+                        foreach (var relationship in rels)
+                        {
+                            friendPid = relationship.RequesterPid == client.User.Pid ? relationship.RequesteePid : relationship.RequesterPid;
+                            friend = Global.Clients.Find(c => c.User.Pid == friendPid);
+                            if (friend != null)
+                                NotificationManager.FriendStatusChanged(friend, client.User.Pid, client.User.Name, false);
+                        }
+                        Global.Clients.Remove(client);
+                    }
                 }
             }
         }

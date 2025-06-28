@@ -13,7 +13,7 @@ namespace QuazalWV
     {
         public static List<ulong> timeToIgnore = new List<ulong>();
         public static Random rand = new Random();
-        private static ExpiringLockManager<IPAddress> lockManager = new ExpiringLockManager<IPAddress>(  expiration: TimeSpan.FromMinutes(5), cleanupInterval: TimeSpan.FromMinutes(1) );
+        private static readonly ExpiringLockManager<IPAddress> lockManager = new ExpiringLockManager<IPAddress>(expiration: TimeSpan.FromMinutes(2), cleanupInterval: TimeSpan.FromMinutes(1));
 
         public static QPacket ProcessSYN(QPacket p, IPEndPoint ep, out ClientInfo client)
         {
