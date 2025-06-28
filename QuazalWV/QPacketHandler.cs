@@ -144,99 +144,119 @@ namespace QuazalWV
 
         public static void ProcessPacket(string source, byte[] data, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload = false)
         {
-			StringBuilder sb = new StringBuilder();
-			foreach (byte b in data)
-				sb.Append(b.ToString("X2") + " ");
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in data)
+                sb.Append(b.ToString("X2") + " ");
             while (true)
             {
-				QPacket p = new QPacket(data);
-				MemoryStream m = new MemoryStream(data);
-				byte[] buff = new byte[(int)p.realSize];
-				m.Seek(0, 0);
-				m.Read(buff, 0, buff.Length);
-				Log.LogPacket(false, buff);
-				Log.WriteLine(5, "[" + source + "] received : " + p.ToStringShort());
-				Log.WriteLine(10, "[" + source + "] received : " + sb.ToString());
-				Log.WriteLine(10, "[" + source + "] received : " + p.ToStringDetailed());
-				QPacket reply = null;
-				ClientInfo client = null;
-				if (p.type != QPacket.PACKETTYPE.SYN && p.type != QPacket.PACKETTYPE.NATPING)
-					client = Global.GetClientByIDrecv(p.m_uiSignature);
-				var itemLock = lockManager.GetLock(ep.Address);
+                QPacket p = new QPacket(data);
+                MemoryStream m = new MemoryStream(data);
+                byte[] buff = new byte[(int)p.realSize];
+                m.Seek(0, 0);
+                m.Read(buff, 0, buff.Length);
+                Log.LogPacket(false, buff);
+                Log.WriteLine(5, "[" + source + "] received : " + p.ToStringShort());
+                Log.WriteLine(10, "[" + source + "] received : " + sb.ToString());
+                Log.WriteLine(10, "[" + source + "] received : " + p.ToStringDetailed());
+                QPacket reply = null;
+                ClientInfo client = null;
+                if (p.type != QPacket.PACKETTYPE.SYN && p.type != QPacket.PACKETTYPE.NATPING)
+                  client = Global.GetClientByIDrecv(p.m_uiSignature);
+                var itemLock = lockManager.GetLock(ep.Address);
                 lock (itemLock)
                 {
-					switch (p.type)
-					{
-						case QPacket.PACKETTYPE.SYN:
-							reply = ProcessSYN(p, ep, out client);
-							break;
-						case QPacket.PACKETTYPE.CONNECT:
-							if (client != null && !p.flags.Contains(QPacket.PACKETFLAG.FLAG_ACK))
-							{
-								client.sPID = serverPID;
-								client.sPort = listenPort;
-								if (removeConnectPayload)
-								{
-									p.payload = new byte[0];
-									p.payloadSize = 0;
-								}
-								reply = ProcessCONNECT(client, p);
-							}
-							break;
-						case QPacket.PACKETTYPE.DATA:
-							if (p.m_oSourceVPort.type == QPacket.STREAMTYPE.OldRVSec)
-								RMC.HandlePacket(listener, p);
-							break;
-						case QPacket.PACKETTYPE.DISCONNECT:
-							if (client != null)
-								reply = ProcessDISCONNECT(client, p);
-							break;
-						case QPacket.PACKETTYPE.PING:
-							if (client != null)
-								reply = ProcessPING(client, p);
-							break;
-						case QPacket.PACKETTYPE.NATPING:
-							client = Global.GetClientByIDrecv(p.m_uiSignature);
-							ulong time = BitConverter.ToUInt64(p.payload, 5);
-							if (timeToIgnore.Contains(time))
-								timeToIgnore.Remove(time);
-							else
-							{
-								reply = p;
-								m = new MemoryStream();
-								byte b = (byte)(reply.payload[0] == 1 ? 0 : 1);
-								m.WriteByte(b);
-								uint rvcid = client.rvCID;
-								Helper.WriteU32(m, rvcid); //RVCID
-								Helper.WriteU64(m, time);
-								reply.payload = m.ToArray();
-								Send(source, reply, ep, listener);
-								m = new MemoryStream();
-								b = (byte)(b == 1 ? 0 : 1);
-								m.WriteByte(b);
-								Helper.WriteU32(m, rvcid); //RVCID
-								time = Helper.MakeTimestamp();
-								timeToIgnore.Add(time);
-								Helper.WriteU64(m, Helper.MakeTimestamp());
-								reply.payload = m.ToArray();
-							}
-							break;
-					}
-					if (reply != null)
-						Send(source, reply, ep, listener);
-				}
-				if (p.realSize != data.Length)
-				{
-					m = new MemoryStream(data);
-					int left = (int)(data.Length - p.realSize);
-					byte[] newData = new byte[left];
-					m.Seek(p.realSize, 0);
-					m.Read(newData, 0, left);
-					data = newData;
-				}
-				else
-					break;
-			}
+                    switch (p.type)
+                    {
+                        case QPacket.PACKETTYPE.SYN:
+                            reply = ProcessSYN(p, ep, out client);
+                            break;
+                        case QPacket.PACKETTYPE.CONNECT:
+                            if (client != null && !p.flags.Contains(QPacket.PACKETFLAG.FLAG_ACK))
+                            {
+                                client.sPID = serverPID;
+                                client.sPort = listenPort;
+                                if (removeConnectPayload)
+                                {
+                                    p.payload = new byte[0];
+                                    p.payloadSize = 0;
+                                }
+                                reply = ProcessCONNECT(client, p);
+                            }
+                            break;
+                        case QPacket.PACKETTYPE.DATA:
+                            if (p.m_oSourceVPort.type == QPacket.STREAMTYPE.OldRVSec)
+                                RMC.HandlePacket(listener, p);
+                            break;
+                        case QPacket.PACKETTYPE.DISCONNECT:
+                            if (client != null)
+                            {
+                                reply = ProcessDISCONNECT(client, p);
+                                Send(source, reply, ep, listener);
+                                // disconnection from RDV
+                                if (source == "RDV")
+                                {
+                                    // notify friends
+                                    var rels = DBHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
+                                    uint friendPid;
+                                    ClientInfo friend;
+                                    foreach (var relationship in rels)
+                                    {
+                                        friendPid = relationship.RequesterPid == client.User.Pid ? relationship.RequesteePid : relationship.RequesterPid;
+                                        friend = Global.Clients.Find(c => c.User.Pid == friendPid);
+                                        if (friend != null)
+                                            NotificationManager.FriendStatusChanged(friend, client.User.Pid, client.User.Name, false);
+                                    }
+                                    Global.Clients.Remove(client);
+                                    Log.WriteLine(1, $"[PRUDP] DISCONNECT", Color.Gray, client);
+                                }
+                            }
+                            break;
+                        case QPacket.PACKETTYPE.PING:
+                            if (client != null)
+                                reply = ProcessPING(client, p);
+                            break;
+                        case QPacket.PACKETTYPE.NATPING:
+                            client = Global.GetClientByIDrecv(p.m_uiSignature);
+                            ulong time = BitConverter.ToUInt64(p.payload, 5);
+                            if (timeToIgnore.Contains(time))
+                                timeToIgnore.Remove(time);
+                            else
+                            {
+                                reply = p;
+                                m = new MemoryStream();
+                                byte b = (byte)(reply.payload[0] == 1 ? 0 : 1);
+                                m.WriteByte(b);
+                                uint rvcid = client.rvCID;
+                                Helper.WriteU32(m, rvcid); //RVCID
+                                Helper.WriteU64(m, time);
+                                reply.payload = m.ToArray();
+                                Send(source, reply, ep, listener);
+                                m = new MemoryStream();
+                                b = (byte)(b == 1 ? 0 : 1);
+                                m.WriteByte(b);
+                                Helper.WriteU32(m, rvcid); //RVCID
+                                time = Helper.MakeTimestamp();
+                                timeToIgnore.Add(time);
+                                Helper.WriteU64(m, Helper.MakeTimestamp());
+                                reply.payload = m.ToArray();
+                            }
+                            break;
+                    }
+                    if (reply != null && p.type != QPacket.PACKETTYPE.DISCONNECT)
+                        Send(source, reply, ep, listener);
+                }
+                if (p.realSize != data.Length)
+                {
+                    m = new MemoryStream(data);
+                    int left = (int)(data.Length - p.realSize);
+                    byte[] newData = new byte[left];
+                    m.Seek(p.realSize, 0);
+                    m.Read(newData, 0, left);
+                    data = newData;
+                }
+                else
+                    break;
+            }
         }
 
         public static void Send(string source, QPacket p, IPEndPoint ep, UdpClient listener)
