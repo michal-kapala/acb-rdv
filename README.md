@@ -10,87 +10,13 @@ Credits for the original implementation of GRO backend go to [@Warranty Voider](
 Here's the configuration needed to set up your environment.
 
 ### Database
-As of now the database file is excluded from git tracking. Once a proper schema emerges it will be committed.
+As of now the database file is excluded from git tracking. Use the provided script to initialize your local database:
 
-1. Install [SQLite Browser](https://sqlitebrowser.org/dl/)) and create `database.sqlite` file inside `./ACB RDV/bin/<architecture>/<mode>`.
+1. Install [SQLite CLI](https://sqlite.org/download.html).
 
-2. Create the needed tables:
+2. Run `db_init.bat` to create and copy database into build directories. It also copies `.cxb` configuration file.
 
-- `users`
-
-```sql
-CREATE TABLE "users" (
-    "id"    INTEGER PRIMARY KEY AUTOINCREMENT,
-    "pid"    BIGINT,
-    "name"    TEXT,
-    "password"    TEXT,
-    "ubi_id"    TEXT,
-    "email"    TEXT,
-    "country_code"    TEXT,
-    "pref_lang"    TEXT
-)
-```
-
-- `privileges`
-
-```sql
-CREATE TABLE privileges (
-    id          INTEGER,
-    description TEXT,
-    locale      TEXT
-)
-```
-- `relationships`
-```sql
-CREATE TABLE relationships (
-    requester INTEGER NOT NULL,
-    requestee INTEGER NOT NULL,
-    type TINYINT NOT NULL,
-    details INTEGER,
-    
-    PRIMARY KEY (requester, requestee)
-)
-```
-- `messages`
-```sql
-CREATE TABLE "messages" (
-    id INTEGER,
-    recipient_pid INTEGER NOT NULL,
-    recipient_type INTEGER,
-    parent_id INTEGER,
-    sender_pid INTEGER,
-    reception_time INTEGER,
-    lifetime INTEGER,
-    flags INTEGER,
-    subject TEXT,
-    sender_name TEXT,
-    body TEXT,
-    delivered INTEGER,
-    PRIMARY KEY(id)
-)
-```
-3. Populate `users` table:
-- add `Tracking` user for the game's telemetry service
-```sql
-INSERT INTO users VALUES (1,'Tracking','JaDe!','1234abcd-5678-90ef-4321-0987654321fe','tracking@ubi.com', 'US', 'en')
-```
-
-- add your account (change `<username>` and `<password>`)
-```sql
-INSERT INTO users VALUES (2,'<username>','<password>','1234abcd-5678-90ef-4321-0987654321ff','some@email.com', 'US', 'en')
-```
-
-If you want to start the game **from SP binary** you will need your real credentials, email and [Ubi account ID](https://www.reddit.com/r/uplay/comments/piyp3h/how_to_find_your_ubisoft_connect_account_id/) to be able to log in as these are used by Ubi's Orbit API.
-
-![](DocResources/db_users.png)
-
-4. Populate `privileges` table:
-
-```sql
-INSERT INTO privileges VALUES (1,'Allow to play online','en-US'),(1000,'Trajan Market Map','en-US'),(1001,'Aqueduct Map','en-US'),(1004,'Ezio's Helmschmied Drachen Armor Skin','en-US'),(1005,'Harlequin','en-US'),(1006,'Officer','en-US');
-```
-
-![](DocResources/db_privileges.png)
+3. (Optional) Install [SQLite Browser](https://sqlitebrowser.org/dl/) for data inspection/modifications.
 
 ### Application
 Create `ACBRDV.exe.config` configuration file in `./ACB RDV/bin/<architecture>/<mode>`:
@@ -109,7 +35,7 @@ Create `ACBRDV.exe.config` configuration file in `./ACB RDV/bin/<architecture>/<
 
 Set `<server host IP>` to the server host's IP depending on your environment (localhost/LAN/Internet).
 
-Make sure the `.cxb` file is present in your server executable's directory.
+Make sure your current build directory was populated with the `.cxb` file.
 
 #### Clients
 
@@ -153,4 +79,10 @@ Run this command from ACB root directory to start the game:
 ACBMP.exe /onlineUser:<user> /onlinePassword:<password>
 ```
 
-Change `<user>` and `<password>` to your credentials from the database file (the user other than `Tracking`).
+Change `<user>` and `<password>` to your credentials from the database file (any user other than `Tracking`).
+
+To log in as the default player, use:
+
+```
+ACBMP.exe /onlineUser:Player /onlinePassword:pass
+```
