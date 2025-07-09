@@ -16,7 +16,7 @@ As of now the database file is excluded from git tracking. Use the provided scri
 
 2. Run `db_init.bat` to create and copy database into build directories. It also copies `.cxb` configuration file.
 
-3. (Optional) Install [SQLite Browser](https://sqlitebrowser.org/dl/)) for data inspection/modifications.
+3. (Optional) Install [SQLite Browser](https://sqlitebrowser.org/dl/) for data inspection/modifications.
 
 ### Application
 Create `ACBRDV.exe.config` configuration file in `./ACB RDV/bin/<architecture>/<mode>`:
