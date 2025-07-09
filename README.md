@@ -34,7 +34,7 @@ CREATE TABLE "users" (
 - `privileges`
 
 ```sql
-CREATE TABLE privileges (
+CREATE TABLE "privileges" (
     id          INTEGER,
     description TEXT,
     locale      TEXT
@@ -42,7 +42,7 @@ CREATE TABLE privileges (
 ```
 - `relationships`
 ```sql
-CREATE TABLE relationships (
+CREATE TABLE "relationships" (
     requester INTEGER NOT NULL,
     requestee INTEGER NOT NULL,
     type TINYINT NOT NULL,
@@ -66,6 +66,7 @@ CREATE TABLE "messages" (
     sender_name TEXT,
     body TEXT,
     delivered INTEGER,
+	
     PRIMARY KEY(id)
 )
 ```
