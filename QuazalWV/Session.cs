@@ -38,7 +38,7 @@ namespace QuazalWV
         public bool CheckQuery(GameSessionQuery query, ClientInfo client)
         {
 
-            Log.WriteLine(1, $"[Session] Checking query for session {this}  for {client.User.Pid}", Color.Red, client);
+            //Log.WriteLine(1, $"[Session] Checking query for session {this}  for {client.User.Pid}", Color.Red, client);
             var qMinLevelRange = query.Params.Find(param => param.Id == (uint)SessionParam.MinLevelRange);
             var qMaxLevelRange = query.Params.Find(param => param.Id == (uint)SessionParam.MaxLevelRange);
             var qGameMode = query.Params.Find(param => param.Id == (uint)SessionParam.GameMode);
@@ -90,9 +90,14 @@ namespace QuazalWV
                 Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), missing current slots", Color.Red, client);
                 return false;
             }
-
+            uint MaxSlots = gameType.Value == (uint)GameType.PRIVATE ? (uint)SessionParam.MaxPrivateSlots : (uint)SessionParam.MaxPublicSlots;
             // too many players
-            if (qMaxSlotsTaken!=null && currentSlots.Value > qMaxSlotsTaken.Value)
+            if (qMaxSlotsTaken ==null && MaxSlots == slotsParam)
+            {
+                Log.WriteLine(1, $"[Session] Session ignored due to too many players new join only one player", Color.Gray, client);
+                return false;
+            }
+            if (qMaxSlotsTaken!=null  && currentSlots.Value > qMaxSlotsTaken.Value)
             {
                 Log.WriteLine(1, $"[Session] Session ignored due to too many players", Color.Gray, client);
                 return false;
@@ -119,10 +124,10 @@ namespace QuazalWV
             return attrs;
         }
 
-        public void RemoveParticipants(List<uint> publicPids, List<uint> privatePids)
+        public void RemoveParticipants(List<uint> ToRemove)
         {
-            PublicPids.RemoveAll(item => publicPids.Contains(item));
-            PrivatePids.RemoveAll(item => privatePids.Contains(item));
+            PublicPids.RemoveAll(item => ToRemove.Contains(item));
+            PrivatePids.RemoveAll(item => ToRemove.Contains(item));
             UpdateCurrentSlots();			
         }
 

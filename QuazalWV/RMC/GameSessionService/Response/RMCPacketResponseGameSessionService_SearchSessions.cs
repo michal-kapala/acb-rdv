@@ -19,7 +19,6 @@ namespace QuazalWV
                 {
                     if (ses.CheckQuery(query, client))
                     {
-                        Log.WriteLine(1, $"[RMC GameSession] xxxx GameSessionSearchResult");
                         var host = Global.Clients.Find(c => c.User.Pid == ses.HostPid);
                         if (host == null)
                             Log.WriteLine(1, $"[RMC GameSession] Error: host {ses.HostPid} not found for SearchSessions result", Color.Red, client);
@@ -33,10 +32,6 @@ namespace QuazalWV
                         };
                         Log.WriteLine(1, $"[RMC GameSession] xxxx GameSessionSearchResult: {result}", Color.Black, client);
                         Results.Add(result);
-                    }
-                    else
-                    {
-                        Log.WriteLine(1, $"[RMC GameSession] xxxx not result", Color.Black, client);
                     }
                 }
                 catch (Exception ex)

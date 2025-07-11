@@ -2,6 +2,8 @@
 using System.Net;
 using System.Threading;
 using QuazalWV;
+using System.Drawing;
+using System;
 
 namespace AcbRdv
 {
@@ -54,7 +56,15 @@ namespace AcbRdv
 
         public static void ProcessPacket(byte[] data, IPEndPoint ep)
         {
-            QPacketHandler.ProcessPacket("RDV", data, ep, listener, serverPID, listenPort);
+            try
+            {
+                QPacketHandler.ProcessPacket("RDV", data, ep, listener, serverPID, listenPort);
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine(1, $"[Exception Processing]: {ex.Message}", Color.Red);
+                Log.WriteLine(1, "Stack trace:\n" + ex.StackTrace);
+            }
         }
 
         private static void WriteLog(int priority, string s)
