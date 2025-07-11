@@ -64,7 +64,8 @@ namespace QuazalWV
         {
             client.RegisteredUrls.Clear();
             client.Urls.Clear();
-            Sessions.RemoveAll(s => s.HostPid == client.PID);
+            //DO NOT REMOVE SESSIONS HOSTED BY THIS GUY BECAUSE OTHER PLAYERS WILL BE KICKED OUT YOU NEED TO MIGRATE THEM FIRST JUST REMOVE THE GUY #TO DO
+            //Sessions.RemoveAll(s => s.HostPid == client.User.Pid);
         }
     }
 }

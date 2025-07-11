@@ -51,7 +51,7 @@ namespace QuazalWV
             Address = addr;
             Port = 4659;
             CID = 1;
-            PID = client.PID;
+            PID = client.User.Pid;
             SID = 1;
             RVCID = client.rvCID;
             Stream = 3;

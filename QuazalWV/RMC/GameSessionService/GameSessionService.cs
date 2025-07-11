@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace QuazalWV
 {
@@ -79,6 +80,8 @@ namespace QuazalWV
                     client.GameSessionID = sesId;
                     newSes = new Session(sesId, reqCreateSes.Session, client);
                     // initialize params
+                    Log.WriteLine(1, $"[RMC GameSession] New session (id={newSes.Key.SessionId}) for client {client.User.Name} hostpid {newSes.HostPid} \n session is {newSes}", Color.Blue, client);
+
                     gameType = newSes.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
                     if (gameType == null)
                         Log.WriteLine(1, $"[Session] Inconsistent session state (id={newSes.Key.SessionId}), missing game type", Color.Red, client);
@@ -99,8 +102,28 @@ namespace QuazalWV
                     break;
                 case 2:
                     var reqUpdateSes = (RMCPacketRequestGameSessionService_UpdateSession)rmc.request;
-                    Global.Sessions.Find(session => session.Key.SessionId == reqUpdateSes.SessionUpdate.Key.SessionId)
-                        .GameSession.Attributes = reqUpdateSes.SessionUpdate.Attributes;
+                    newSes = Global.Sessions.Find(session => session.Key.SessionId == reqUpdateSes.SessionUpdate.Key.SessionId);
+
+                    //Global.Sessions.Find(session => session.Key.SessionId == reqUpdateSes.SessionUpdate.Key.SessionId)
+                    //    .GameSession.Attributes = reqUpdateSes.SessionUpdate.Attributes;
+                    if (newSes == null)
+                    {
+                        Log.WriteLine(1, $"[RMC GameSession] Update session not existant WTF is hapening", Color.Blue, client);
+                    }
+                    foreach (var newParam in reqUpdateSes.SessionUpdate.Attributes)
+                    {
+                        var existing = newSes.GameSession.Attributes.FirstOrDefault(attr => attr.Id == newParam.Id);
+                        if (existing != null)
+                        {
+                            existing.Value = newParam.Value;
+                        }
+                        else
+                        {
+                            newSes.GameSession.Attributes.Add(newParam);
+                        }
+                    }
+                    //newSes.GameSession.Attributes = reqUpdateSes.SessionUpdate.Attributes;
+                    Log.WriteLine(1, $"[RMC GameSession] after Updating  session {newSes}", Color.Blue, client);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
@@ -159,7 +182,7 @@ namespace QuazalWV
                     }
                     else if (newSes.IsJoinable())
                     {
-                        ClientInfo host = Global.Clients.Find(c => c.PID == newSes.HostPid);
+                        ClientInfo host = Global.Clients.Find(c => c.User.Pid == newSes.HostPid);
                         if (host == null)
                         {
                             Log.WriteLine(1, $"[RMC GameSession] Session host {newSes.HostPid} not found", Color.Red, client);
@@ -321,10 +344,10 @@ namespace QuazalWV
                         }
                         else
                         {
-                            if (abandonedSes.PublicPids.Contains(client.PID))
-                                abandonedSes.PublicPids.Remove(client.PID);
-                            if (abandonedSes.PrivatePids.Contains(client.PID))
-                                abandonedSes.PrivatePids.Remove(client.PID);
+                            if (abandonedSes.PublicPids.Contains(client.User.Pid))
+                                abandonedSes.PublicPids.Remove(client.User.Pid);
+                            if (abandonedSes.PrivatePids.Contains(client.User.Pid))
+                                abandonedSes.PrivatePids.Remove(client.User.Pid);
                         }
                     }
                     else
