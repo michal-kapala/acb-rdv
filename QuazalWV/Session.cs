@@ -37,6 +37,8 @@ namespace QuazalWV
 
         public bool CheckQuery(GameSessionQuery query, ClientInfo client)
         {
+
+            Log.WriteLine(1, $"[Session] Checking query for session {this}  for {client.User.Pid}", Color.Red, client);
             var qMinLevelRange = query.Params.Find(param => param.Id == (uint)SessionParam.MinLevelRange);
             var qMaxLevelRange = query.Params.Find(param => param.Id == (uint)SessionParam.MaxLevelRange);
             var qGameMode = query.Params.Find(param => param.Id == (uint)SessionParam.GameMode);
@@ -56,12 +58,14 @@ namespace QuazalWV
                 return false;
             }
 
+            // this will fuck up with the first search before creating a session
             // ignore queries with level limits or without slots
-            if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
-            {
-                Log.WriteLine(1, $"[Session] Session ignored due to level ranges/lack of slots", Color.Gray, client);
-                return false;
-            }
+            //Log.WriteLine(1, $"[Session] has the following amount of slots {qMinLevelRange.Value} {qMaxLevelRange.Value} {qMaxSlotsTaken} ", Color.Gray, client);
+            //if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
+            //{
+            //    Log.WriteLine(1, $"[Session] Session ignored due to level ranges/lack of slots", Color.Gray, client);
+            //    return false;
+            //}
 
             var gameMode = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameMode);
             var gameType = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
@@ -88,7 +92,7 @@ namespace QuazalWV
             }
 
             // too many players
-            if (currentSlots.Value > qMaxSlotsTaken.Value)
+            if (qMaxSlotsTaken!=null && currentSlots.Value > qMaxSlotsTaken.Value)
             {
                 Log.WriteLine(1, $"[Session] Session ignored due to too many players", Color.Gray, client);
                 return false;
@@ -197,6 +201,10 @@ namespace QuazalWV
                 return false;
             }
             return maxSlots.Value > currentSlots.Value;
+        }
+        public override string ToString()
+        {
+            return $"Session type {Key.TypeId} sessid {Key.SessionId} public pids {string.Join(", ", PublicPids)} and private pids {string.Join(", ", PrivatePids)} hostpid {HostPid} session attributes {string.Join("\n", GameSession.Attributes)}";
         }
     }
 }

@@ -239,7 +239,6 @@ namespace QuazalWV
                                 var future_abandoned  = Global.Sessions.Find(session => session.Key.SessionId == result.GameSessionID);
                                 result.AbandoningSession = true;
                                 result.AbandonedSessionID = result.GameSessionID;
-                                // TODO: update old session
                             }
                             result.GameSessionID = reqAddParticip.Key.SessionId;
                             result.InGameSession = true;
@@ -259,7 +258,6 @@ namespace QuazalWV
                                 var future_abandoned = Global.Sessions.Find(session => session.Key.SessionId == result.GameSessionID);
                                 result.AbandoningSession = true;
                                 result.AbandonedSessionID = result.GameSessionID;
-                                // TODO: update old session
                             }
                             result.GameSessionID = reqAddParticip.Key.SessionId;
                             result.InGameSession = true;

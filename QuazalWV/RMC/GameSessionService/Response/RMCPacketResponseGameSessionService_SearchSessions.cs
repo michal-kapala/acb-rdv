@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -14,22 +15,36 @@ namespace QuazalWV
             Results = new List<GameSessionSearchResult>();
             foreach (var ses in Global.Sessions)
             {
-                if (ses.CheckQuery(query, client))
+                try
                 {
-                    var host = Global.Clients.Find(c => c.User.Pid == ses.HostPid);
-                    if (host == null)
-                        Log.WriteLine(1, $"[RMC GameSession] Error: host {ses.HostPid} not found for SearchSessions result", Color.Red, client);
-
-                    var result = new GameSessionSearchResult
+                    if (ses.CheckQuery(query, client))
                     {
-                        Key = ses.Key,
-                        HostPid = ses.HostPid,
-                        HostUrls = host != null ? host.RegisteredUrls : new List<StationUrl>(),
-                        Attributes = ses.FilterAttributes()
-                    };
-                    Log.WriteLine(2, $"[RMC GameSession] GameSessionSearchResult: {result}", Color.Black, client);
-                    Results.Add(result);
+                        Log.WriteLine(1, $"[RMC GameSession] xxxx GameSessionSearchResult");
+                        var host = Global.Clients.Find(c => c.User.Pid == ses.HostPid);
+                        if (host == null)
+                            Log.WriteLine(1, $"[RMC GameSession] Error: host {ses.HostPid} not found for SearchSessions result", Color.Red, client);
+
+                        var result = new GameSessionSearchResult
+                        {
+                            Key = ses.Key,
+                            HostPid = ses.HostPid,
+                            HostUrls = host != null ? host.RegisteredUrls : new List<StationUrl>(),
+                            Attributes = ses.FilterAttributes()
+                        };
+                        Log.WriteLine(1, $"[RMC GameSession] xxxx GameSessionSearchResult: {result}", Color.Black, client);
+                        Results.Add(result);
+                    }
+                    else
+                    {
+                        Log.WriteLine(1, $"[RMC GameSession] xxxx not result", Color.Black, client);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Log.WriteLine(1, "An error occurred: " + ex.Message);
+                    Log.WriteLine(1, "Stack trace:\n" + ex.StackTrace);
+                }
+
             }
         }
 
