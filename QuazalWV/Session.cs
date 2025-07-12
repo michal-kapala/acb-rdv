@@ -87,15 +87,15 @@ namespace QuazalWV
                 Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), missing current slots", Color.Red, client);
                 return false;
             }
-            uint MaxSlots = gameType.Value == (uint)GameType.PRIVATE ? (uint)SessionParam.MaxPrivateSlots : (uint)SessionParam.MaxPublicSlots;
-            // too many players
-            if (qMaxSlotsTaken == null && MaxSlots == slotsParam)
+            
+            if (qMaxSlotsTaken == null)
             {
-                Log.WriteLine(1, $"[Session] Session ignored due to too many players new join only one player", Color.Gray, client);
+                Log.WriteLine(1, $"[Session] Session query missing QueryMaxSlotsTaken parameter", Color.Red, client);
                 return false;
             }
 
-            if (qMaxSlotsTaken != null && currentSlots.Value > qMaxSlotsTaken.Value)
+            // too many players
+            if (currentSlots.Value > qMaxSlotsTaken.Value)
             {
                 Log.WriteLine(1, $"[Session] Session ignored due to too many players", Color.Gray, client);
                 return false;
