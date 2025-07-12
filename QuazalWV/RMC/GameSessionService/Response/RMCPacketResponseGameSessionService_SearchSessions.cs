@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -28,7 +27,7 @@ namespace QuazalWV
                         HostUrls = host != null ? host.RegisteredUrls : new List<StationUrl>(),
                         Attributes = ses.FilterAttributes()
                     };
-                    Log.WriteLine(1, $"[RMC GameSession] xxxx GameSessionSearchResult: {result}", Color.Black, client);
+                    Log.WriteLine(1, $"[RMC GameSession] GameSessionSearchResult: {result}", Color.Black, client);
                     Results.Add(result);
                 }
             }

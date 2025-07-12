@@ -57,7 +57,6 @@ namespace QuazalWV
                 return false;
             }
 
-            // this will fuck up with the first search before creating a session
             // ignore queries with level limits or without slots
             if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
             {

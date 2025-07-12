@@ -80,8 +80,6 @@ namespace QuazalWV
                     client.GameSessionID = sesId;
                     newSes = new Session(sesId, reqCreateSes.Session, client);
                     // initialize params
-                    Log.WriteLine(1, $"[RMC GameSession] New session (id={newSes.Key.SessionId}) for client {client.User.Name} hostpid {newSes.HostPid} \n session is {newSes}", Color.Blue, client);
-
                     gameType = newSes.GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
                     if (gameType == null)
                         Log.WriteLine(1, $"[Session] Inconsistent session state (id={newSes.Key.SessionId}), missing game type", Color.Red, client);
@@ -305,7 +303,7 @@ namespace QuazalWV
                     reply = new RMCPResponseEmpty();
                     if (client.GameSessionID == 0)
                     {
-                        Log.WriteLine(1, $"[RMC GameSession] RegisterURLs: {client.User.Name} is not in session", Color.Red, client);
+                        Log.WriteLine(1, $"[RMC GameSession] RegisterURLs: {client.User.Name} is not in a session", Color.Red, client);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_PlayerIsNotSessionParticipant);
                     }
                     else
@@ -325,7 +323,6 @@ namespace QuazalWV
                             {
                                 Log.WriteLine(1, $"[RMC GameSession] RegisterURLs: Host migration for session {ses.Key.SessionId}, new host {newHostPid}", Color.Blue, client);
                                 ses.Migrating = false;
-                                Log.WriteLine(1, $"[RMC GameSession] RegisterURLs: Session after migration:\n{ses}", Color.Blue, client);
                             }
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                         }
