@@ -7,7 +7,7 @@ namespace QuazalWV
     public class ClientInfo
     {
         public static System.Random rand = new System.Random();
-        public uint PID;
+        public uint PID { get; set; }
         public uint sPID;
         public ushort sPort;
         public uint IDrecv;

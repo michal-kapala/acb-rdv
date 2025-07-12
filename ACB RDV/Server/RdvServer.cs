@@ -2,6 +2,8 @@
 using System.Net;
 using System.Threading;
 using QuazalWV;
+using System.Drawing;
+using System;
 
 namespace AcbRdv
 {
@@ -47,7 +49,10 @@ namespace AcbRdv
                     byte[] bytes = listener.Receive(ref ep);
                     ProcessPacket(bytes, ep);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Log.WriteLine(1, $"[Error]: {ex.Message}", Color.Red);
+                }
             }
             WriteLog(1, "Server stopped");
         }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Text;
 
 namespace QuazalWV
 {
@@ -11,6 +12,7 @@ namespace QuazalWV
         public List<uint> PrivatePids { get; set; }
         public uint HostPid { get; set; }
         public List<StationUrl> HostUrls { get; set; }
+        public bool Migrating { get; set; } = false;
 
         public Session(uint sesId, GameSession ses, ClientInfo host)
         {
@@ -22,7 +24,7 @@ namespace QuazalWV
             };
             PublicPids = new List<uint>();
             PrivatePids = new List<uint>();
-            HostPid = host.PID;
+            HostPid = host.User.Pid;
             foreach (var url in host.Urls)
                 Log.WriteLine(2, $"[Session] Host URL added: ${url}", Color.Green);
             HostUrls = host.Urls;
@@ -50,7 +52,7 @@ namespace QuazalWV
             }
 
             // self-hosted
-            if (client.PID == HostPid)
+            if (client.User.Pid == HostPid)
             {
                 Log.WriteLine(1, $"[Session] Ignoring a self-hosted session", Color.Gray, client);
                 return false;
@@ -86,6 +88,12 @@ namespace QuazalWV
                 Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), missing current slots", Color.Red, client);
                 return false;
             }
+            
+            if (qMaxSlotsTaken == null)
+            {
+                Log.WriteLine(1, $"[Session] Session query missing QueryMaxSlotsTaken parameter", Color.Red, client);
+                return false;
+            }
 
             // too many players
             if (currentSlots.Value > qMaxSlotsTaken.Value)
@@ -115,27 +123,28 @@ namespace QuazalWV
             return attrs;
         }
 
-        public void RemoveParticipants(List<uint> publicPids, List<uint> privatePids)
+        public void RemoveParticipants(List<uint> ToRemove)
         {
-            PublicPids.RemoveAll(item => publicPids.Contains(item));
-            PrivatePids.RemoveAll(item => privatePids.Contains(item));
+            PublicPids.RemoveAll(item => ToRemove.Contains(item));
+            PrivatePids.RemoveAll(item => ToRemove.Contains(item));
             UpdateCurrentSlots();			
         }
 
         public void Leave(ClientInfo client)
         {
-            PublicPids.Remove(client.PID);
-            PrivatePids.Remove(client.PID);
+            PublicPids.Remove(client.User.Pid);
+            PrivatePids.Remove(client.User.Pid);
             UpdateCurrentSlots();
             // host left - assign new host (migrate?)
-            if (client.PID == HostPid)
+            if (client.User.Pid == HostPid)
             {
                 if (PublicPids.Count > 0)
                     HostPid = PublicPids[0];
                 else
                     HostPid = PrivatePids[0];
-                Log.WriteLine(1, $"[Session] On-leave host migration from {client.PID} to {HostPid}", Color.Orange);
-                var newHost = Global.Clients.Find(c => c.PID == HostPid);
+                // this flow should never happen as host migrations use MigrateSession->RegisterURLs->AbandonSession flow
+                Log.WriteLine(1, $"[Session] On-leave host migration from {client.User.Pid} to {HostPid}", Color.Orange);
+                var newHost = Global.Clients.Find(c => client.User.Pid == HostPid);
                 if (newHost == null)
                 {
                     Log.WriteLine(1, $"[Session] On-leave host migration elected non-existent host {HostPid}", Color.Red);
@@ -197,6 +206,23 @@ namespace QuazalWV
                 return false;
             }
             return maxSlots.Value > currentSlots.Value;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"\t[ID: {Key.SessionId}]");
+            sb.AppendLine($"\t[Type: {Key.TypeId}]");
+            sb.AppendLine($"\t[Host: {HostPid}]");
+            sb.AppendLine($"\t[Public PIDs: ({string.Join(", ", PublicPids)})]");
+            sb.AppendLine($"\t[Private PIDs: ({string.Join(", ", PrivatePids)})]");
+            sb.AppendLine($"\t[Attributes]");
+            foreach (var attr in GameSession.Attributes)
+                sb.AppendLine($"\t\t{attr}");
+            sb.AppendLine($"\t[Host URLs]");
+            foreach (var url in HostUrls)
+                sb.AppendLine($"\t\t[{url}]");
+            return sb.ToString();
         }
     }
 }
