@@ -42,12 +42,15 @@ namespace QuazalWV
             return m.ToArray();
         }
 
-        public void RegisterUrls(ClientInfo client)
+        public void RegisterUrls(ClientInfo client, Session ses)
         {
             client.RegisteredUrls.Clear();
+            ses.HostUrls.Clear();
             foreach (StationUrl url in Urls)
+            {
                 client.RegisteredUrls.Add(url);
-            // TODO: update hosted session's URLs
+                ses.HostUrls.Add(url);
+            }
         }
     }
 }

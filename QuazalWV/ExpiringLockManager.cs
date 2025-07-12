@@ -41,7 +41,7 @@ namespace QuazalWV
                     var client = Global.Clients.Find(c => c.ep.Address.ToString() == kvp.Key.ToString());
                     if (client != null)
                     {
-                        Log.WriteLine(1, $"[PRUDP] TIMEOUT", Color.Red, client);
+                        Log.WriteLine(1, $"[PRUDP] TIMEOUT", Color.Gray, client);
                         var rels = DBHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
                         uint friendPid;
                         ClientInfo friend;

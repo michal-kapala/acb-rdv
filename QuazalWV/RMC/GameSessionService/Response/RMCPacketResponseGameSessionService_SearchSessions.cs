@@ -15,31 +15,22 @@ namespace QuazalWV
             Results = new List<GameSessionSearchResult>();
             foreach (var ses in Global.Sessions)
             {
-                try
+                if (ses.CheckQuery(query, client))
                 {
-                    if (ses.CheckQuery(query, client))
+                    var host = Global.Clients.Find(c => c.User.Pid == ses.HostPid);
+                    if (host == null)
+                        Log.WriteLine(1, $"[RMC GameSession] Error: host {ses.HostPid} not found for SearchSessions result", Color.Red, client);
+
+                    var result = new GameSessionSearchResult
                     {
-                        var host = Global.Clients.Find(c => c.User.Pid == ses.HostPid);
-                        if (host == null)
-                            Log.WriteLine(1, $"[RMC GameSession] Error: host {ses.HostPid} not found for SearchSessions result", Color.Red, client);
-
-                        var result = new GameSessionSearchResult
-                        {
-                            Key = ses.Key,
-                            HostPid = ses.HostPid,
-                            HostUrls = host != null ? host.RegisteredUrls : new List<StationUrl>(),
-                            Attributes = ses.FilterAttributes()
-                        };
-                        Log.WriteLine(1, $"[RMC GameSession] xxxx GameSessionSearchResult: {result}", Color.Black, client);
-                        Results.Add(result);
-                    }
+                        Key = ses.Key,
+                        HostPid = ses.HostPid,
+                        HostUrls = host != null ? host.RegisteredUrls : new List<StationUrl>(),
+                        Attributes = ses.FilterAttributes()
+                    };
+                    Log.WriteLine(1, $"[RMC GameSession] xxxx GameSessionSearchResult: {result}", Color.Black, client);
+                    Results.Add(result);
                 }
-                catch (Exception ex)
-                {
-                    Log.WriteLine(1, "An error occurred: " + ex.Message);
-                    Log.WriteLine(1, "Stack trace:\n" + ex.StackTrace);
-                }
-
             }
         }
 

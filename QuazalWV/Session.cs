@@ -11,6 +11,7 @@ namespace QuazalWV
         public List<uint> PrivatePids { get; set; }
         public uint HostPid { get; set; }
         public List<StationUrl> HostUrls { get; set; }
+        public bool Migrating { get; set; } = false;
 
         public Session(uint sesId, GameSession ses, ClientInfo host)
         {
@@ -37,8 +38,6 @@ namespace QuazalWV
 
         public bool CheckQuery(GameSessionQuery query, ClientInfo client)
         {
-
-            //Log.WriteLine(1, $"[Session] Checking query for session {this}  for {client.User.Pid}", Color.Red, client);
             var qMinLevelRange = query.Params.Find(param => param.Id == (uint)SessionParam.MinLevelRange);
             var qMaxLevelRange = query.Params.Find(param => param.Id == (uint)SessionParam.MaxLevelRange);
             var qGameMode = query.Params.Find(param => param.Id == (uint)SessionParam.GameMode);
@@ -60,12 +59,11 @@ namespace QuazalWV
 
             // this will fuck up with the first search before creating a session
             // ignore queries with level limits or without slots
-            //Log.WriteLine(1, $"[Session] has the following amount of slots {qMinLevelRange.Value} {qMaxLevelRange.Value} {qMaxSlotsTaken} ", Color.Gray, client);
-            //if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
-            //{
-            //    Log.WriteLine(1, $"[Session] Session ignored due to level ranges/lack of slots", Color.Gray, client);
-            //    return false;
-            //}
+            if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
+            {
+                Log.WriteLine(1, $"[Session] Session ignored due to level ranges/lack of slots", Color.Gray, client);
+                return false;
+            }
 
             var gameMode = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameMode);
             var gameType = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
@@ -92,12 +90,13 @@ namespace QuazalWV
             }
             uint MaxSlots = gameType.Value == (uint)GameType.PRIVATE ? (uint)SessionParam.MaxPrivateSlots : (uint)SessionParam.MaxPublicSlots;
             // too many players
-            if (qMaxSlotsTaken ==null && MaxSlots == slotsParam)
+            if (qMaxSlotsTaken == null && MaxSlots == slotsParam)
             {
                 Log.WriteLine(1, $"[Session] Session ignored due to too many players new join only one player", Color.Gray, client);
                 return false;
             }
-            if (qMaxSlotsTaken!=null  && currentSlots.Value > qMaxSlotsTaken.Value)
+
+            if (qMaxSlotsTaken != null && currentSlots.Value > qMaxSlotsTaken.Value)
             {
                 Log.WriteLine(1, $"[Session] Session ignored due to too many players", Color.Gray, client);
                 return false;
@@ -143,6 +142,7 @@ namespace QuazalWV
                     HostPid = PublicPids[0];
                 else
                     HostPid = PrivatePids[0];
+                // this flow should never happen as host migrations use MigrateSession->RegisterURLs->AbandonSession flow
                 Log.WriteLine(1, $"[Session] On-leave host migration from {client.User.Pid} to {HostPid}", Color.Orange);
                 var newHost = Global.Clients.Find(c => client.User.Pid == HostPid);
                 if (newHost == null)
@@ -209,7 +209,7 @@ namespace QuazalWV
         }
         public override string ToString()
         {
-            return $"Session type {Key.TypeId} sessid {Key.SessionId} public pids {string.Join(", ", PublicPids)} and private pids {string.Join(", ", PrivatePids)} hostpid {HostPid} session attributes {string.Join("\n", GameSession.Attributes)}";
+            return $"Session type {Key.TypeId} sessid {Key.SessionId} public pids {string.Join(", ", PublicPids)} and private pids {string.Join(", ", PrivatePids)} hostpid {HostPid} session attributes {string.Join("\n", GameSession.Attributes)}, urls {string.Join("|", HostUrls)}";
         }
     }
 }

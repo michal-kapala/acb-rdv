@@ -50,7 +50,7 @@ namespace AcbRdv
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteLine(1, $"[Exception Processing]: {ex.Message}", Color.Red);
+                    Log.WriteLine(1, $"[Error]: {ex.Message}", Color.Red);
                 }
             }
             WriteLog(1, "Server stopped");
@@ -58,16 +58,7 @@ namespace AcbRdv
 
         public static void ProcessPacket(byte[] data, IPEndPoint ep)
         {
-            try
-            {
-                QPacketHandler.ProcessPacket("Auth", data, ep, listener, RdvServer.serverPID, RdvServer.listenPort);
-            }
-            catch (Exception ex)
-            {
-                Log.WriteLine(1, $"[Exception Processing]: {ex.Message}", Color.Red);
-                Log.WriteLine(1, "Stack trace:\n" + ex.StackTrace);
-            }
-            
+            QPacketHandler.ProcessPacket("Auth", data, ep, listener, RdvServer.serverPID, RdvServer.listenPort);
         }
 
         private static void WriteLog(int priority, string s)

@@ -49,22 +49,17 @@ namespace AcbRdv
                     byte[] bytes = listener.Receive(ref ep);
                     ProcessPacket(bytes, ep);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Log.WriteLine(1, $"[Error]: {ex.Message}", Color.Red);
+                }
             }
             WriteLog(1, "Server stopped");
         }
 
         public static void ProcessPacket(byte[] data, IPEndPoint ep)
         {
-            try
-            {
-                QPacketHandler.ProcessPacket("RDV", data, ep, listener, serverPID, listenPort);
-            }
-            catch (Exception ex)
-            {
-                Log.WriteLine(1, $"[Exception Processing]: {ex.Message}", Color.Red);
-                Log.WriteLine(1, "Stack trace:\n" + ex.StackTrace);
-            }
+            QPacketHandler.ProcessPacket("RDV", data, ep, listener, serverPID, listenPort);
         }
 
         private static void WriteLog(int priority, string s)
