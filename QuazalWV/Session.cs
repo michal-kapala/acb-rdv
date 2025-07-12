@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Text;
 
 namespace QuazalWV
 {
@@ -206,9 +207,22 @@ namespace QuazalWV
             }
             return maxSlots.Value > currentSlots.Value;
         }
+
         public override string ToString()
         {
-            return $"Session type {Key.TypeId} sessid {Key.SessionId} public pids {string.Join(", ", PublicPids)} and private pids {string.Join(", ", PrivatePids)} hostpid {HostPid} session attributes {string.Join("\n", GameSession.Attributes)}, urls {string.Join("|", HostUrls)}";
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"\t[ID: {Key.SessionId}]");
+            sb.AppendLine($"\t[Type: {Key.TypeId}]");
+            sb.AppendLine($"\t[Host: {HostPid}]");
+            sb.AppendLine($"\t[Public PIDs: ({string.Join(", ", PublicPids)})]");
+            sb.AppendLine($"\t[Private PIDs: ({string.Join(", ", PrivatePids)})]");
+            sb.AppendLine($"\t[Attributes]");
+            foreach (var attr in GameSession.Attributes)
+                sb.AppendLine($"\t\t{attr}");
+            sb.AppendLine($"\t[Host URLs]");
+            foreach (var url in HostUrls)
+                sb.AppendLine($"\t\t[{url}]");
+            return sb.ToString();
         }
     }
 }
