@@ -340,25 +340,32 @@ namespace QuazalWV
                         abandonedSes = Global.Sessions.Find(session => session.Key.SessionId == reqAbandon.Key.SessionId);
                     if (abandonedSes != null)
                     {
-                        if (abandonedSes.NbParticipants() == 1)
+                        client.GameSessionID = 0;
+                        client.InGameSession = false;
+                        bool removed = false;
+                        if (abandonedSes.PublicPids.Contains(client.User.Pid))
+                            removed = abandonedSes.PublicPids.Remove(client.User.Pid);
+
+                        if (abandonedSes.PrivatePids.Contains(client.User.Pid))
                         {
-                            Global.Sessions.Remove(abandonedSes);
-                            Log.WriteLine(1, $"[RMC GameSession] Session {abandonedSes.Key.SessionId} deleted on abandon from player {client.User.Pid}", Color.Gray, client);
-                            client.GameSessionID = 0;
-                            client.InGameSession = false;
+                            bool privRemoved = abandonedSes.PrivatePids.Remove(client.User.Pid);
+                            removed = removed ? removed : privRemoved;
                         }
-                        else
+                        
+                        if (abandonedSes.NbParticipants() == 0)
                         {
-                            if (abandonedSes.PublicPids.Contains(client.User.Pid))
-                                abandonedSes.PublicPids.Remove(client.User.Pid);
-                            if (abandonedSes.PrivatePids.Contains(client.User.Pid))
-                                abandonedSes.PrivatePids.Remove(client.User.Pid);
+                            // duplicate request check
+                            if (removed)
+                            {
+                                Global.Sessions.Remove(abandonedSes);
+                                Log.WriteLine(1, $"[RMC GameSession] Session {abandonedSes.Key.SessionId} deleted on abandon from player {client.User.Pid}", Color.Gray, client);
+                            }
+                            else
+                                Log.WriteLine(1, $"[RMC GameSession] AbandonSession request duplicate", Color.Gray, client);
                         }
                     }
                     else
-                    {
                         Log.WriteLine(1, $"[RMC GameSession] AbandonSession: session {reqAbandon.Key.SessionId} not found", Color.Red, client);
-                    }
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
