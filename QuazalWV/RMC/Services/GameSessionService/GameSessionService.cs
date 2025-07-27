@@ -139,16 +139,8 @@ namespace QuazalWV
                     }
                     break;
                 case 5:
+                    // does not change the session state
                     var reqLeaveSes = (RMCPacketRequestGameSessionService_LeaveSession)rmc.request;
-                    var leftSes = Global.Sessions.Find(session => session.Key.SessionId == reqLeaveSes.Key.SessionId);
-                    // delete the session if empty
-                    if (leftSes.NbParticipants() == 1)
-                    {
-                        Global.Sessions.Remove(leftSes);
-                        Log.WriteLine(1, $"[RMC GameSession] Session {reqLeaveSes.Key.SessionId} deleted on leave from player {client.User.Pid}", Color.Gray, client);
-                    }
-                    else
-                        leftSes.Leave(client);
                     reply = new RMCPResponseEmpty();
                     client.GameSessionID = 0;
                     client.InGameSession = false;

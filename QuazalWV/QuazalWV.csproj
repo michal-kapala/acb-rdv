@@ -220,6 +220,7 @@
     <Compile Include="RMC\Services\MessagingService\Response\RMCPacketResponseMessagingService_GetMessagesHeaders.cs" />
     <Compile Include="RMC\Services\MessagingService\Response\RMCPacketResponseMessagingService_RetrieveMessages.cs" />
     <Compile Include="RMC\Services\NATTraversalService\NATTraversalService.cs" />
+    <Compile Include="RMC\Services\NATTraversalService\Request\RMCPacketRequestNATTraversalService_InitiateProbe.cs" />
     <Compile Include="RMC\Services\NATTraversalService\Request\RMCPacketRequestNATTraversalService_RequestProbeInitiation.cs" />
     <Compile Include="RMC\Services\NewsService\Data\NewsChannel.cs" />
     <Compile Include="RMC\Services\NewsService\Data\NewsHeader.cs" />
