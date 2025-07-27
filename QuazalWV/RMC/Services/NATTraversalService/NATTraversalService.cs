@@ -25,8 +25,19 @@ namespace QuazalWV
             {
                 case 1:
                     var reqReqProbeInit = (RMCPacketRequestNATTraversalService_RequestProbeInitiation)rmc.request;
+                    RMCPacketRequestNATTraversalService_InitiateProbe reqInitProbe;
                     foreach (var url in reqReqProbeInit.TargetUrls)
+                    {
                         Log.WriteLine(1, $"[NAT url: {url}]", Color.Pink, client);
+                        var player = Global.Clients.Find(c => c.User.Pid == url.PID);
+                        // NAT relay
+                        if (player != null)
+                        {
+                            var targetUrl = new StationUrl(client);
+                            reqInitProbe = new RMCPacketRequestNATTraversalService_InitiateProbe(targetUrl);
+                            RMC.SendRequest(player, reqInitProbe, RMCP.PROTOCOL.NATTraversalRelayService, 2);
+                        }
+                    }
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

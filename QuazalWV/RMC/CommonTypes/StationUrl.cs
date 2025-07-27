@@ -26,7 +26,7 @@ namespace QuazalWV
         /// </summary>
         public uint PID { get; set; }
         /// <summary>
-        /// Stream ID attrbute.
+        /// Stream ID attribute.
         /// </summary>
         public byte SID { get; set; }
         /// <summary>
@@ -43,13 +43,13 @@ namespace QuazalWV
         public byte Type { get; set; }
 
         /// <summary>
-        /// Constructs TTL session URL for specified address.
+        /// Constructs the client's PRUDP URL.
         /// </summary>
-        public StationUrl(ClientInfo client, string addr)
+        public StationUrl(ClientInfo client)
         {
             Protocol = "prudp";
-            Address = addr;
-            Port = 4659;
+            Address = client.ep.Address.ToString();
+            Port = (ushort)client.ep.Port;
             CID = 1;
             PID = client.User.Pid;
             SID = 1;

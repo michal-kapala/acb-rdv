@@ -88,7 +88,9 @@ namespace QuazalWV
 
         public override string ToString()
         {
-            return "[RMC Packet : Proto = " + proto + " CallID=" + callID + " MethodID=" + methodID + "]";
+            string result = success ? "Success" : "Fail";
+            string res = isRequest ? "" : $" Result={result}";
+            return $"[RMC Packet : Proto = {proto} CallID={callID} MethodID={methodID}{res}]";
         }
 
         public string PayLoadToString()

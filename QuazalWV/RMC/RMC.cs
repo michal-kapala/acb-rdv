@@ -43,14 +43,13 @@ namespace QuazalWV
             if (rmc.success)
             {
                 rmc.callID = Helper.ReadU32(m);
-                rmc.methodID = Helper.ReadU32(m);
+                rmc.methodID = Helper.ReadU32(m) - 0x8000;
             }
             else
             {
                 rmc.error = Helper.ReadU32(m);
                 rmc.callID = Helper.ReadU32(m);
             }
-            WriteLog(1, "Got response for Protocol " + rmc.proto + " = " + (rmc.success ? "Success" : "Fail"));
             if (p.flags.Contains(QPacket.PACKETFLAG.FLAG_NEED_ACK))
                 SendACK(client.udp, p, client);
         }
