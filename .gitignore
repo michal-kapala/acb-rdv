@@ -27,6 +27,7 @@ nupkg/
 # Be.Windows.Forms.HexBox/*
 
 # Build results
+packages/*
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/*
