@@ -13,7 +13,7 @@ namespace AcbRdv
         public static readonly object _sync = new object();
         public static bool _exit = false;
         private static TcpListener listener;
-        private static string ip = Global.serverBindAddress;
+        private static string ip = Global.ServerBindAddress;
         private static ushort listenPort = 80;
         private static ushort targetPort = 21030;
 

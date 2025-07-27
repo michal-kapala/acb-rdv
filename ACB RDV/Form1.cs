@@ -19,7 +19,7 @@ namespace AcbRdv
             InitializeComponent();
             Log.ClearLog();
             Log.box = richTextBox1;
-            DBHelper.Init();
+            DbHelper.Init();
             toolStripComboBox1.SelectedIndex = 0;
         }
 
