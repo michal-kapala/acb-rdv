@@ -259,6 +259,8 @@ namespace QuazalWV
                         invitee = Global.Clients.Find(c => c.User.Pid == pid);
                         if (invitee != null)
                             NotificationManager.GameInviteSent(invitee, client.User.Pid, reqSendInvitation.Invitation);
+                        else
+                            DbHelper.AddGameInvites(reqSendInvitation.Invitation.Key, client.User.Pid, pid, reqSendInvitation.Invitation.Message);
                     }
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
