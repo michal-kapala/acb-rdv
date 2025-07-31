@@ -552,5 +552,86 @@ namespace QuazalWV
             }
             return rowsAffected == ids.Count;
         }
+
+        public static bool AddGameInvites(GameSessionKey sesKey, uint inviterPid, uint inviteePid, string message)
+        {
+            int rowsAffected;
+            string sql = "INSERT INTO game_invites (inviter, invitee, session_type, session_id, message) VALUES (@inviter, @invitee, @session_type, @session_id, @message)";
+            using (var cmd = new SQLiteCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("@inviter", inviterPid);
+                cmd.Parameters.AddWithValue("@invitee", inviteePid);
+                cmd.Parameters.AddWithValue("@session_type", sesKey.TypeId);
+                cmd.Parameters.AddWithValue("@session_id", sesKey.SessionId);
+                cmd.Parameters.AddWithValue("@message", message);
+                try
+                {
+                    rowsAffected = cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Log.WriteLine(1, $"[DB] {ex}", Color.Red);
+                    return false;
+                }
+            }
+            return rowsAffected > 0;
+        }
+
+        public static List<GameInvite> GetGameInvites(uint inviteePid)
+        {
+            List<GameInvite> invites = new List<GameInvite>();
+            string sql = "SELECT * FROM game_invites WHERE invitee = @invitee";
+            using (var cmd = new SQLiteCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("@invitee", inviteePid);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var key = new GameSessionKey
+                        {
+                            TypeId = (uint)(reader.GetInt32(reader.GetOrdinal("session_type"))),
+                            SessionId = (uint)(reader.GetInt32(reader.GetOrdinal("session_id")))
+                        };
+
+                        var invitation = new GameSessionInvitation
+                        {
+                            Key = key,
+                            Recipients = new List<uint> { inviteePid },
+                            Message = reader.GetString(reader.GetOrdinal("message"))
+                        };
+
+                        var invite = new GameInvite
+                        {
+                            Id = (uint)(reader.GetInt32(reader.GetOrdinal("id"))),
+                            Inviter = (uint)(reader.GetInt32(reader.GetOrdinal("inviter"))),
+                            Invitation = invitation
+                        };
+                        invites.Add(invite);
+                    }
+                }
+            }
+            return invites;
+        }
+
+        public static bool DeleteGameInvites(uint inviteePid)
+        {
+            int rowsAffected;
+            string sql = "DELETE FROM game_invites WHERE invitee = @invitee";
+            using (var cmd = new SQLiteCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("@invitee", inviteePid);
+                try
+                {
+                    rowsAffected = cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Log.WriteLine(1, $"[DB] {ex}", Color.Red);
+                    return false;
+                }
+            }
+            return rowsAffected > 0;
+        }
     }
 }

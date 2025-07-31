@@ -113,3 +113,12 @@ CREATE TABLE IF NOT EXISTS "telemetry_tags" (
 	attr        TEXT NOT NULL,
 	dtime       INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS "game_invites" (
+	"id"            INTEGER PRIMARY KEY,
+	"inviter"       INTEGER,
+	"invitee"       INTEGER,
+	"session_type"  INTEGER,
+	"session_id"    INTEGER,
+	"message"       TEXT
+);

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace QuazalWV
 {
@@ -209,20 +210,18 @@ namespace QuazalWV
                             inviteNotif = rel.Type == PlayerRelationship.Pending && otherPid == rel.RequesterPid;
                             friends.Add(new FriendData(rel, otherUser, online, inviteNotif));
                             // send 'is now online' notifs to friends
-                            if (online)
+                            if (online && rel.Type == PlayerRelationship.Friend)
                                 NotificationManager.FriendStatusChanged(friendClient, client.User.Pid, client.User.Name, true);
                         }
                         reply = new RMCPacketResponseFriendsService_GetDetailedList(friends);
                         RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
-                        // send invite notifs on logon
-                        if ((PlayerRelationship)reqGetDetailedList.Relationship == PlayerRelationship.Pending)
-                        {
-                            foreach (FriendData friend in friends)
-                            {
-                                if (friend != null && friend.InviteNotif)
-                                    NotificationManager.FriendInviteReceived(client, friend.Pid, friend.Name);
-                            }
-                        }
+                        // send friend invite notifs on logon (3rd request)
+                        if ((PlayerRelationship)reqGetDetailedList.Relationship == PlayerRelationship.Pending && reqGetDetailedList.Reversed)
+                            Task.Run(async () => await SendLogonFriendInvites(client, friends));
+
+                        // send game invite notifs on logon (4th request)
+                        if ((PlayerRelationship)reqGetDetailedList.Relationship == PlayerRelationship.Blocked)
+                            Task.Run(async () => await SendLogonGameInvites(client));
                     }
                     catch (Exception ex)
                     {
@@ -246,6 +245,40 @@ namespace QuazalWV
                     Log.WriteLine(1, $"[RMC Friends] Error: Unknown Method {rmc.methodID}", Color.Red, client);
                     break;
             }
+        }
+
+        private async static Task SendLogonFriendInvites(ClientInfo client, List<FriendData> friends)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2));
+            foreach (FriendData friend in friends)
+            {
+                if (friend != null && friend.InviteNotif)
+                    NotificationManager.FriendInviteReceived(client, friend.Pid, friend.Name);
+            }
+        }
+
+        private async static Task SendLogonGameInvites(ClientInfo client)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(3));
+            var gameInvites = DbHelper.GetGameInvites(client.User.Pid);
+            foreach (var invite in gameInvites)
+            {
+                var host = Global.Clients.Find(c => c.User.Pid == invite.Inviter);
+                var ses = Global.Sessions.Find(s => s.Key.SessionId == invite.Invitation.Key.SessionId);
+                if (host != null && ses != null)
+                {
+                    if (host.User != null)
+                    {
+                        uint pid = ses.PublicPids.Find(id => id == host.User.Pid);
+                        if (pid == 0)
+                            pid = ses.PrivatePids.Find(id => id == host.User.Pid);
+                        if (pid == host.User.Pid)
+                            NotificationManager.GameInviteSent(client, invite.Inviter, invite.Invitation);
+                    }
+                }
+            }
+            if (gameInvites.Count > 0)
+                DbHelper.DeleteGameInvites(client.User.Pid);
         }
     }
 }

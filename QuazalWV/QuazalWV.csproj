@@ -89,6 +89,7 @@
     <Compile Include="Database\DbHelper.cs" />
     <Compile Include="Database\DbModel.cs" />
     <Compile Include="Database\DbRelationshipResult.cs" />
+    <Compile Include="Database\Models\GameInvite.cs" />
     <Compile Include="Database\Models\Relationship.cs" />
     <Compile Include="Database\Models\TelemetryTag.cs" />
     <Compile Include="Database\Models\User.cs" />
