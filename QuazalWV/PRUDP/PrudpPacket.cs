@@ -2,12 +2,10 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using System.Net;
-using System.Net.Sockets;
 
 namespace QuazalWV
 {
-    public class QPacket
+    public class PrudpPacket
     {
         public enum STREAMTYPE
         {
@@ -83,11 +81,11 @@ namespace QuazalWV
         public bool usesCompression = true;
         public uint realSize;
         
-        public QPacket()
+        public PrudpPacket()
         {
         }
 
-        public QPacket(byte[] data)
+        public PrudpPacket(byte[] data)
         {
             MemoryStream m = new MemoryStream(data);
             m_oSourceVPort = new VPort(Helper.ReadU8(m));

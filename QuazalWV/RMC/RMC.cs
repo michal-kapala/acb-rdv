@@ -10,7 +10,7 @@ namespace QuazalWV
     public static class RMC
     {
         public const uint MaxRmcPayloadSize = 963;
-        public static void HandlePacket(UdpClient udp, QPacket p)
+        public static void HandlePacket(UdpClient udp, PrudpPacket p)
         {
             ClientInfo client = Global.GetClientByIDrecv(p.m_uiSignature);
             if (client == null)
@@ -19,7 +19,7 @@ namespace QuazalWV
             if (p.uiSeqId > client.gameSeqId)
                 client.gameSeqId = p.uiSeqId;
             client.udp = udp;
-            if (p.flags.Contains(QPacket.PACKETFLAG.FLAG_ACK))
+            if (p.flags.Contains(PrudpPacket.PACKETFLAG.FLAG_ACK))
                 return;
             WriteLog(10, "Handling packet...");
             RMCP rmc = new RMCP(p);
@@ -29,13 +29,13 @@ namespace QuazalWV
                 HandleResponse(client, p, rmc);
         }
 
-        public static void HandleResponse(ClientInfo client, QPacket p, RMCP rmc)
+        public static void HandleResponse(ClientInfo client, PrudpPacket p, RMCP rmc)
         {
             ProcessResponse(client, p, rmc);
             WriteLog(1, "Received Response : " + rmc.ToString());
         }
 
-        public static void ProcessResponse(ClientInfo client, QPacket p, RMCP rmc)
+        public static void ProcessResponse(ClientInfo client, PrudpPacket p, RMCP rmc)
         {
             MemoryStream m = new MemoryStream(p.payload);
             m.Seek(rmc._afterProtocolOffset, 0);
@@ -50,11 +50,11 @@ namespace QuazalWV
                 rmc.error = Helper.ReadU32(m);
                 rmc.callID = Helper.ReadU32(m);
             }
-            if (p.flags.Contains(QPacket.PACKETFLAG.FLAG_NEED_ACK))
+            if (p.flags.Contains(PrudpPacket.PACKETFLAG.FLAG_NEED_ACK))
                 SendACK(client.udp, p, client);
         }
 
-        public static void HandleRequest(ClientInfo client, QPacket p, RMCP rmc)
+        public static void HandleRequest(ClientInfo client, PrudpPacket p, RMCP rmc)
         {
             ProcessRequest(client, p, rmc);
             if (rmc.callID > client.callCounterRMC)
@@ -134,7 +134,7 @@ namespace QuazalWV
             }
         }
 
-        public static void ProcessRequest(ClientInfo client, QPacket p, RMCP rmc)
+        public static void ProcessRequest(ClientInfo client, PrudpPacket p, RMCP rmc)
         {
             MemoryStream m = new MemoryStream(p.payload);
             m.Seek(rmc._afterProtocolOffset, 0);
@@ -212,7 +212,7 @@ namespace QuazalWV
         }
 
 
-        public static void SendResponseWithACK(UdpClient udp, QPacket p, RMCP rmc, ClientInfo client, RMCPResponse reply, bool useCompression = true, uint error = 0)
+        public static void SendResponseWithACK(UdpClient udp, PrudpPacket p, RMCP rmc, ClientInfo client, RMCPResponse reply, bool useCompression = true, uint error = 0)
         {
             WriteLog(2, "Response : " + reply.ToString());
             string payload = reply.PayloadToString();
@@ -224,10 +224,10 @@ namespace QuazalWV
             SendResponsePacket(udp, p, rmc, client, reply, useCompression, error);
         }
 
-        private static void SendACK(UdpClient udp, QPacket p, ClientInfo client)
+        private static void SendACK(UdpClient udp, PrudpPacket p, ClientInfo client)
         {
-            QPacket np = new QPacket(p.ToBuffer());
-            np.flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK };
+            PrudpPacket np = new PrudpPacket(p.ToBuffer());
+            np.flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_ACK };
             np.m_oSourceVPort = p.m_oDestinationVPort;
             np.m_oDestinationVPort = p.m_oSourceVPort;
             np.m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature : client.trackingSignature;
@@ -237,7 +237,7 @@ namespace QuazalWV
             Send(udp, np, client);
         }
 
-        private static void SendResponsePacket(UdpClient udp, QPacket p, RMCP rmc, ClientInfo client, RMCPResponse reply, bool useCompression, uint error)
+        private static void SendResponsePacket(UdpClient udp, PrudpPacket p, RMCP rmc, ClientInfo client, RMCPResponse reply, bool useCompression, uint error)
         {
             MemoryStream m = new MemoryStream();
             if ((ushort)rmc.proto < 0x7F)
@@ -266,9 +266,9 @@ namespace QuazalWV
             m = new MemoryStream();
             Helper.WriteU32(m, (uint)buff.Length);
             m.Write(buff, 0, buff.Length);
-            QPacket np = new QPacket(p.ToBuffer())
+            PrudpPacket np = new PrudpPacket(p.ToBuffer())
             {
-                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_NEED_ACK },
+                flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_NEED_ACK },
                 m_oSourceVPort = p.m_oDestinationVPort,
                 m_oDestinationVPort = p.m_oSourceVPort,
                 m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature : client.trackingSignature
@@ -276,7 +276,7 @@ namespace QuazalWV
             MakeAndSend(client, np, m.ToArray());
         }
         
-        public static void SendRequestPacket(QPacket p, RMCP rmc, ClientInfo client, RMCPResponse packet, bool useCompression, uint error)
+        public static void SendRequestPacket(PrudpPacket p, RMCP rmc, ClientInfo client, RMCPResponse packet, bool useCompression, uint error)
         {
             MemoryStream m = new MemoryStream();
             if ((ushort)rmc.proto < 0x7F)
@@ -303,15 +303,15 @@ namespace QuazalWV
             m = new MemoryStream();
             Helper.WriteU32(m, (uint)buff.Length);
             m.Write(buff, 0, buff.Length);
-            QPacket np = new QPacket(p.ToBuffer())
+            PrudpPacket np = new PrudpPacket(p.ToBuffer())
             {
-                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_NEED_ACK },
+                flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_NEED_ACK },
                 m_uiSignature = client.IDsend
             };
             MakeAndSend(client, np, m.ToArray());
         }
 
-        public static void MakeAndSend(ClientInfo client, QPacket np, byte[] data)
+        public static void MakeAndSend(ClientInfo client, PrudpPacket np, byte[] data)
         {
             MemoryStream m = new MemoryStream(data);
             if (data.Length < MaxRmcPayloadSize)
@@ -326,7 +326,7 @@ namespace QuazalWV
             }
             else
             {
-                np.flags.Add(QPacket.PACKETFLAG.FLAG_RELIABLE);
+                np.flags.Add(PrudpPacket.PACKETFLAG.FLAG_RELIABLE);
                 int pos = 0;
                 m.Seek(0, 0);
                 np.m_byPartNumber = 0;
@@ -357,7 +357,7 @@ namespace QuazalWV
             }
         }
 
-        public static void Send(UdpClient udp, QPacket p, ClientInfo client)
+        public static void Send(UdpClient udp, PrudpPacket p, ClientInfo client)
         {
             byte[] data = p.ToBuffer();
             StringBuilder sb = new StringBuilder();
@@ -390,12 +390,12 @@ namespace QuazalWV
             m.WriteByte(0);
             Helper.WriteU32(m, param3);
             byte[] payload = m.ToArray();
-            QPacket q = new QPacket
+            PrudpPacket q = new PrudpPacket
             {
-                m_oSourceVPort = new QPacket.VPort(0x31),
-                m_oDestinationVPort = new QPacket.VPort(0x3f),
-                type = QPacket.PACKETTYPE.DATA,
-                flags = new List<QPacket.PACKETFLAG>(),
+                m_oSourceVPort = new PrudpPacket.VPort(0x31),
+                m_oDestinationVPort = new PrudpPacket.VPort(0x3f),
+                type = PrudpPacket.PACKETTYPE.DATA,
+                flags = new List<PrudpPacket.PACKETFLAG>(),
                 payload = new byte[0],
                 uiSeqId = ++client.gameSeqId,
                 m_bySessionID = client.sessionID
@@ -416,12 +416,12 @@ namespace QuazalWV
         public static void SendRequest(ClientInfo client, RMCPRequest req, RMCP.PROTOCOL protocol, uint methodId)
         {
             byte[] payload = req.ToBuffer();
-            QPacket q = new QPacket
+            PrudpPacket q = new PrudpPacket
             {
-                m_oSourceVPort = new QPacket.VPort(0x31),
-                m_oDestinationVPort = new QPacket.VPort(0x3f),
-                type = QPacket.PACKETTYPE.DATA,
-                flags = new List<QPacket.PACKETFLAG>(),
+                m_oSourceVPort = new PrudpPacket.VPort(0x31),
+                m_oDestinationVPort = new PrudpPacket.VPort(0x3f),
+                type = PrudpPacket.PACKETTYPE.DATA,
+                flags = new List<PrudpPacket.PACKETFLAG>(),
                 payload = new byte[0],
                 uiSeqId = ++client.gameSeqId,
                 m_bySessionID = client.sessionID

@@ -61,12 +61,12 @@ namespace AcbRdv
             TcpClient client = (TcpClient)obj;
             NetworkStream ns = client.GetStream();
             MemoryStream m = new MemoryStream();
-            Thread.Sleep(500);
-            //Read Content
+            // required for local testing
+            Thread.Sleep(300);
             while (ns.DataAvailable)
                 m.WriteByte((byte)ns.ReadByte());
             Log.WriteLine(2, "[OnlineConfigSvc] Received " + m.Length + " bytes");
-            //Create Response
+            
             StringBuilder sb = new StringBuilder();
             sb.Append("[");
             int count = 0;
@@ -78,12 +78,12 @@ namespace AcbRdv
                     sb.Append(",");
             }
             sb.Append("]");
-            //Add HTTP header
+            
             StringBuilder sb2 = new StringBuilder();
             AddHttpHeader(sb2, sb.Length);
             sb2.Append(sb.ToString());
             byte[] buff = Encoding.ASCII.GetBytes(sb2.ToString());
-            //send and bye
+
             ns.Write(buff, 0, buff.Length);
             ns.Flush();
             ns.Close();

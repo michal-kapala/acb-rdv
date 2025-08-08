@@ -61,7 +61,7 @@ namespace QuazalWV
         {
         }
 
-        public RMCP(QPacket p)
+        public RMCP(PrudpPacket p)
         {
             MemoryStream m = new MemoryStream(p.payload);
             Helper.ReadU32(m);

@@ -121,8 +121,8 @@
     <Compile Include="RMC\Services\AuthenticationService\Kerberos\KerberosTicket.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PRUDP\QPacket.cs" />
-    <Compile Include="PRUDP\QPacketHandler.cs" />
+    <Compile Include="PRUDP\PrudpPacket.cs" />
+    <Compile Include="PRUDP\PrudpHandler.cs" />
     <Compile Include="RMC\RMC.cs" />
     <Compile Include="RMC\RMCP.cs" />
     <Compile Include="RMC\RMCPCustom.cs" />

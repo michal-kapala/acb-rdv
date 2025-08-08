@@ -74,15 +74,15 @@ namespace QuazalWV
             StringBuilder sb = new StringBuilder();
             while (true)
             {
-                QPacket qp = new QPacket(data);
+                PrudpPacket qp = new PrudpPacket(data);
                 sb.AppendLine("##########################################################");
                 sb.AppendLine(qp.ToStringDetailed());
-                if (qp.type == QPacket.PACKETTYPE.DATA && qp.m_byPartNumber == 0)
+                if (qp.type == PrudpPacket.PACKETTYPE.DATA && qp.m_byPartNumber == 0)
                 {
                     switch (qp.m_oSourceVPort.type)
                     {
-                        case QPacket.STREAMTYPE.OldRVSec:
-                            if (qp.flags.Contains(QPacket.PACKETFLAG.FLAG_ACK))
+                        case PrudpPacket.STREAMTYPE.OldRVSec:
+                            if (qp.flags.Contains(PrudpPacket.PACKETFLAG.FLAG_ACK))
                                 break;
                             sb.AppendLine("Trying to process RMC packet...");
                             try
@@ -116,7 +116,7 @@ namespace QuazalWV
                                 sb.AppendLine();
                             }
                             break;
-                        case QPacket.STREAMTYPE.DO:
+                        case PrudpPacket.STREAMTYPE.DO:
                             sb.AppendLine("ACB RDV cannot process DO protocol packets");
                             break;
                     }

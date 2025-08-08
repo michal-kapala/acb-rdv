@@ -61,12 +61,12 @@ namespace AcbRdv
             byte[] payload = m.ToArray();
             foreach (ClientInfo client in Global.Clients)
             {
-                QPacket q = new QPacket
+                PrudpPacket q = new PrudpPacket
                 {
-                    m_oSourceVPort = new QPacket.VPort(0x31),
-                    m_oDestinationVPort = new QPacket.VPort(0x3f),
-                    type = QPacket.PACKETTYPE.DATA,
-                    flags = new List<QPacket.PACKETFLAG>(),
+                    m_oSourceVPort = new PrudpPacket.VPort(0x31),
+                    m_oDestinationVPort = new PrudpPacket.VPort(0x3f),
+                    type = PrudpPacket.PACKETTYPE.DATA,
+                    flags = new List<PrudpPacket.PACKETFLAG>(),
                     payload = new byte[0],
                     uiSeqId = (ushort)(++client.gameSeqId),
                     m_bySessionID = client.sessionID

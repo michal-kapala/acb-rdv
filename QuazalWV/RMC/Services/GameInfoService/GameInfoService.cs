@@ -21,7 +21,7 @@ namespace QuazalWV
             }
         }
 
-        public static void HandleRequest(QPacket p, RMCP rmc, ClientInfo client)
+        public static void HandleRequest(PrudpPacket p, RMCP rmc, ClientInfo client)
         {
             RMCPResponse reply;
             switch (rmc.methodID)

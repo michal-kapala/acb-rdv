@@ -19,7 +19,7 @@ As of now the database file is excluded from git tracking. Use the provided scri
 3. (Optional) Install [SQLite Browser](https://sqlitebrowser.org/dl/) for data inspection/modifications.
 
 ### Application
-Create `ACBRDV.exe.config` configuration file in `./ACB RDV/bin/<architecture>/<mode>`:
+Add `appSettings` tag with server IP to `./ACB RDV/App.config` file:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>

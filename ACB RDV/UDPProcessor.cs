@@ -53,7 +53,7 @@ namespace AcbRdv
         {
             try
             {
-                MessageBox.Show(QPacket.MakeChecksum(makeArray(toolStripTextBox1.Text.Trim().Replace(" ", ""))).ToString("X2"));
+                MessageBox.Show(PrudpPacket.MakeChecksum(makeArray(toolStripTextBox1.Text.Trim().Replace(" ", ""))).ToString("X2"));
             }
             catch
             { }

@@ -9,13 +9,13 @@ using System.Drawing;
 
 namespace QuazalWV
 {
-    public static class QPacketHandler
+    public static class PrudpHandler
     {
         public static List<ulong> timeToIgnore = new List<ulong>();
         public static Random rand = new Random();
         private static readonly ExpiringLockManager<IPAddress> lockManager = new ExpiringLockManager<IPAddress>(expiration: TimeSpan.FromSeconds(15), cleanupInterval: TimeSpan.FromSeconds(10));
 
-        public static QPacket ProcessSYN(QPacket p, IPEndPoint ep, out ClientInfo client)
+        public static PrudpPacket ProcessSYN(PrudpPacket p, IPEndPoint ep, out ClientInfo client)
         {
             client = Global.GetClientByEndPoint(ep);
             if (client == null)
@@ -28,12 +28,12 @@ namespace QuazalWV
                 };
                 Global.Clients.Add(client);
             }
-            QPacket reply = new QPacket
+            PrudpPacket reply = new PrudpPacket
             {
                 m_oSourceVPort = p.m_oDestinationVPort,
                 m_oDestinationVPort = p.m_oSourceVPort,
-                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
-                type = QPacket.PACKETTYPE.SYN,
+                flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_ACK },
+                type = PrudpPacket.PACKETTYPE.SYN,
                 m_bySessionID = p.m_bySessionID,
                 m_uiSignature = p.m_uiSignature,
                 uiSeqId = p.uiSeqId,
@@ -41,25 +41,25 @@ namespace QuazalWV
                 payload = new byte[0]
             };
             // for localhost testing, remove from prod
-            if (p.m_oSourceVPort.port == 15)
-                Thread.Sleep(50);
+            //if (p.m_oSourceVPort.port == 15)
+            //    Thread.Sleep(50);
 
             return reply;
         }
 
-        public static QPacket ProcessCONNECT(ClientInfo client, QPacket p)
+        public static PrudpPacket ProcessCONNECT(ClientInfo client, PrudpPacket p)
         {
             client.IDsend = p.m_uiConnectionSignature;
             if (p.m_oSourceVPort.port == 15)
                 client.playerSignature = p.m_uiConnectionSignature;
             else
                 client.trackingSignature = p.m_uiConnectionSignature;
-            QPacket reply = new QPacket
+            PrudpPacket reply = new PrudpPacket
             {
                 m_oSourceVPort = p.m_oDestinationVPort,
                 m_oDestinationVPort = p.m_oSourceVPort,
-                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
-                type = QPacket.PACKETTYPE.CONNECT,
+                flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_ACK },
+                type = PrudpPacket.PACKETTYPE.CONNECT,
                 m_bySessionID = p.m_bySessionID,
                 m_uiSignature = p.m_uiConnectionSignature,
                 uiSeqId = p.uiSeqId,
@@ -76,7 +76,7 @@ namespace QuazalWV
             return reply;
         }
 
-        private static byte[] MakeConnectPayload(ClientInfo client, QPacket p)
+        private static byte[] MakeConnectPayload(ClientInfo client, PrudpPacket p)
         {
             MemoryStream m = new MemoryStream(p.payload);
             uint size = Helper.ReadU32(m);
@@ -109,14 +109,14 @@ namespace QuazalWV
             return m.ToArray();
         }
 
-        public static QPacket ProcessDISCONNECT(ClientInfo client, QPacket p)
+        public static PrudpPacket ProcessDISCONNECT(ClientInfo client, PrudpPacket p)
         {
-            QPacket reply = new QPacket
+            PrudpPacket reply = new PrudpPacket
             {
                 m_oSourceVPort = p.m_oDestinationVPort,
                 m_oDestinationVPort = p.m_oSourceVPort,
-                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
-                type = QPacket.PACKETTYPE.DISCONNECT,
+                flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_ACK },
+                type = PrudpPacket.PACKETTYPE.DISCONNECT,
                 m_bySessionID = p.m_bySessionID,
                 m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature - 0x10000 : client.trackingSignature - 0x10000,
                 uiSeqId = p.uiSeqId,
@@ -125,14 +125,14 @@ namespace QuazalWV
             return reply;
         }
 
-        public static QPacket ProcessPING(ClientInfo client, QPacket p)
+        public static PrudpPacket ProcessPING(ClientInfo client, PrudpPacket p)
         {
-            QPacket reply = new QPacket
+            PrudpPacket reply = new PrudpPacket
             {
                 m_oSourceVPort = p.m_oDestinationVPort,
                 m_oDestinationVPort = p.m_oSourceVPort,
-                flags = new List<QPacket.PACKETFLAG>() { QPacket.PACKETFLAG.FLAG_ACK },
-                type = QPacket.PACKETTYPE.PING,
+                flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_ACK },
+                type = PrudpPacket.PACKETTYPE.PING,
                 m_bySessionID = p.m_bySessionID,
                 m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature : client.trackingSignature,
                 uiSeqId = p.uiSeqId,
@@ -149,7 +149,7 @@ namespace QuazalWV
                 sb.Append(b.ToString("X2") + " ");
             while (true)
             {
-                QPacket p = new QPacket(data);
+                PrudpPacket p = new PrudpPacket(data);
                 MemoryStream m = new MemoryStream(data);
                 byte[] buff = new byte[(int)p.realSize];
                 m.Seek(0, 0);
@@ -158,20 +158,20 @@ namespace QuazalWV
                 Log.WriteLine(5, "[" + source + "] received : " + p.ToStringShort());
                 Log.WriteLine(10, "[" + source + "] received : " + sb.ToString());
                 Log.WriteLine(10, "[" + source + "] received : " + p.ToStringDetailed());
-                QPacket reply = null;
+                PrudpPacket reply = null;
                 ClientInfo client = null;
-                if (p.type != QPacket.PACKETTYPE.SYN && p.type != QPacket.PACKETTYPE.NATPING)
+                if (p.type != PrudpPacket.PACKETTYPE.SYN && p.type != PrudpPacket.PACKETTYPE.NATPING)
                   client = Global.GetClientByIDrecv(p.m_uiSignature);
                 var itemLock = lockManager.GetLock(ep.Address);
                 lock (itemLock)
                 {
                     switch (p.type)
                     {
-                        case QPacket.PACKETTYPE.SYN:
+                        case PrudpPacket.PACKETTYPE.SYN:
                             reply = ProcessSYN(p, ep, out client);
                             break;
-                        case QPacket.PACKETTYPE.CONNECT:
-                            if (client != null && !p.flags.Contains(QPacket.PACKETFLAG.FLAG_ACK))
+                        case PrudpPacket.PACKETTYPE.CONNECT:
+                            if (client != null && !p.flags.Contains(PrudpPacket.PACKETFLAG.FLAG_ACK))
                             {
                                 client.sPID = serverPID;
                                 client.sPort = listenPort;
@@ -183,11 +183,11 @@ namespace QuazalWV
                                 reply = ProcessCONNECT(client, p);
                             }
                             break;
-                        case QPacket.PACKETTYPE.DATA:
-                            if (p.m_oSourceVPort.type == QPacket.STREAMTYPE.OldRVSec)
+                        case PrudpPacket.PACKETTYPE.DATA:
+                            if (p.m_oSourceVPort.type == PrudpPacket.STREAMTYPE.OldRVSec)
                                 RMC.HandlePacket(listener, p);
                             break;
-                        case QPacket.PACKETTYPE.DISCONNECT:
+                        case PrudpPacket.PACKETTYPE.DISCONNECT:
                             if (client != null)
                             {
                                 reply = ProcessDISCONNECT(client, p);
@@ -211,11 +211,11 @@ namespace QuazalWV
                                 }
                             }
                             break;
-                        case QPacket.PACKETTYPE.PING:
+                        case PrudpPacket.PACKETTYPE.PING:
                             if (client != null)
                                 reply = ProcessPING(client, p);
                             break;
-                        case QPacket.PACKETTYPE.NATPING:
+                        case PrudpPacket.PACKETTYPE.NATPING:
                             client = Global.GetClientByIDrecv(p.m_uiSignature);
                             ulong time = BitConverter.ToUInt64(p.payload, 5);
                             if (timeToIgnore.Contains(time))
@@ -242,7 +242,7 @@ namespace QuazalWV
                             }
                             break;
                     }
-                    if (reply != null && p.type != QPacket.PACKETTYPE.DISCONNECT)
+                    if (reply != null && p.type != PrudpPacket.PACKETTYPE.DISCONNECT)
                         Send(source, reply, ep, listener);
                 }
                 if (p.realSize != data.Length)
@@ -259,7 +259,7 @@ namespace QuazalWV
             }
         }
 
-        public static void Send(string source, QPacket p, IPEndPoint ep, UdpClient listener)
+        public static void Send(string source, PrudpPacket p, IPEndPoint ep, UdpClient listener)
         {
             byte[] data = p.ToBuffer();
             StringBuilder sb = new StringBuilder();
