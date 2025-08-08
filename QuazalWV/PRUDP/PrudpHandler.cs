@@ -40,9 +40,6 @@ namespace QuazalWV
                 m_uiConnectionSignature = client.IDrecv,
                 payload = new byte[0]
             };
-            // for localhost testing, remove from prod
-            //if (p.m_oSourceVPort.port == 15)
-            //    Thread.Sleep(50);
 
             return reply;
         }
