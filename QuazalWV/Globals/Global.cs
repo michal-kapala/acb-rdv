@@ -34,9 +34,9 @@ namespace QuazalWV
             return null;
         }
 
-        private static void WriteLog(int priority, string s)
+        private static void WriteLog(int priority, string content)
         {
-            Log.WriteLine(priority, "[Global] " + s, Color.Orange);
+            Log.WriteLine(priority, content, LogSource.Global, Color.Orange);
         }
 
         internal static void RemoveSessionsOnLogin(ClientInfo client)

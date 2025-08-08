@@ -5,6 +5,8 @@ namespace QuazalWV
 {
     public static class NewsService
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.News;
+
         public static void ProcessRequest(Stream s, RMCP rmc)
         {
             switch (rmc.methodID)
@@ -19,7 +21,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestNewsService_GetNumberOfNews(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC News] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red);
                     break;
             }
         }
@@ -35,15 +37,15 @@ namespace QuazalWV
                     break;
                 case 8:
                     reply = new RMCPacketResponseNewsService_GetNewsHeaders();
-					RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
-					break;
+                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    break;
                 case 10:
                     var getNewsNumber = (RMCPacketRequestNewsService_GetNumberOfNews)rmc.request;
                     reply = new RMCPacketResponseNewsService_GetNumberOfNews();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC News] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }

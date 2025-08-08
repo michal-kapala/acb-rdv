@@ -105,6 +105,7 @@
     <Compile Include="Data\Enums\PlayerRelationship.cs" />
     <Compile Include="Data\Enums\Presence\PresencePropertyId.cs" />
     <Compile Include="Data\Enums\Presence\VariantType.cs" />
+    <Compile Include="Data\Enums\LogSource.cs" />
     <Compile Include="Data\Enums\QError.cs" />
     <Compile Include="Data\Enums\SessionParam.cs" />
     <Compile Include="Data\Interfaces\AnyDataHeader.cs" />

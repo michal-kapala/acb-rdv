@@ -51,7 +51,7 @@ namespace AcbRdv
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteLine(1, $"[Error]: {ex.Message}", Color.Red);
+                    Log.WriteLine(1, $"Error: {ex.Message}", LogSource.RDV, Color.Red);
                 }
             }
             WriteLog(1, "Server stopped");
@@ -59,12 +59,12 @@ namespace AcbRdv
 
         public static void ProcessPacket(byte[] data, IPEndPoint ep)
         {
-            PrudpHandler.ProcessPacket("RDV", data, ep, listener, serverPID, listenPort);
+            PrudpHandler.ProcessPacket(LogSource.RDV, data, ep, listener, serverPID, listenPort);
         }
 
-        private static void WriteLog(int priority, string s)
+        private static void WriteLog(int priority, string content)
         {
-            Log.WriteLine(priority, "[RDV] " + s);
+            Log.WriteLine(priority, content, LogSource.RDV);
         }
     }
 }

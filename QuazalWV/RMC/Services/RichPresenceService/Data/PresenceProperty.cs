@@ -38,7 +38,7 @@ namespace QuazalWV
                     Helper.WriteU32(s, Value);
                     break;
                 default:
-                    Log.WriteLine(1, $"[PresenceProperty] {DataType} variant type unsupported", Color.Red);
+                    Log.WriteLine(1, $"{DataType} variant type unsupported", LogSource.PresenceProperty, Color.Red);
                     break;
             }
         }
@@ -58,7 +58,7 @@ namespace QuazalWV
                 case PresencePropertyId.SessionDLCMask:
                     return $"{Id}: {Value}";
                 default:
-                    Log.WriteLine(1, $"[PresenceProperty] Unknown presence property {(uint)Id}", Color.Red);
+                    Log.WriteLine(1, $"Unknown presence property {(uint)Id}", LogSource.PresenceProperty, Color.Red);
                     return $"{(uint)Id}: {Value}";
             }
         }

@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using QuazalWV;
+using System.Drawing;
 
 namespace AcbRdv
 {
@@ -37,7 +38,7 @@ namespace AcbRdv
         {
             listener = new TcpListener(IPAddress.Parse(ip), listenPort);
             listener.Start();
-            Log.WriteLine(1, "[OnlineConfigSvc] Server started");
+            Log.WriteLine(1, "Server started", LogSource.OnlineConfigSvc);
             while (true)
             {
                 lock (_sync)
@@ -48,12 +49,12 @@ namespace AcbRdv
                 try
                 {
                     TcpClient client = listener.AcceptTcpClient();
-                    Log.WriteLine(1, "[OnlineConfigSvc] Client connected");
+                    Log.WriteLine(1, "Client connected", LogSource.OnlineConfigSvc, Color.Green);
                     new Thread(tClientHandler).Start(client);
                 }
                 catch { }
             }
-            Log.WriteLine(1, "[OnlineConfigSvc] Server stopped");
+            Log.WriteLine(1, "Server stopped", LogSource.OnlineConfigSvc);
         }
 
         public static void tClientHandler(object obj)
@@ -65,7 +66,7 @@ namespace AcbRdv
             Thread.Sleep(300);
             while (ns.DataAvailable)
                 m.WriteByte((byte)ns.ReadByte());
-            Log.WriteLine(2, "[OnlineConfigSvc] Received " + m.Length + " bytes");
+            Log.WriteLine(2, $"Received {m.Length} bytes", LogSource.OnlineConfigSvc);
             
             StringBuilder sb = new StringBuilder();
             sb.Append("[");
@@ -87,7 +88,7 @@ namespace AcbRdv
             ns.Write(buff, 0, buff.Length);
             ns.Flush();
             ns.Close();
-            Log.WriteLine(2, "[OnlineConfigSvc] Send " + buff.Length + " bytes");
+            Log.WriteLine(2, $"Sent {buff.Length} bytes", LogSource.OnlineConfigSvc);
         }
 
         private static void AddHttpHeader(StringBuilder sb, int contentlen)

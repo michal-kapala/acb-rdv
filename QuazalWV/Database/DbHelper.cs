@@ -14,7 +14,7 @@ namespace QuazalWV
         {
             connection.ConnectionString = "Data Source=database.sqlite";
             connection.Open();
-            Log.WriteLine(1, "DB loaded...");
+            Log.WriteLine(1, "DB loaded...", LogSource.DB);
         }
 
         public static List<List<string>> GetQueryResults(string query)
@@ -83,7 +83,7 @@ namespace QuazalWV
                 }
                 else
                 {
-                    Log.WriteLine(1, $"[DB] The players {requester} and {requestee} are already friends", Color.Orange);
+                    Log.WriteLine(1, $"The players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
                     return DbRelationshipResult.AlreadyPresent;
                 }
             }
@@ -113,7 +113,7 @@ namespace QuazalWV
                         relations.Add(relationship);
                         if (forbidden.Contains(relationship.Type))
                         {
-                            Log.WriteLine(1, "[DB] Blacklisting failed, an entry already exists", Color.Orange);
+                            Log.WriteLine(1, "Blacklisting failed, an entry already exists", LogSource.DB, Color.Orange);
                             return DbRelationshipResult.UserBlocked;
                         }
                     }
@@ -131,7 +131,7 @@ namespace QuazalWV
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
-                            Log.WriteLine(1, $"[DB] Player {requester} blacklisted {requestee}", Color.Orange);
+                            Log.WriteLine(1, $"Player {requester} blacklisted {requestee}", LogSource.DB, Color.Orange);
                             return DbRelationshipResult.Succeeded;
                         }
                         return DbRelationshipResult.Failed;
@@ -139,7 +139,7 @@ namespace QuazalWV
                 }
                 else
                 {
-                    Log.WriteLine(1, "[DB] One player already blacklisted the other or they dont have any relationship", Color.Orange);
+                    Log.WriteLine(1, "One player already blacklisted the other or they dont have any relationship", LogSource.DB, Color.Orange);
                     return DbRelationshipResult.UserBlocked;
                 }
             }
@@ -168,7 +168,7 @@ namespace QuazalWV
                         relations.Add(relationship);
                         if (forbidden.Contains(relationship.Type))
                         {
-                            Log.WriteLine(1, $"[DB] Players {requester} and {requestee} are already friends", Color.Orange);
+                            Log.WriteLine(1, $"Players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
                             return DbRelationshipResult.AlreadyPresent;
                         }
                     }
@@ -189,7 +189,7 @@ namespace QuazalWV
                 }
                 else
                 {
-                    Log.WriteLine(1, $"[DB] Players {requester} and {requestee} are already friends", Color.Orange);
+                    Log.WriteLine(1, $"Players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
                     return DbRelationshipResult.AlreadyPresent;
                 }
             }
@@ -206,7 +206,7 @@ namespace QuazalWV
                 case PlayerRelationship.Blocked:
                     return GetSymmetric(pid, (byte)PlayerRelationship.Blocked);
                 default:
-                    Log.WriteLine(1, $"[DB] Unknown relationship type {type}", Color.Red);
+                    Log.WriteLine(1, $"Unknown relationship type {type}", LogSource.DB, Color.Red);
                     return new List<Relationship>();
             }
         }
@@ -359,7 +359,7 @@ namespace QuazalWV
             List<Privilege> privileges = new List<Privilege>();
             List<List<string>> results = GetQueryResults($"SELECT * FROM privileges WHERE locale='{locale}'");
             if (results.Count == 0)
-                Log.WriteLine(1, $"[RMC Privileges] Unknown locale: {locale}", Color.Red);
+                Log.WriteLine(1, $"Unknown locale: {locale}", LogSource.DB, Color.Red);
 
             foreach (List<string> entry in results)
             {
@@ -379,7 +379,7 @@ namespace QuazalWV
             List<UplayReward> rewards = new List<UplayReward>();
             List<List<string>> results = GetQueryResults($"SELECT * FROM rewards");
             if (results.Count < 6)
-                Log.WriteLine(1, $"[RMC UplayWin] Rewards missing", Color.Red);
+                Log.WriteLine(1, $"Rewards missing", LogSource.DB, Color.Red);
 
             foreach (List<string> entry in results)
             {
@@ -422,7 +422,7 @@ namespace QuazalWV
             }
             catch (Exception e)
             {
-                Log.WriteLine(1, $"[DB] {e}", Color.Red);
+                Log.WriteLine(1, $"{e}", LogSource.DB, Color.Red);
                 return false;
             }
         }
@@ -451,7 +451,7 @@ namespace QuazalWV
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteLine(1, $"[DB] {ex}", Color.Red);
+                    Log.WriteLine(1, $"{ex}", LogSource.DB, Color.Red);
                     return false;
                 }
             }
@@ -546,7 +546,7 @@ namespace QuazalWV
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteLine(1, $"[DB] {ex}", Color.Red);
+                    Log.WriteLine(1, $"{ex}", LogSource.DB, Color.Red);
                     return false;
                 }
             }
@@ -570,7 +570,7 @@ namespace QuazalWV
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteLine(1, $"[DB] {ex}", Color.Red);
+                    Log.WriteLine(1, $"{ex}", LogSource.DB, Color.Red);
                     return false;
                 }
             }
@@ -627,7 +627,7 @@ namespace QuazalWV
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteLine(1, $"[DB] {ex}", Color.Red);
+                    Log.WriteLine(1, $"{ex}", LogSource.DB, Color.Red);
                     return false;
                 }
             }

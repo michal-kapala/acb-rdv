@@ -61,7 +61,7 @@ namespace QuazalWV
                     string name = Enum.GetName(typeof(SessionParam), Id);
                     if (name == null)
                     {
-                        Log.WriteLine(1, $"[RMC] Param name not found for id={Id}", Color.Red);
+                        Log.WriteLine(1, $"Param name not found for id={Id}", LogSource.RMC, Color.Red);
                         return $"[Unk{Id:X2}: {Value}]";
                     }
                     return $"[{name}: {Value}]";

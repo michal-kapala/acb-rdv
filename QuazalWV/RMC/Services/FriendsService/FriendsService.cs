@@ -8,6 +8,8 @@ namespace QuazalWV
 {
     public static class FriendsService
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.Friends;
+
         public static void ProcessRequest(Stream s, RMCP rmc)
         {
             switch (rmc.methodID)
@@ -34,7 +36,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestFriendsService_GetRelationships(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Friends] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteRmcLine(1, $"[RMC Friends] Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red);
                     break;
             }
         }
@@ -59,7 +61,7 @@ namespace QuazalWV
                         }
                         else if (invitee == null)
                         {
-                            Log.WriteLine(1, $"[RMC Friends] Invitee {reqAddFriendByName.Invitee} not found", Color.Red, client);
+                            Log.WriteRmcLine(1, $"Invitee {reqAddFriendByName.Invitee} not found", protocol, LogSource.RMC, Color.Red, client);
                             reply = new RMCPResponseEmpty();
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.Friends_UserNotFound);
                         }
@@ -85,7 +87,7 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, $"[RMC Friends] AddFriendByNameWithDetails: {ex.Message}", Color.Red, client);
+                        Log.WriteRmcLine(1, $"AddFriendByNameWithDetails: {ex.Message}", protocol, LogSource.RMC, Color.Red, client);
                     }
                     break;
                 case 5:
@@ -96,7 +98,7 @@ namespace QuazalWV
                         inviter = DbHelper.GetUserByID(reqAcceptFriendship.Pid);
                         if (inviter == null)
                         {
-                            Log.WriteLine(1, $"[RMC Friends] Inviter {reqAcceptFriendship.Pid} not found", Color.Red, client);
+                            Log.WriteRmcLine(1, $"Inviter {reqAcceptFriendship.Pid} not found", protocol, LogSource.RMC, Color.Red, client);
                             reply = new RMCPResponseEmpty();
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.Friends_UserNotFound);
                         }
@@ -119,7 +121,7 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, $"[RMC Friends] AcceptFriendship: {ex.Message}", Color.Red, client);
+                        Log.WriteRmcLine(1, $"AcceptFriendship: {ex.Message}", protocol, LogSource.RMC, Color.Red, client);
                     }
                     break;
                 case 6:
@@ -145,7 +147,7 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, $"[RMC Friends] DeclineFriendship: {ex.Message}", Color.Red, client);
+                        Log.WriteRmcLine(1, $"DeclineFriendship: {ex.Message}", protocol, LogSource.RMC, Color.Red, client);
                     }
                     break;
                 case 7:
@@ -171,7 +173,7 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, $"[RMC Friends] BlackList: {ex.Message}", Color.Red, client);
+                        Log.WriteRmcLine(1, $"BlackList: {ex.Message}", protocol, LogSource.RMC, Color.Red, client);
                     }
                     break;
                 case 9:
@@ -188,7 +190,7 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, $"[RMC Friends] ClearRelationship: {ex.Message}", Color.Red, client);
+                        Log.WriteRmcLine(1, $"ClearRelationship: {ex.Message}", protocol, LogSource.RMC, Color.Red, client);
                     }
                     break;
                 case 12:
@@ -225,7 +227,7 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, $"[RMC Friends] GetDetailedList: {ex.Message}", Color.Red, client);
+                        Log.WriteRmcLine(1, $"GetDetailedList: {ex.Message}", protocol, LogSource.RMC, Color.Red, client);
                     }
                     break;
                 case 13:
@@ -238,11 +240,11 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, $"[RMC Friends] GetRelationships: {ex.Message}", Color.Red, client);
+                        Log.WriteRmcLine(1, $"GetRelationships: {ex.Message}", protocol, LogSource.RMC, Color.Red, client);
                     }
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Friends] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }

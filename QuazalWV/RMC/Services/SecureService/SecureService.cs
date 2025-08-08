@@ -1,13 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.IO;
 using System.Drawing;
 
 namespace QuazalWV
 {
     public static class SecureService
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.Secure;
+
         public static void ProcessRequest(Stream s, RMCP rmc)
         {
             switch (rmc.methodID)
@@ -19,7 +18,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestSecureService_RegisterEx(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Secure] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red);
                     break;
             }
         }
@@ -48,12 +47,12 @@ namespace QuazalWV
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                             break;
                         default:
-                            Log.WriteLine(1, $"[RMC Secure] Error: Unknown Custom Data class {reqRegisterEx.className}", Color.Red, client);
+                            Log.WriteRmcLine(1, $"Error: Unknown Custom Data class {reqRegisterEx.className}", protocol, LogSource.RMC, Color.Red, client);
                             break;
                     }
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Secure] Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }

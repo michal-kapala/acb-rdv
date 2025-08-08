@@ -6,6 +6,8 @@ namespace QuazalWV
 {
     public class MessagingService
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.Messaging;
+
         public static void ProcessRequest(Stream s, RMCP rmc)
         {
             switch (rmc.methodID)
@@ -17,7 +19,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestMessagingService_RetrieveMessages(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Messaging] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red);
                     break;
             }
         }
@@ -44,7 +46,7 @@ namespace QuazalWV
                     DbHelper.UpdateDeliveredMessages(reqRecvMsgs.MessageIds);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Messaging] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }
