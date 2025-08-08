@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Drawing;
 
 namespace QuazalWV
 {
@@ -218,8 +217,6 @@ namespace QuazalWV
             string payload = reply.PayloadToString();
             if (payload != "")
                 WriteLog(5, "Response Data Content : \n" + payload);
-            // for localhost testing, remove from prod
-            Thread.Sleep(100);
             SendACK(udp, p, client);
             SendResponsePacket(udp, p, rmc, client, reply, useCompression, error);
         }
