@@ -5,6 +5,8 @@ namespace QuazalWV
 {
     public class VirginService 
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.Virgin;
+
         public static void ProcessRequest(Stream s, RMCP rmc, ClientInfo client)
         {
             switch (rmc.methodID)
@@ -13,7 +15,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestVirginService_SendVirginInfo(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Virgin] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }
@@ -25,13 +27,12 @@ namespace QuazalWV
             {
                 case 1:
                     var reqSendVinfo = (RMCPacketRequestVirginService_SendVirginInfo)rmc.request;
-                    Log.WriteLine(1, $"[RMC Virgin] VirginInfo: {reqSendVinfo.PayloadToString()}", Color.Black, client);
+                    Log.WriteRmcLine(1, $"VirginInfo: {reqSendVinfo.PayloadToString()}", protocol, LogSource.RMC, Color.Black, client);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
-                
                 default:
-                    Log.WriteLine(1, $"[RMC Virgin] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }

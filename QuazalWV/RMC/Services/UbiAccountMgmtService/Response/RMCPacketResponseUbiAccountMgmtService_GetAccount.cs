@@ -23,7 +23,7 @@ namespace QuazalWV
                 Exists = true;
             }
             else
-                Log.WriteLine(1, "[RMC UbiAccountMgmt] GetAccount got a null user", Color.Red);
+                Log.WriteRmcLine(1, "GetAccount got a null user", RMCP.PROTOCOL.UbiAccountMgmt, LogSource.RMC, Color.Red);
         }
 
         public override string PayloadToString()

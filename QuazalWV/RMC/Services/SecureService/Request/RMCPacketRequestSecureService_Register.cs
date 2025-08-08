@@ -49,7 +49,7 @@ namespace QuazalWV
                 trackingUrls.Add(sUrl.ToString());
             }
             if (trackingUrls.Count == 0)
-                Log.WriteLine(1, $"[RMC Secure] Register: assigned empty URL list", Color.Red, client);
+                Log.WriteRmcLine(1, $"Register: assigned empty URL list", RMCP.PROTOCOL.Secure, LogSource.RMC, Color.Red, client);
             
             client.TrackingUserUrls = trackingUrls;
 
@@ -57,7 +57,7 @@ namespace QuazalWV
             ClientInfo listClient = Global.Clients.Find(c => c.User.Pid == client.User.Pid);
             if (listClient == null)
             {
-                Log.WriteLine(1, "[RMC Secure] Register: the client wasn't found in global list, adding", Color.Red, client);
+                Log.WriteRmcLine(1, "Register: the client wasn't found in global list, adding", RMCP.PROTOCOL.Secure, LogSource.RMC, Color.Red, client);
                 Global.Clients.Add(client);
             }
         }

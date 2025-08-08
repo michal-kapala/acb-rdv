@@ -97,7 +97,7 @@ namespace QuazalWV
                         Type = byte.Parse(pair.Value);
                         break;
                     default:
-                        Log.WriteLine(1, $"[StationURL] Unknown attribute: {pair.Key}", Color.Red);
+                        Log.WriteLine(1, $"Unknown attribute: {pair.Key}", LogSource.StationURL, Color.Red);
                         break;
                 }
             }
@@ -127,7 +127,7 @@ namespace QuazalWV
         {
             int endIndex = url.IndexOf(":/");
             if (endIndex == -1)
-                Log.WriteLine(1, $"[StationURL] Protocol not found in URL: ${url}", Color.Red);
+                Log.WriteLine(1, $"Protocol not found in URL: ${url}", LogSource.StationURL, Color.Red);
             Protocol = url.Substring(0, endIndex);
             return url.Remove(0, Protocol.Length + 2);
         }

@@ -25,7 +25,7 @@ namespace QuazalWV
             }
             catch (Exception ex)
             {
-                Log.WriteLine(1, $"[PresenceParser] {ex}", Color.Red);
+                Log.WriteLine(1, $"{ex}", LogSource.PresenceParser, Color.Red);
             }
             return props;
         }
@@ -56,7 +56,7 @@ namespace QuazalWV
         {
             uint result = 0;
             if (Buffer.Length < 8 || Buffer.Length % 8 != 0)
-                Log.WriteLine(1, $"[PresenceParser] Invalid buffer length {Buffer.Length}", Color.Red);
+                Log.WriteLine(1, $"Invalid buffer length {Buffer.Length}", LogSource.PresenceParser, Color.Red);
 
             result += ReadByte();
             result += (uint)(ReadByte()) << 8;

@@ -5,6 +5,8 @@ namespace QuazalWV
 {
     public static class PersistentStoreService
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.PersistentStore;
+
         public static void ProcessRequest(Stream s, RMCP rmc)
         {
             switch (rmc.methodID)
@@ -13,7 +15,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestPersistentStoreService_GetItem(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Persistent Store] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red);
                     break;
             }
         }
@@ -29,7 +31,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Persistent Store] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }

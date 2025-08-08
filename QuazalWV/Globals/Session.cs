@@ -26,7 +26,7 @@ namespace QuazalWV
             PrivatePids = new List<uint>();
             HostPid = host.User.Pid;
             foreach (var url in host.Urls)
-                Log.WriteLine(2, $"[Session] Host URL added: ${url}", Color.Green);
+                Log.WriteLine(2, $"Host URL added: ${url}", LogSource.Session, Color.Green);
             HostUrls = host.Urls;
         }
 
@@ -47,21 +47,21 @@ namespace QuazalWV
             // query integrity check
             if (qMinLevelRange == null || qMaxLevelRange == null || qGameMode == null || qGameType == null)
             {
-                Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), failed integrity check", Color.Red, client);
+                Log.WriteLine(1, $"Inconsistent session state (id={Key.SessionId}), failed integrity check", LogSource.Session, Color.Red, client);
                 return false;
             }
 
             // self-hosted
             if (client.User.Pid == HostPid)
             {
-                Log.WriteLine(1, $"[Session] Ignoring a self-hosted session", Color.Gray, client);
+                Log.WriteLine(1, $"Ignoring a self-hosted session", LogSource.Session, Color.Gray, client);
                 return false;
             }
 
             // ignore queries with level limits or without slots
             if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
             {
-                Log.WriteLine(1, $"[Session] Session ignored due to level ranges/lack of slots", Color.Gray, client);
+                Log.WriteLine(1, $"Session ignored due to level ranges/lack of slots", LogSource.Session, Color.Gray, client);
                 return false;
             }
 
@@ -70,14 +70,14 @@ namespace QuazalWV
 
             if (gameMode == null || gameType == null)
             {
-                Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), missing game mode or type", Color.Red, client);
+                Log.WriteLine(1, $"Inconsistent session state (id={Key.SessionId}), missing game mode or type", LogSource.Session, Color.Red, client);
                 return false;
             }
 
             // game mode/type mismatch
             if (gameMode.Value != qGameMode.Value || gameType.Value != qGameType.Value)
             {
-                Log.WriteLine(1, $"[Session] Session ignored due to game mode/type mismatch", Color.Gray, client);
+                Log.WriteLine(1, $"Session ignored due to game mode/type mismatch", LogSource.Session, Color.Gray, client);
                 return false;
             }
 
@@ -85,20 +85,20 @@ namespace QuazalWV
             var currentSlots = GameSession.Attributes.Find(param => param.Id == slotsParam);
             if (currentSlots == null)
             {
-                Log.WriteLine(1, $"[Session] Inconsistent session state (id={Key.SessionId}), missing current slots", Color.Red, client);
+                Log.WriteLine(1, $"Inconsistent session state (id={Key.SessionId}), missing current slots", LogSource.Session, Color.Red, client);
                 return false;
             }
             
             if (qMaxSlotsTaken == null)
             {
-                Log.WriteLine(1, $"[Session] Session query missing QueryMaxSlotsTaken parameter", Color.Red, client);
+                Log.WriteLine(1, $"Session query missing QueryMaxSlotsTaken parameter", LogSource.Session, Color.Red, client);
                 return false;
             }
 
             // too many players
             if (currentSlots.Value > qMaxSlotsTaken.Value)
             {
-                Log.WriteLine(1, $"[Session] Session ignored due to too many players", Color.Gray, client);
+                Log.WriteLine(1, $"Session ignored due to too many players", LogSource.Session, Color.Gray, client);
                 return false;
             }
             return true;
@@ -143,11 +143,11 @@ namespace QuazalWV
                 else
                     HostPid = PrivatePids[0];
                 // this flow should never happen as host migrations use MigrateSession->RegisterURLs->AbandonSession flow
-                Log.WriteLine(1, $"[Session] On-leave host migration from {client.User.Pid} to {HostPid}", Color.Orange);
+                Log.WriteLine(1, $"On-leave host migration from {client.User.Pid} to {HostPid}", LogSource.Session, Color.Orange);
                 var newHost = Global.Clients.Find(c => client.User.Pid == HostPid);
                 if (newHost == null)
                 {
-                    Log.WriteLine(1, $"[Session] On-leave host migration elected non-existent host {HostPid}", Color.Red);
+                    Log.WriteLine(1, $"On-leave host migration elected non-existent host {HostPid}", LogSource.Session, Color.Red);
                     return;
                 }
                 HostUrls = newHost.RegisteredUrls;	
@@ -165,7 +165,7 @@ namespace QuazalWV
             if (currPublicSlots == null)
             {
                 GameSession.Attributes.Add(new Property((uint)SessionParam.CurrentPublicSlots, (uint)PublicPids.Count));
-                Log.WriteLine(1, $"[Session] Session {Key.SessionId} missing public slots param", Color.Red);
+                Log.WriteLine(1, $"Session {Key.SessionId} missing public slots param", LogSource.Session, Color.Red);
             }
             else
                 currPublicSlots.Value = (uint)PublicPids.Count;
@@ -174,7 +174,7 @@ namespace QuazalWV
             if (currPrivateSlots == null)
             {
                 GameSession.Attributes.Add(new Property((uint)SessionParam.CurrentPrivateSlots, (uint)PrivatePids.Count));
-                Log.WriteLine(1, $"[Session] Session {Key.SessionId} missing private slots param", Color.Red);
+                Log.WriteLine(1, $"Session {Key.SessionId} missing private slots param", LogSource.Session, Color.Red);
             }
             else
                 currPrivateSlots.Value = (uint)PrivatePids.Count;
@@ -190,19 +190,19 @@ namespace QuazalWV
             var isPrivateParam = FindProp(SessionParam.IsPrivate);
             if (isPrivateParam == null)
             {
-                Log.WriteLine(1, $"[Session] IsPrivate attribute missing in session {Key.SessionId}", Color.Red);
+                Log.WriteLine(1, $"IsPrivate attribute missing in session {Key.SessionId}", LogSource.Session, Color.Red);
                 return false;
             }
             var maxSlots = FindProp(isPrivateParam.Value == 0 ? SessionParam.MaxPublicSlots : SessionParam.MaxPrivateSlots);
             if (maxSlots == null)
             {
-                Log.WriteLine(1, $"[Session] MaxSlots attribute missing in session {Key.SessionId}", Color.Red);
+                Log.WriteLine(1, $"MaxSlots attribute missing in session {Key.SessionId}", LogSource.Session, Color.Red);
                 return false;
             }
             var currentSlots = FindProp(isPrivateParam.Value == 0 ? SessionParam.CurrentPublicSlots : SessionParam.CurrentPrivateSlots);
             if (currentSlots == null)
             {
-                Log.WriteLine(1, $"[Session] CurrentSlots attribute missing in session {Key.SessionId}", Color.Red);
+                Log.WriteLine(1, $"CurrentSlots attribute missing in session {Key.SessionId}", LogSource.Session, Color.Red);
                 return false;
             }
             return maxSlots.Value > currentSlots.Value;

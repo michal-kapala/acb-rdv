@@ -64,67 +64,67 @@ namespace QuazalWV
                 WriteLog(5, payload, client);
             switch (rmc.proto)
             {
-                case RMCP.PROTOCOL.NATTraversalRelayService:
+                case RMCP.PROTOCOL.NatTraversalRelay:
                     NATTraversalService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.AuthenticationService:
+                case RMCP.PROTOCOL.Authentication:
                     AuthenticationService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.SecureService:
+                case RMCP.PROTOCOL.Secure:
                     SecureService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.FriendsService:
+                case RMCP.PROTOCOL.Friends:
                     FriendsService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.MessagingService:
+                case RMCP.PROTOCOL.Messaging:
                     MessagingService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.PersistentStoreService:
+                case RMCP.PROTOCOL.PersistentStore:
                     PersistentStoreService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.MessageDeliveryService:
+                case RMCP.PROTOCOL.MessageDelivery:
                     MessageDeliveryService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.UbiAccountMgmtService:
+                case RMCP.PROTOCOL.UbiAccountMgmt:
                     UbiAccountMgmtService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.NewsService:
+                case RMCP.PROTOCOL.News:
                     NewsService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.UbiNewsService:
+                case RMCP.PROTOCOL.UbiNews:
                     UbiNewsService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.PrivilegesService:
+                case RMCP.PROTOCOL.Privileges:
                     PrivilegesService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.TrackingService:
+                case RMCP.PROTOCOL.Tracking:
                     TrackingService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.LocalizationService:
+                case RMCP.PROTOCOL.Localization:
                     LocalizationService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.GameSessionService:
+                case RMCP.PROTOCOL.GameSession:
                     GameSessionService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.HermesPlayerStatsService:
+                case RMCP.PROTOCOL.HermesPlayerStats:
                     HermesPlayerStatisticsService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.RichPresenceService:
+                case RMCP.PROTOCOL.RichPresence:
                     RichPresenceService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.TrackingExtService:
+                case RMCP.PROTOCOL.TrackingExt:
                     TrackingExtService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.GameInfoService:
+                case RMCP.PROTOCOL.GameInfo:
                     GameInfoService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.ContactsExtensionsService:
+                case RMCP.PROTOCOL.ContactsExtensions:
                     ContactsService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.UplayWinService:
+                case RMCP.PROTOCOL.UplayWin:
                     UplayWinService.HandleRequest(p, rmc, client);
                     break;
-                case RMCP.PROTOCOL.VirginService:
+                case RMCP.PROTOCOL.Virgin:
                     VirginService.HandleRequest(p, rmc, client);
                     break;
                 default:
@@ -141,67 +141,67 @@ namespace QuazalWV
             rmc.methodID = Helper.ReadU32(m);
             switch (rmc.proto)
             {
-                case RMCP.PROTOCOL.NATTraversalRelayService:
+                case RMCP.PROTOCOL.NatTraversalRelay:
                     NATTraversalService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.AuthenticationService:
+                case RMCP.PROTOCOL.Authentication:
                     AuthenticationService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.SecureService:
+                case RMCP.PROTOCOL.Secure:
                     SecureService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.FriendsService:
+                case RMCP.PROTOCOL.Friends:
                     FriendsService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.MessagingService:
+                case RMCP.PROTOCOL.Messaging:
                     MessagingService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.PersistentStoreService:
+                case RMCP.PROTOCOL.PersistentStore:
                     PersistentStoreService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.MessageDeliveryService:
+                case RMCP.PROTOCOL.MessageDelivery:
                     MessageDeliveryService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.UbiAccountMgmtService:
+                case RMCP.PROTOCOL.UbiAccountMgmt:
                     UbiAccountMgmtService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.NewsService:
+                case RMCP.PROTOCOL.News:
                     NewsService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.UbiNewsService:
+                case RMCP.PROTOCOL.UbiNews:
                     UbiNewsService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.PrivilegesService:
+                case RMCP.PROTOCOL.Privileges:
                     PrivilegesService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.TrackingService:
+                case RMCP.PROTOCOL.Tracking:
                     TrackingService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.LocalizationService:
+                case RMCP.PROTOCOL.Localization:
                     LocalizationService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.GameSessionService:
+                case RMCP.PROTOCOL.GameSession:
                     GameSessionService.ProcessRequest(m, rmc, client);
                     break;
-                case RMCP.PROTOCOL.HermesPlayerStatsService:
+                case RMCP.PROTOCOL.HermesPlayerStats:
                     HermesPlayerStatisticsService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.RichPresenceService:
+                case RMCP.PROTOCOL.RichPresence:
                     RichPresenceService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.TrackingExtService:
+                case RMCP.PROTOCOL.TrackingExt:
                     TrackingExtService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.GameInfoService:
+                case RMCP.PROTOCOL.GameInfo:
                     GameInfoService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.ContactsExtensionsService:
+                case RMCP.PROTOCOL.ContactsExtensions:
                     ContactsService.ProcessRequest(m, rmc);
                     break;
-                case RMCP.PROTOCOL.VirginService:
+                case RMCP.PROTOCOL.Virgin:
                     VirginService.ProcessRequest(m, rmc, client);
                     break;
-                case RMCP.PROTOCOL.UplayWinService:
+                case RMCP.PROTOCOL.UplayWin:
                     UplayWinService.ProcessRequest(m, rmc);
                     break;
                 default:
@@ -401,7 +401,7 @@ namespace QuazalWV
             };
             RMCP rmc = new RMCP
             {
-                proto = RMCP.PROTOCOL.GlobalNotificationEventService,
+                proto = RMCP.PROTOCOL.GlobalNotificationEvent,
                 methodID = 1,
                 callID = ++client.callCounterRMC
             };
@@ -438,9 +438,9 @@ namespace QuazalWV
             SendRequestPacket(q, rmc, client, reply, true, 0);
         }
 
-        private static void WriteLog(int priority, string s, ClientInfo client)
+        private static void WriteLog(int priority, string content, ClientInfo client)
         {
-            Log.WriteLine(priority, $"[RMC] {s}", null, client);
+            Log.WriteLine(priority, content, LogSource.RMC, null, client);
         }
     }
 }

@@ -49,7 +49,7 @@ namespace QuazalWV
             Id = id;
             if (id > MaxStatId)
             {
-                Log.WriteLine(1, $"[HermesPlayerStats] Unknown stat ID {id}", Color.Red);
+                Log.WriteRmcLine(1, $"Unknown stat ID {id}", RMCP.PROTOCOL.HermesPlayerStats, LogSource.RMC, Color.Red);
                 Value1 = new PlayerStatisticValues(1, 2, 3, "", 1);
                 UnkByte = 1;
                 Value2 = new PlayerStatisticValues(1, 2, 3, "", 1);

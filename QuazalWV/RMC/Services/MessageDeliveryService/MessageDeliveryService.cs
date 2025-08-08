@@ -6,6 +6,8 @@ namespace QuazalWV
 {
     public static class MessageDeliveryService
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.MessageDelivery;
+
         public static void ProcessRequest(Stream s, RMCP rmc)
         {
             switch (rmc.methodID)
@@ -14,7 +16,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestMessageDeliveryService_DeliverMessage(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC MessageDelivery] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red);
                     break;
             }
         }
@@ -39,11 +41,11 @@ namespace QuazalWV
                     {
                         var recipient = Global.Clients.Find(c => c.User.Pid == reqDeliver.Message.RecipientId);
                         if (recipient != null)
-                            RMC.SendRequest(recipient, reqDeliver, RMCP.PROTOCOL.MessageDeliveryService, 1);
+                            RMC.SendRequest(recipient, reqDeliver, RMCP.PROTOCOL.MessageDelivery, 1);
                     }
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC MessageDelivery] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }

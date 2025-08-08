@@ -33,16 +33,20 @@ namespace QuazalWV
             }
         }
 
-        public static void WriteLine(int priority, string s, object color = null, ClientInfo client = null)
+        public static void WriteLine(int priority, string content, LogSource source = LogSource.Undefined, object color = null, ClientInfo client = null, bool skipSpace = false)
         {
             if (box == null) return;
             try
             {
                 box.Invoke(new Action(delegate
                 {
-                    string stamp = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + " : [" + priority.ToString("D2") + "]";
+                    string line = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + " : [" + priority.ToString("D2") + "]";
+                    if (source != LogSource.Undefined)
+                        line += $"[{source}]";
                     if (client != null && client.User != null && client.User.Name != null)
-                        stamp += $"[{client.User.Name}]";
+                        line += $"[{client.User.Name}]";
+                    if (line.Length > 0 && line[line.Length - 1] != ' ' && !skipSpace)
+                        line += " ";
                     if (priority <= MinPriority)
                     {
                         Color c;
@@ -50,18 +54,56 @@ namespace QuazalWV
                             c = (Color)color;
                         else
                             c = Color.Black;
-                        if (s.ToLower().Contains("error"))
+                        if (content.ToLower().Contains("error"))
                             c = Color.Red;
                         box.SelectionStart = box.TextLength;
                         box.SelectionLength = 0;
                         box.SelectionColor = c;
-                        box.AppendText(stamp + s + "\n");
+                        box.AppendText(line + content + "\n");
                         box.SelectionColor = box.ForeColor;
                         box.ScrollToCaret();                        
                     }
                     lock (_sync)
                     {
-                        logBuffer.Append(stamp + s + "\n");
+                        logBuffer.Append(line + content + "\n");
+                        new Thread(tSaveLog).Start();
+                    }
+                }));
+            }
+            catch { }
+        }
+
+        public static void WriteRmcLine(int priority, string content, RMCP.PROTOCOL protocol, LogSource source = LogSource.RMC, object color = null, ClientInfo client = null)
+        {
+            if (box == null) return;
+            try
+            {
+                box.Invoke(new Action(delegate
+                {
+                    string line = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + " : [" + priority.ToString("D2") + "]";
+                    line += $"[{source} {protocol}]";
+                    if (client != null && client.User != null && client.User.Name != null)
+                        line += $"[{client.User.Name}]";
+                    line += " ";
+                    if (priority <= MinPriority)
+                    {
+                        Color c;
+                        if (color != null)
+                            c = (Color)color;
+                        else
+                            c = Color.Black;
+                        if (content.ToLower().Contains("error"))
+                            c = Color.Red;
+                        box.SelectionStart = box.TextLength;
+                        box.SelectionLength = 0;
+                        box.SelectionColor = c;
+                        box.AppendText(line + content + "\n");
+                        box.SelectionColor = box.ForeColor;
+                        box.ScrollToCaret();
+                    }
+                    lock (_sync)
+                    {
+                        logBuffer.Append(line + content + "\n");
                         new Thread(tSaveLog).Start();
                     }
                 }));
@@ -96,7 +138,7 @@ namespace QuazalWV
                                 sb.AppendLine("\tRMC Request  : " + p.isRequest);
                                 sb.AppendLine("\tRMC Protocol : " + p.proto);
                                 sb.AppendLine("\tRMC Method   : " + p.methodID.ToString("X"));
-                                if (p.proto == RMCP.PROTOCOL.GlobalNotificationEventService && p.methodID == 1)
+                                if (p.proto == RMCP.PROTOCOL.GlobalNotificationEvent && p.methodID == 1)
                                 {
                                     sb.AppendLine("\t\tNotification :");
                                     sb.AppendLine("\t\t\tSource".PadRight(20) + ": 0x" + Helper.ReadU32(m).ToString("X8"));
@@ -140,7 +182,7 @@ namespace QuazalWV
             if (!enablePacketLogging)
                 return;
             MemoryStream m = new MemoryStream();
-            m.WriteByte(1);//version
+            m.WriteByte(1); // version
             m.WriteByte((byte)(sent ? 1 : 0));
             Helper.WriteU32(m, (uint)data.Length);
             m.Write(data, 0, data.Length);

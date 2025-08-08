@@ -5,6 +5,8 @@ namespace QuazalWV
 {
     public static class HermesPlayerStatisticsService
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.HermesPlayerStats;
+
         public static void ProcessRequest(Stream s, RMCP rmc)
         {
             switch (rmc.methodID)
@@ -25,7 +27,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestHermesPlayerStatisticsService_ReadStatsLeaderboardByPlayerNames(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC HermesPlayerStats] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red);
                     break;
             }
         }
@@ -57,7 +59,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC HermesPlayerStats] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }

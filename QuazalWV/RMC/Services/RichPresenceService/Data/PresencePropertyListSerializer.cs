@@ -34,7 +34,7 @@ namespace QuazalWV
                     result += U32ToHexLE(prop.Value);
                     break;
                 default:
-                    Log.WriteLine(1, $"[PresenceSerializer] {prop.DataType} variant type unsupported", Color.Red);
+                    Log.WriteLine(1, $"{prop.DataType} variant type unsupported", LogSource.PresenceSerializer, Color.Red);
                     return "";
             }
             return result;

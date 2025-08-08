@@ -33,7 +33,7 @@ namespace QuazalWV
                 Time = ToDateTime(RawTime);
             else
             {
-                Log.WriteLine(2, $"[QDateTime] Invalid time: {RawTime}", Color.Red);
+                Log.WriteLine(2, $"Invalid time: {RawTime}", LogSource.QDateTime, Color.Red);
                 Time = DateTime.Now;
             }
         }

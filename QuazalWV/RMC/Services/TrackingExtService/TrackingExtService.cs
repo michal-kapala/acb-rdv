@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
-using System.Text;
 
 namespace QuazalWV
 {
     public static class TrackingExtService
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.TrackingExt;
+
         public static void ProcessRequest(Stream s, RMCP rmc)
         {
             switch (rmc.methodID)
@@ -16,7 +15,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestTrackingExtService_IsTrackingSessionActive(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Tracking Ext] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red);
                     break;
             }
         }
@@ -31,7 +30,7 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Tracking Ext] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }

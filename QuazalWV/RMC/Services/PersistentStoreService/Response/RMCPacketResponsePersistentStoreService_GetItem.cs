@@ -20,7 +20,7 @@ namespace QuazalWV
             catch
             {
                 Content = new byte[0];
-                Log.WriteLine(1, $"[RMC Persistent Store] Cannot read {fileName}", Color.Red);
+                Log.WriteRmcLine(1, $"Cannot read {fileName}", RMCP.PROTOCOL.PersistentStore, LogSource.RMC, Color.Red);
             }
             Result = true;
         }

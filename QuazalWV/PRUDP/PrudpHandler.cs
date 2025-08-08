@@ -89,13 +89,13 @@ namespace QuazalWV
             {
                 // challenge dumped from the original traffic
                 challenge = 0xF94C56FB;
-                Log.WriteLine(1, $"[Tracking][PRUDP] CONNECT for Tracking, challenge: 0x{challenge:X8}");
+                Log.WriteLine(1, $"[Tracking] CONNECT for Tracking, challenge: 0x{challenge:X8}", LogSource.PRUDP, Color.Black, null, true);
                 m = new MemoryStream();
                 Helper.WriteU32(m, 4);
                 Helper.WriteU32(m, challenge);
                 return m.ToArray();
             }
-            Log.WriteLine(1, $"[PRUDP] CONNECT: PID: {pid}, CID: {cid}, challenge: 0x{challenge:X8}", Color.Green);
+            Log.WriteLine(1, $"CONNECT: PID: {pid}, CID: {cid}, challenge: 0x{challenge:X8}", LogSource.PRUDP, Color.Green);
             m = new MemoryStream();
             Helper.WriteU32(m, 4);
             Helper.WriteU32(m, challenge + 1);
@@ -135,11 +135,11 @@ namespace QuazalWV
             return reply;
         }
 
-        public static void ProcessPacket(string source, byte[] data, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload = false)
+        public static void ProcessPacket(LogSource source, byte[] data, IPEndPoint ep, UdpClient listener, uint serverPID, ushort listenPort, bool removeConnectPayload = false)
         {
             StringBuilder sb = new StringBuilder();
             foreach (byte b in data)
-                sb.Append(b.ToString("X2") + " ");
+                sb.Append($"{b:X2} ");
             while (true)
             {
                 PrudpPacket p = new PrudpPacket(data);
@@ -148,9 +148,9 @@ namespace QuazalWV
                 m.Seek(0, 0);
                 m.Read(buff, 0, buff.Length);
                 Log.LogPacket(false, buff);
-                Log.WriteLine(5, "[" + source + "] received : " + p.ToStringShort());
-                Log.WriteLine(10, "[" + source + "] received : " + sb.ToString());
-                Log.WriteLine(10, "[" + source + "] received : " + p.ToStringDetailed());
+                Log.WriteLine(5, $"[{source}] received : {p.ToStringShort()}", LogSource.PRUDP, Color.Black, null, true);
+                Log.WriteLine(10, $"[{source}] received : {sb}", LogSource.PRUDP, Color.Black, null, true);
+                Log.WriteLine(10, $"[{source}] received : {p.ToStringDetailed()}", LogSource.PRUDP, Color.Black, null, true);
                 PrudpPacket reply = null;
                 ClientInfo client = null;
                 if (p.type != PrudpPacket.PACKETTYPE.SYN && p.type != PrudpPacket.PACKETTYPE.NATPING)
@@ -186,7 +186,7 @@ namespace QuazalWV
                                 reply = ProcessDISCONNECT(client, p);
                                 Send(source, reply, ep, listener);
                                 // disconnection from RDV
-                                if (source == "RDV")
+                                if (source == LogSource.RDV)
                                 {
                                     // notify friends
                                     var rels = DbHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
@@ -200,7 +200,7 @@ namespace QuazalWV
                                             NotificationManager.FriendStatusChanged(friend, client.User.Pid, client.User.Name, false);
                                     }
                                     Global.Clients.Remove(client);
-                                    Log.WriteLine(1, $"[PRUDP] DISCONNECT", Color.Gray, client);
+                                    Log.WriteLine(1, "DISCONNECT", LogSource.PRUDP, Color.Gray, client);
                                 }
                             }
                             break;
@@ -252,15 +252,15 @@ namespace QuazalWV
             }
         }
 
-        public static void Send(string source, PrudpPacket p, IPEndPoint ep, UdpClient listener)
+        public static void Send(LogSource source, PrudpPacket p, IPEndPoint ep, UdpClient listener)
         {
             byte[] data = p.ToBuffer();
             StringBuilder sb = new StringBuilder();
             foreach (byte b in data)
-                sb.Append(b.ToString("X2") + " ");
-            Log.WriteLine(5, "[" + source + "] send : " + p.ToStringShort());
-            Log.WriteLine(10, "[" + source + "] send : " + sb.ToString());
-            Log.WriteLine(10, "[" + source + "] send : " + p.ToStringDetailed());
+                sb.Append($"{b:X2} ");
+            Log.WriteLine(5, $"[{source}] send : {p.ToStringShort()}", LogSource.PRUDP, Color.Black, null, true);
+            Log.WriteLine(10, $"[{source}] send : {sb}", LogSource.PRUDP, Color.Black, null, true);
+            Log.WriteLine(10, $"[{source}] send : {p.ToStringDetailed()}", LogSource.PRUDP, Color.Black, null, true);
             listener.Send(data, data.Length, ep);
             Log.LogPacket(true, data);
         }

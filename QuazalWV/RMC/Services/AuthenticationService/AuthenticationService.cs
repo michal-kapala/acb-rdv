@@ -6,6 +6,8 @@ namespace QuazalWV
 {
     public static class AuthenticationService
     {
+        public const RMCP.PROTOCOL protocol = RMCP.PROTOCOL.Authentication;
+
         public static void ProcessRequest(Stream s, RMCP rmc)
         {
             switch (rmc.methodID)
@@ -20,7 +22,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestAuthenticationService_RequestTicket(s);
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Method {rmc.methodID}", Color.Red);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red);
                     break;
             }
         }
@@ -40,7 +42,7 @@ namespace QuazalWV
                         if (u != null && reqLogin.username == "Tracking")
                             client.TrackingUser = u;
                         else
-                            Log.WriteLine(1, $"[RMC Authentication] Login called for a non-existent user {reqLogin.username}", Color.Red);
+                            Log.WriteRmcLine(1, $"Login called for a non-existent user {reqLogin.username}", protocol, LogSource.RMC, Color.Red);
 
                         reply = new RMCPacketResponseAuthenticationService_Login(client);
                         //client.sessionKey = ((RMCPacketResponseAuthenticationService_Login)reply).ticket.sessionKey;
@@ -48,7 +50,7 @@ namespace QuazalWV
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine(1, $"[RMC Authentication] Login for Tracking: {ex}", Color.Red);
+                        Log.WriteRmcLine(1, $"Login for Tracking: {ex}", protocol, LogSource.RMC, Color.Red);
                     }
                     break;
                 case 2:
@@ -74,12 +76,12 @@ namespace QuazalWV
                             }
                             else
                             {
-                                Log.WriteLine(1, $"[RMC Authentication] LoginEx called for a non-existent user {reqLoginEx.username}", Color.Red, client);
+                                Log.WriteRmcLine(1, $"LoginEx called for a non-existent user {reqLoginEx.username}", protocol, LogSource.RMC, Color.Red, client);
                                 RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.RendezVous_InvalidUsername);
                             }
                             break;
                         default:
-                            Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Custom Data class {reqLoginEx.className}", Color.Red, client);
+                            Log.WriteRmcLine(1, $"Error: Unknown Custom Data class {reqLoginEx.className}", protocol, LogSource.RMC, Color.Red, client);
                             break;
                     }
                     break;
@@ -102,7 +104,7 @@ namespace QuazalWV
                     }
                     break;
                 default:
-                    Log.WriteLine(1, $"[RMC Authentication] Error: Unknown Method {rmc.methodID}", Color.Red, client);
+                    Log.WriteRmcLine(1, $"Error: Unknown Method {rmc.methodID}", protocol, LogSource.RMC, Color.Red, client);
                     break;
             }
         }
