@@ -20,6 +20,7 @@ nupkg/
 *.txt
 *.bin
 *.config
+ACB RDV/App.config
 !App.config
 *.ipch
 *.cache
@@ -52,4 +53,3 @@ ACB RDV/bin/x86/Release/ACBRDV.exe
 ACB RDV/bin/x86/Release/QuazalWV.dll
 QuazalWV/bin/x86/Release/QuazalWV.dll
 DDLParserWV/bin/*
-ACB RDV/App.config
