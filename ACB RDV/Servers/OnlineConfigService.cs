@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using QuazalWV;
+using System.Drawing;
 
 namespace AcbRdv
 {
@@ -48,7 +49,7 @@ namespace AcbRdv
                 try
                 {
                     TcpClient client = listener.AcceptTcpClient();
-                    Log.WriteLine(1, "[OnlineConfigSvc] Client connected");
+                    Log.WriteLine(1, "[OnlineConfigSvc] Client connected", Color.Green);
                     new Thread(tClientHandler).Start(client);
                 }
                 catch { }

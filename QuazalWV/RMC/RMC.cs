@@ -20,7 +20,7 @@ namespace QuazalWV
             client.udp = udp;
             if (p.flags.Contains(PrudpPacket.PACKETFLAG.FLAG_ACK))
                 return;
-            WriteLog(10, "Handling packet...");
+            WriteLog(10, "Handling packet...", client);
             RMCP rmc = new RMCP(p);
             if (rmc.isRequest)
                 HandleRequest(client, p, rmc);
@@ -31,7 +31,7 @@ namespace QuazalWV
         public static void HandleResponse(ClientInfo client, PrudpPacket p, RMCP rmc)
         {
             ProcessResponse(client, p, rmc);
-            WriteLog(1, "Received Response : " + rmc.ToString());
+            WriteLog(1, $"Received Response : {rmc}", client);
         }
 
         public static void ProcessResponse(ClientInfo client, PrudpPacket p, RMCP rmc)
@@ -58,10 +58,10 @@ namespace QuazalWV
             ProcessRequest(client, p, rmc);
             if (rmc.callID > client.callCounterRMC)
                 client.callCounterRMC = rmc.callID;
-            WriteLog(1, "Received Request : " + rmc.ToString());
+            WriteLog(1, $"Received Request : {rmc}", client);
             string payload = rmc.PayLoadToString();
             if (payload != "")
-                WriteLog(5, payload);
+                WriteLog(5, payload, client);
             switch (rmc.proto)
             {
                 case RMCP.PROTOCOL.NATTraversalRelayService:
@@ -128,7 +128,7 @@ namespace QuazalWV
                     VirginService.HandleRequest(p, rmc, client);
                     break;
                 default:
-                    WriteLog(1, $"Error: No handler implemented for packet protocol {rmc.proto}");
+                    WriteLog(1, $"Error: No handler implemented for packet protocol {rmc.proto}", client);
                     break;
             }
         }
@@ -205,7 +205,7 @@ namespace QuazalWV
                     UplayWinService.ProcessRequest(m, rmc);
                     break;
                 default:
-                    WriteLog(1, "Error: No request reader implemented for packet protocol " + rmc.proto);
+                    WriteLog(1, $"Error: No request reader implemented for packet protocol {rmc.proto}", client);
                     break;
             }
         }
@@ -213,24 +213,26 @@ namespace QuazalWV
 
         public static void SendResponseWithACK(UdpClient udp, PrudpPacket p, RMCP rmc, ClientInfo client, RMCPResponse reply, bool useCompression = true, uint error = 0)
         {
-            WriteLog(2, "Response : " + reply.ToString());
+            WriteLog(2, $"Response : {reply}", client);
             string payload = reply.PayloadToString();
             if (payload != "")
-                WriteLog(5, "Response Data Content : \n" + payload);
+                WriteLog(5, $"Response Data Content : \n{payload}", client);
             SendACK(udp, p, client);
             SendResponsePacket(udp, p, rmc, client, reply, useCompression, error);
         }
 
         private static void SendACK(UdpClient udp, PrudpPacket p, ClientInfo client)
         {
-            PrudpPacket np = new PrudpPacket(p.ToBuffer());
-            np.flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_ACK };
-            np.m_oSourceVPort = p.m_oDestinationVPort;
-            np.m_oDestinationVPort = p.m_oSourceVPort;
-            np.m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature : client.trackingSignature;
-            np.payload = new byte[0];
-            np.payloadSize = 0;
-            WriteLog(10, "send ACK packet");
+            PrudpPacket np = new PrudpPacket(p.ToBuffer())
+            {
+                flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_ACK },
+                m_oSourceVPort = p.m_oDestinationVPort,
+                m_oDestinationVPort = p.m_oSourceVPort,
+                m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature : client.trackingSignature,
+                payload = new byte[0],
+                payloadSize = 0
+            };
+            WriteLog(10, "send ACK packet", client);
             Send(udp, np, client);
         }
 
@@ -318,7 +320,7 @@ namespace QuazalWV
                 //np.uiSeqId++;
                 np.payload = data;
                 np.payloadSize = (ushort)np.payload.Length;
-                WriteLog(10, "sent packet");
+                WriteLog(10, "sent packet", client);
                 Send(client.udp, np, client);
             }
             else
@@ -350,7 +352,7 @@ namespace QuazalWV
                     pos += len;
                     Thread.Sleep(1);
                 }
-                WriteLog(10, "sent packets");
+                WriteLog(10, "sent packets", client);
             }
         }
 
@@ -360,9 +362,9 @@ namespace QuazalWV
             StringBuilder sb = new StringBuilder();
             foreach (byte b in data)
                 sb.Append(b.ToString("X2") + " ");
-            WriteLog(5, "send : " + p.ToStringShort());
-            WriteLog(10, "send : " + sb.ToString());
-            WriteLog(10, "send : " + p.ToStringDetailed());
+            WriteLog(5, "send : " + p.ToStringShort(), client);
+            WriteLog(10, "send : " + sb.ToString(), client);
+            WriteLog(10, "send : " + p.ToStringDetailed(), client);
             udp.Send(data, data.Length, client.ep);
             Log.LogPacket(true, data);
         }
@@ -375,7 +377,7 @@ namespace QuazalWV
                                          + param1.ToString("X8") + " "
                                          + param2.ToString("X8") + " "
                                          + param3.ToString("X8") + " \""
-                                         + paramStr + "\"]");
+                                         + paramStr + "\"]", client);
             MemoryStream m = new MemoryStream();
             Helper.WriteU32(m, source);
             Helper.WriteU32(m, type * 1000 + subType);
@@ -436,10 +438,9 @@ namespace QuazalWV
             SendRequestPacket(q, rmc, client, reply, true, 0);
         }
 
-        private static void WriteLog(int priority, string s)
+        private static void WriteLog(int priority, string s, ClientInfo client)
         {
-            Log.WriteLine(priority, "[RMC] " + s);
+            Log.WriteLine(priority, $"[RMC] {s}", null, client);
         }
-
     }
 }
