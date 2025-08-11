@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "users" (
     "id"            INTEGER PRIMARY KEY AUTOINCREMENT,
-    "pid"           BIGINT,
-    "name"          TEXT,
+    "pid"           BIGINT UNIQUE,
+    "name"          TEXT UNIQUE,
     "password"      TEXT,
     "ubi_id"        TEXT,
     "email"         TEXT,
