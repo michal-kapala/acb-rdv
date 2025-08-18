@@ -8,11 +8,14 @@ namespace QuazalWV
 {
     public static class DbHelper
     {
-        public static SQLiteConnection connection = new SQLiteConnection();
+        public static SQLiteConnection connection;
 
         public static void Init()
         {
-            connection.ConnectionString = "Data Source=database.sqlite";
+            connection = new SQLiteConnection
+            {
+                ConnectionString = "Data Source=database.sqlite"
+            };
             connection.Open();
             Log.WriteLine(1, "DB loaded...", LogSource.DB);
         }
