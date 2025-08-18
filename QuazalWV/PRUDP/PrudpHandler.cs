@@ -80,7 +80,7 @@ namespace QuazalWV
             m.Read(buff, 0, (int)size);
             buff = Helper.Decrypt(client.sessionKey, buff);
             m = new MemoryStream(buff);
-            uint pid = Helper.ReadU32(m); // user pid
+            uint pid = Helper.ReadU32(m);
             uint cid = Helper.ReadU32(m); // connection id
             uint challenge = Helper.ReadU32(m);
 
@@ -89,12 +89,14 @@ namespace QuazalWV
             {
                 // challenge dumped from the original traffic
                 challenge = 0xF94C56FB;
+                client.TrackingUser = DbHelper.GetUserByName("Tracking");
                 Log.WriteLine(1, $"[Tracking] CONNECT for Tracking, challenge: 0x{challenge:X8}", LogSource.PRUDP, Color.Black, null, true);
                 m = new MemoryStream();
                 Helper.WriteU32(m, 4);
                 Helper.WriteU32(m, challenge);
                 return m.ToArray();
             }
+            client.User = DbHelper.GetUserByID(pid);
             Log.WriteLine(1, $"CONNECT: PID: {pid}, CID: {cid}, challenge: 0x{challenge:X8}", LogSource.PRUDP, Color.Green);
             m = new MemoryStream();
             Helper.WriteU32(m, 4);
