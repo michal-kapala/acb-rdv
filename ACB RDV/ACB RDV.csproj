@@ -219,6 +219,12 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
   </Target>
+  <Target Name="RemoveDependencyXmlFiles" AfterTargets="Build">
+    <ItemGroup>
+      <XmlFiles Include="$(OutputPath)**\*.xml" Exclude="$(OutputPath)$(AssemblyName).xml" />
+    </ItemGroup>
+    <Delete Files="@(XmlFiles)" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
