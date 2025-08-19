@@ -15,8 +15,8 @@ namespace AcbRdv
         public static bool _exit = false;
         private static TcpListener listener;
         private static string ip = Global.ServerBindAddress;
-        private static ushort listenPort = 80;
-        private static ushort targetPort = 21030;
+        private static readonly ushort listenPort = 80;
+        private static readonly ushort targetPort = 21030;
 
         public static void Start()
         {
@@ -49,7 +49,6 @@ namespace AcbRdv
                 try
                 {
                     TcpClient client = listener.AcceptTcpClient();
-                    Log.WriteLine(1, "Client connected", LogSource.OnlineConfigSvc, Color.Green);
                     new Thread(tClientHandler).Start(client);
                 }
                 catch { }
@@ -67,8 +66,27 @@ namespace AcbRdv
             while (ns.DataAvailable)
                 m.WriteByte((byte)ns.ReadByte());
             Log.WriteLine(2, $"Received {m.Length} bytes", LogSource.OnlineConfigSvc);
-            
+            string content;
+            m.Position = 0;
+            using (var reader = new StreamReader(m))
+            {
+                content = reader.ReadToEnd();
+            }
+            string httpEndpoint = content.Split('?')[0];
+            string httpRequest = content.Split('\n')[0].Replace("\r", "");
             StringBuilder sb = new StringBuilder();
+            // 404
+            if (httpEndpoint != "GET /OnlineConfigService.svc/GetOnlineConfig")
+            {
+                var ep = client.Client.RemoteEndPoint as IPEndPoint;
+                Log.WriteLine(1, $"[{ep.Address}:{ep.Port}] {httpRequest}", LogSource.OnlineConfigSvc, Color.Red);
+                MakeResponse404(sb);
+                Send(ns, sb);
+                return;
+            }
+            // 200
+            Log.WriteLine(1, "Client connected", LogSource.OnlineConfigSvc, Color.Green);
+            Log.WriteLine(2, httpRequest, LogSource.OnlineConfigSvc, Color.Green);
             sb.Append("[");
             int count = 0;
             foreach (KeyValuePair<string, string> pair in responseData)
@@ -81,27 +99,41 @@ namespace AcbRdv
             sb.Append("]");
             
             StringBuilder sb2 = new StringBuilder();
-            AddHttpHeader(sb2, sb.Length);
+            MakeResponse200(sb2, sb.Length);
             sb2.Append(sb.ToString());
-            byte[] buff = Encoding.ASCII.GetBytes(sb2.ToString());
-
-            ns.Write(buff, 0, buff.Length);
-            ns.Flush();
-            ns.Close();
-            Log.WriteLine(2, $"Sent {buff.Length} bytes", LogSource.OnlineConfigSvc);
+            Send(ns, sb2);
         }
 
-        private static void AddHttpHeader(StringBuilder sb, int contentlen)
+        private static void MakeResponse200(StringBuilder sb, int contentLen)
         {
             sb.AppendLine("HTTP/1.1 200 OK");
             sb.AppendLine("Cache-Control: private");
-            sb.AppendLine("Content-Length: " + contentlen);
+            sb.AppendLine($"Content-Length: {contentLen}");
             sb.AppendLine("Content-Type: application/json; charset=utf-8");
             sb.AppendLine("Server: Microsoft-IIS/7.5");
             sb.AppendLine("X-AspNet-Version: 2.0.50727");
             sb.AppendLine("X-Powered-By: ASP.NET");
             sb.AppendLine("Date: Fri, 01 Nov 2019 14:04:13 GMT");
             sb.AppendLine("");
+        }
+
+        private static void MakeResponse404(StringBuilder sb)
+        {
+            sb.AppendLine("HTTP/1.1 404 Not Found");
+            sb.AppendLine("Cache-Control: private");
+            sb.AppendLine("Content-Length: 0");
+            sb.AppendLine("Content-Type: deez/nuts; charset=utf-8");
+            sb.AppendLine("X-Powered-By: ur mom");
+            sb.AppendLine("Date: Tue, 11 Sep 2001 13:46:00 GMT");
+            sb.AppendLine("");
+        }
+
+        private static void Send(NetworkStream ns, StringBuilder sb)
+        {
+            byte[] buff = Encoding.ASCII.GetBytes(sb.ToString());
+            ns.Write(buff, 0, buff.Length);
+            ns.Flush();
+            ns.Close();
         }
 
         private static Dictionary<string, string> responseData = new Dictionary<string, string>()
