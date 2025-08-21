@@ -106,6 +106,8 @@ namespace QuazalWV
 
         public static PrudpPacket ProcessDISCONNECT(ClientInfo client, PrudpPacket p)
         {
+            uint playerSig = client != null ? client.playerSignature - 0x10000 : 0;
+            uint trackingSig = client != null ? client.trackingSignature - 0x10000 : 0;
             PrudpPacket reply = new PrudpPacket
             {
                 m_oSourceVPort = p.m_oDestinationVPort,
@@ -113,7 +115,7 @@ namespace QuazalWV
                 flags = new List<PrudpPacket.PACKETFLAG>() { PrudpPacket.PACKETFLAG.FLAG_ACK },
                 type = PrudpPacket.PACKETTYPE.DISCONNECT,
                 m_bySessionID = p.m_bySessionID,
-                m_uiSignature = p.m_oSourceVPort.port == 15 ? client.playerSignature - 0x10000 : client.trackingSignature - 0x10000,
+                m_uiSignature = p.m_oSourceVPort.port == 15 ? playerSig : trackingSig,
                 uiSeqId = p.uiSeqId,
                 payload = new byte[0]
             };
@@ -183,28 +185,24 @@ namespace QuazalWV
                                 RMC.HandlePacket(listener, p);
                             break;
                         case PrudpPacket.PACKETTYPE.DISCONNECT:
-                            if (client != null)
+                            reply = ProcessDISCONNECT(client, p);
+                            // disconnection from RDV - notify friends
+                            if (client != null && client.User != null && source == LogSource.RDV)
                             {
-                                reply = ProcessDISCONNECT(client, p);
-                                Send(source, reply, ep, listener);
-                                // disconnection from RDV
-                                if (source == LogSource.RDV)
+                                var rels = DbHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
+                                uint friendPid;
+                                ClientInfo friend;
+                                foreach (var relationship in rels)
                                 {
-                                    // notify friends
-                                    var rels = DbHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
-                                    uint friendPid;
-                                    ClientInfo friend;
-                                    foreach (var relationship in rels)
-                                    {
-                                        friendPid = relationship.RequesterPid == client.User.Pid ? relationship.RequesteePid : relationship.RequesterPid;
-                                        friend = Global.Clients.Find(c => c.User.Pid == friendPid);
-                                        if (friend != null)
-                                            NotificationManager.FriendStatusChanged(friend, client.User.Pid, client.User.Name, false);
-                                    }
-                                    Global.Clients.Remove(client);
-                                    Log.WriteLine(1, "DISCONNECT", LogSource.PRUDP, Color.Gray, client);
+                                    friendPid = relationship.RequesterPid == client.User.Pid ? relationship.RequesteePid : relationship.RequesterPid;
+                                    friend = Global.Clients.Find(c => c.User.Pid == friendPid);
+                                    if (friend != null)
+                                        NotificationManager.FriendStatusChanged(friend, client.User.Pid, client.User.Name, false);
                                 }
+                                Global.Clients.Remove(client);
+                                Log.WriteLine(1, "DISCONNECT", LogSource.PRUDP, Color.Gray, client);
                             }
+                            Send(source, reply, ep, listener);
                             break;
                         case PrudpPacket.PACKETTYPE.PING:
                             if (client != null)
