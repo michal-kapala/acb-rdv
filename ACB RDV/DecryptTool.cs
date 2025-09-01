@@ -1,12 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using QuazalWV;
 
@@ -14,9 +8,15 @@ namespace AcbRdv
 {
     public partial class DecryptTool : Form
     {
+        string RmcKey { get; set; } = Global.Rc4KeyRdv;
+        byte[] DoKey { get; set; } = Global.Rc4KeyP2p;
+        bool UseRmcKey { get; set; } = true;
+
         public DecryptTool()
         {
             InitializeComponent();
+            radioButton1.Checked = true;
+            radioButton2.Checked = false;
         }
 
         private byte[] ToBuff(string s)
@@ -27,7 +27,7 @@ namespace AcbRdv
             return m.ToArray();
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private void DecryptDecompressButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace AcbRdv
                 if ((s.Length % 2) != 0)
                     return;
                 byte[] data = ToBuff(s);
-                data = Helper.Decrypt("CD&ML", data);
+                data = UseRmcKey ? Helper.Decrypt(RmcKey, data) : Helper.Decrypt(DoKey, data);
                 MemoryStream m = new MemoryStream();
                 m.Write(data, 1, data.Length - 1);
                 data = Helper.Decompress(m.ToArray());
@@ -49,7 +49,7 @@ namespace AcbRdv
             catch { richTextBox2.Text = "ERROR"; }
         }
 
-        private void toolStripButton2_Click(object sender, EventArgs e)
+        private void CompressEncryptButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace AcbRdv
                 MemoryStream m = new MemoryStream();
                 m.WriteByte(count);
                 m.Write(buff, 0, buff.Length);
-                data = Helper.Encrypt("CD&ML", m.ToArray());
+                data = UseRmcKey ? Helper.Encrypt(RmcKey, m.ToArray()) : Helper.Encrypt(DoKey, m.ToArray());
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in data)
                     sb.Append(b.ToString("X2"));
@@ -76,7 +76,7 @@ namespace AcbRdv
             catch { richTextBox1.Text = "ERROR"; }
         }
 
-        private void toolStripButton3_Click(object sender, EventArgs e)
+        private void DecryptButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace AcbRdv
                 if ((s.Length % 2) != 0)
                     return;
                 byte[] data = ToBuff(s);
-                data = Helper.Decrypt("CD&ML", data);
+                data = UseRmcKey ? Helper.Decrypt(RmcKey, data) : Helper.Decrypt(DoKey, data);
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in data)
                     sb.Append(b.ToString("X2"));
@@ -95,7 +95,7 @@ namespace AcbRdv
             catch { richTextBox2.Text = "ERROR"; }
         }
 
-        private void toolStripButton4_Click(object sender, EventArgs e)
+        private void EncryptButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -105,7 +105,7 @@ namespace AcbRdv
                 if ((s.Length % 2) != 0)
                     return;
                 byte[] data = ToBuff(s);
-                data = Helper.Encrypt("CD&ML", data);
+                data = UseRmcKey ? Helper.Encrypt(RmcKey, data) : Helper.Encrypt(DoKey, data);
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in data)
                     sb.Append(b.ToString("X2"));
@@ -114,7 +114,7 @@ namespace AcbRdv
             catch { richTextBox1.Text = "ERROR"; }
         }
 
-        private void toolStripButton5_Click(object sender, EventArgs e)
+        private void DecompressButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace AcbRdv
             catch { richTextBox2.Text = "ERROR"; }
         }
 
-        private void toolStripButton6_Click(object sender, EventArgs e)
+        private void CompressButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -159,6 +159,18 @@ namespace AcbRdv
                 richTextBox1.Text = sb.ToString();
             }
             catch { richTextBox1.Text = "ERROR"; }
+        }
+
+        private void RmcKeyRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            radioButton2.Checked = !radioButton1.Checked;
+            UseRmcKey = true;
+        }
+
+        private void DoKeyRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            radioButton1.Checked = !radioButton2.Checked;
+            UseRmcKey = false;
         }
     }
 }

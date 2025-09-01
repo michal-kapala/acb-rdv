@@ -113,7 +113,7 @@ namespace QuazalWV
             if (payload != null && payload.Length > 0 && type != PACKETTYPE.SYN && m_oSourceVPort.type != STREAMTYPE.NAT)
             {
                 if (m_oSourceVPort.type == STREAMTYPE.OldRVSec)
-                    payload = Helper.Decrypt(Global.Rc4Key, payload);
+                    payload = Helper.Decrypt(Global.Rc4KeyRdv, payload);
                 usesCompression = payload[0] != 0;
                 if (usesCompression)
                 {
@@ -182,7 +182,7 @@ namespace QuazalWV
                     tmpPayload = m2.ToArray();
                 }
                 if (m_oSourceVPort.type == STREAMTYPE.OldRVSec)
-                    tmpPayload = Helper.Encrypt(Global.Rc4Key, tmpPayload);
+                    tmpPayload = Helper.Encrypt(Global.Rc4KeyRdv, tmpPayload);
             }
             if (flags.Contains(PACKETFLAG.FLAG_HAS_SIZE))
                 Helper.WriteU16(m, (ushort)tmpPayload.Length);

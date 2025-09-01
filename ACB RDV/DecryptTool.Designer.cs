@@ -30,15 +30,17 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DecryptTool));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.richTextBox2 = new System.Windows.Forms.RichTextBox();
-            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -57,9 +59,19 @@
             this.toolStripButton6});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(584, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(677, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripButton5
+            // 
+            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
+            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton5.Name = "toolStripButton5";
+            this.toolStripButton5.Size = new System.Drawing.Size(76, 22);
+            this.toolStripButton5.Text = "Decompress";
+            this.toolStripButton5.Click += new System.EventHandler(this.DecompressButton_Click);
             // 
             // toolStripButton1
             // 
@@ -69,7 +81,7 @@
             this.toolStripButton1.Name = "toolStripButton1";
             this.toolStripButton1.Size = new System.Drawing.Size(133, 22);
             this.toolStripButton1.Text = "Decrypt && Decompress";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            this.toolStripButton1.Click += new System.EventHandler(this.DecryptDecompressButton_Click);
             // 
             // toolStripButton3
             // 
@@ -79,7 +91,7 @@
             this.toolStripButton3.Name = "toolStripButton3";
             this.toolStripButton3.Size = new System.Drawing.Size(52, 22);
             this.toolStripButton3.Text = "Decrypt";
-            this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
+            this.toolStripButton3.Click += new System.EventHandler(this.DecryptButton_Click);
             // 
             // toolStripButton4
             // 
@@ -89,7 +101,7 @@
             this.toolStripButton4.Name = "toolStripButton4";
             this.toolStripButton4.Size = new System.Drawing.Size(51, 22);
             this.toolStripButton4.Text = "Encrypt";
-            this.toolStripButton4.Click += new System.EventHandler(this.toolStripButton4_Click);
+            this.toolStripButton4.Click += new System.EventHandler(this.EncryptButton_Click);
             // 
             // toolStripButton2
             // 
@@ -99,7 +111,17 @@
             this.toolStripButton2.Name = "toolStripButton2";
             this.toolStripButton2.Size = new System.Drawing.Size(123, 22);
             this.toolStripButton2.Text = "Compress && Encrypt ";
-            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+            this.toolStripButton2.Click += new System.EventHandler(this.CompressEncryptButton_Click);
+            // 
+            // toolStripButton6
+            // 
+            this.toolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton6.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton6.Image")));
+            this.toolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton6.Name = "toolStripButton6";
+            this.toolStripButton6.Size = new System.Drawing.Size(64, 22);
+            this.toolStripButton6.Text = "Compress";
+            this.toolStripButton6.Click += new System.EventHandler(this.CompressButton_Click);
             // 
             // splitContainer1
             // 
@@ -115,7 +137,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.richTextBox2);
-            this.splitContainer1.Size = new System.Drawing.Size(584, 362);
+            this.splitContainer1.Size = new System.Drawing.Size(677, 362);
             this.splitContainer1.SplitterDistance = 194;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -123,10 +145,10 @@
             // 
             this.richTextBox1.DetectUrls = false;
             this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.richTextBox1.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.richTextBox1.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.richTextBox1.Location = new System.Drawing.Point(0, 0);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(584, 194);
+            this.richTextBox1.Size = new System.Drawing.Size(677, 194);
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
             // 
@@ -137,35 +159,41 @@
             this.richTextBox2.Font = new System.Drawing.Font("Courier New", 8.25F);
             this.richTextBox2.Location = new System.Drawing.Point(0, 0);
             this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.Size = new System.Drawing.Size(584, 164);
+            this.richTextBox2.Size = new System.Drawing.Size(677, 164);
             this.richTextBox2.TabIndex = 1;
             this.richTextBox2.Text = "";
             // 
-            // toolStripButton5
+            // radioButton1
             // 
-            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
-            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton5.Name = "toolStripButton5";
-            this.toolStripButton5.Size = new System.Drawing.Size(76, 22);
-            this.toolStripButton5.Text = "Decompress";
-            this.toolStripButton5.Click += new System.EventHandler(this.toolStripButton5_Click);
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Location = new System.Drawing.Point(535, 2);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(49, 17);
+            this.radioButton1.TabIndex = 2;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "RMC";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            this.radioButton1.CheckedChanged += new System.EventHandler(this.RmcKeyRadioButton_CheckedChanged);
             // 
-            // toolStripButton6
+            // radioButton2
             // 
-            this.toolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton6.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton6.Image")));
-            this.toolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton6.Name = "toolStripButton6";
-            this.toolStripButton6.Size = new System.Drawing.Size(64, 22);
-            this.toolStripButton6.Text = "Compress";
-            this.toolStripButton6.Click += new System.EventHandler(this.toolStripButton6_Click);
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Location = new System.Drawing.Point(590, 2);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(41, 17);
+            this.radioButton2.TabIndex = 3;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "DO";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.CheckedChanged += new System.EventHandler(this.DoKeyRadioButton_CheckedChanged);
             // 
             // DecryptTool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(584, 387);
+            this.ClientSize = new System.Drawing.Size(677, 387);
+            this.Controls.Add(this.radioButton2);
+            this.Controls.Add(this.radioButton1);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.toolStrip1);
             this.Name = "DecryptTool";
@@ -193,5 +221,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton4;
         private System.Windows.Forms.ToolStripButton toolStripButton5;
         private System.Windows.Forms.ToolStripButton toolStripButton6;
+        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton radioButton2;
     }
 }
