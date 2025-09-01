@@ -7,7 +7,8 @@ namespace QuazalWV
 {
     public static class Global
     {
-        public const string Rc4Key = "CD&ML";
+        public const string Rc4KeyRdv = "CD&ML";
+        public static readonly byte[] Rc4KeyP2p = Helper.P2pKey();
         public static string ServerBindAddress { get; set; } = ConfigurationManager.AppSettings["SecureServerAddress"];
         public static uint IdCounter { get; set; } = 0x12345678;
         public static uint PidCounter { get; set; } = 0x1234;
