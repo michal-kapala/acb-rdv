@@ -58,8 +58,27 @@ namespace QuazalWV
         public uint AbandonedSessionID { get; set; } = 0;
         public bool AbandoningSession { get; set; } = false;
         /// <summary>
-        /// Rich presence info.
+        /// Public IP address of the client (determined once)
         /// </summary>
         public List<PresenceProperty> PresenceProps { get; set; } = new List<PresenceProperty>();
+        public string PublicIp { get; set; }
+        /// <summary>
+        /// Public IP initialiazation
+        /// </summary>
+        public void InitPublicIp()
+        {
+            try
+            {
+                using (var web = new System.Net.WebClient())
+                {
+                    PublicIp = web.DownloadString("https://api.ipify.org").Trim();
+                }
+            }
+            catch
+            {
+                // Fallback to local IP if public is not reachable
+                PublicIp = ep.Address.ToString();
+            }
+        }
     }
 }

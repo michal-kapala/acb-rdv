@@ -56,7 +56,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestGameSessionService_CancelInvitation(s);
                     break;
                 case 21:
-                    rmc.request = new RMCPacketRequestGameSessionService_RegisterURLs(s);
+                    rmc.request = new RMCPacketRequestGameSessionService_RegisterURLs(s, client);
                     break;
                 case 23:
                     rmc.request = new RMCPacketRequestGameSessionService_AbandonSession(s);

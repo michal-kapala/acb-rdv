@@ -36,7 +36,7 @@ namespace AcbRdv
 
         public static void tMainThread(object obj)
         {
-            listener = new TcpListener(IPAddress.Parse(ip), listenPort);
+            listener = new TcpListener(IPAddress.Any, listenPort);
             listener.Start();
             Log.WriteLine(1, "Server started", LogSource.OnlineConfigSvc);
             while (true)

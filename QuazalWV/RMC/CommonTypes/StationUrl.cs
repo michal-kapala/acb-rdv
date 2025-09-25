@@ -43,12 +43,15 @@ namespace QuazalWV
         public byte Type { get; set; }
 
         /// <summary>
-        /// Constructs the client's PRUDP URL.
+        /// Constructor of ClientInfo
         /// </summary>
         public StationUrl(ClientInfo client)
         {
             Protocol = "prudp";
-            Address = client.ep.Address.ToString();
+
+            // Use the determined public IP of the client
+            Address = client.PublicIp ?? client.ep.Address.ToString();
+
             Port = (ushort)client.ep.Port;
             CID = 1;
             PID = client.User.Pid;
