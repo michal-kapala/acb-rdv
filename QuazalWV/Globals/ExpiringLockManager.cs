@@ -41,18 +41,24 @@ namespace QuazalWV
                     var client = Global.Clients.Find(c => c.ep.Address.ToString() == kvp.Key.ToString());
                     if (client != null)
                     {
-                        Log.WriteLine(1, $"TIMEOUT", LogSource.PRUDP, Color.Gray, client);
-                        var rels = DbHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
-                        uint friendPid;
-                        ClientInfo friend;
-                        foreach (var relationship in rels)
-                        {
-                            friendPid = relationship.RequesterPid == client.User.Pid ? relationship.RequesteePid : relationship.RequesterPid;
-                            friend = Global.Clients.Find(c => c.User.Pid == friendPid);
-                            if (friend != null)
-                                NotificationManager.FriendStatusChanged(friend, client.User.Pid, client.User.Name, false);
+                        try
+                        { Log.WriteLine(1, $"TIMEOUT", LogSource.PRUDP, Color.Gray, client);
+                            var rels = DbHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
+                            uint friendPid;
+                            ClientInfo friend;
+                            foreach (var relationship in rels)
+                            {
+                                friendPid = relationship.RequesterPid == client.User.Pid ? relationship.RequesteePid : relationship.RequesterPid;
+                                friend = Global.Clients.Find(c => c.User.Pid == friendPid);
+                                if (friend != null)
+                                    NotificationManager.FriendStatusChanged(friend, client.User.Pid, client.User.Name, false);
+                            }
+                            Global.Clients.Remove(client);
                         }
-                        Global.Clients.Remove(client);
+                        catch (Exception ex)
+                        {
+                            Log.WriteLine(1, $"Error during client timeout cleanup: {ex}", LogSource.PRUDP, Color.Red);
+                        }
                     }
                 }
             }
