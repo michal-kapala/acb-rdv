@@ -14,7 +14,11 @@ namespace QuazalWV
         public uint rvCID = (uint)rand.Next();
         public uint IDsend;
         public byte sessionID;
-        public byte[] sessionKey = new byte[] { 0x9C, 0xB0, 0x1D, 0x7A, 0x2C, 0x5A, 0x6C, 0x5B, 0xED, 0x12, 0x68, 0x45, 0x69, 0xAE, 0x09, 0x0D };
+        public byte[] sessionKey = new byte[]
+        {
+            0x9C, 0xB0, 0x1D, 0x7A, 0x2C, 0x5A, 0x6C, 0x5B,
+            0xED, 0x12, 0x68, 0x45, 0x69, 0xAE, 0x09, 0x0D
+        };
         public ushort gameSeqId;
         /// <summary>
         /// Reliable substream sequence ID.
@@ -45,7 +49,6 @@ namespace QuazalWV
         public UdpClient udp;
         public List<StationUrl> RegisteredUrls { get; set; } = new List<StationUrl>();
         public List<StationUrl> Urls { get; set; } = new List<StationUrl>();
-        public bool isLocal = true;
         public User User { get; set; }
         public User TrackingUser { get; set; }
         public string LocaleCode { get; set; }
@@ -57,27 +60,40 @@ namespace QuazalWV
         public bool InGameSession { get; set; } = false;
         public uint AbandonedSessionID { get; set; } = 0;
         public bool AbandoningSession { get; set; } = false;
-        /// <summary>
-        /// Public IP address of the client (determined once)
-        /// </summary>
         public List<PresenceProperty> PresenceProps { get; set; } = new List<PresenceProperty>();
-        public string PublicIp { get; set; }
         /// <summary>
-        /// Public IP initialiazation
+        /// Resolved IP address used for communication.
         /// </summary>
-        public void InitPublicIp()
+        public string ResolvedIp { get; set; }
+
+        /// <summary>
+        /// Determines the address the client should use for communication.
+        /// Uses the local IP if the server is private/localhost, otherwise fetches the public IP.
+        /// </summary>
+        public void DetermineConnectionAddress()
         {
-            try
+            byte[] bytes = ep.Address.GetAddressBytes();
+            bool isPrivate = (bytes[0] == 10) ||
+                             (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31) ||
+                             (bytes[0] == 192 && bytes[1] == 168) ||
+                             (bytes[0] == 127);
+
+            if (isPrivate)
             {
-                using (var web = new System.Net.WebClient())
-                {
-                    PublicIp = web.DownloadString("https://api.ipify.org").Trim();
-                }
+                ResolvedIp = ep.Address.ToString();
             }
-            catch
+            else
             {
-                // Fallback to local IP if public is not reachable
-                PublicIp = ep.Address.ToString();
+                try
+                {
+                    // Fetch public IP of the client
+                    ResolvedIp = new System.Net.WebClient().DownloadString("https://api.ipify.org").Trim();
+                }
+                catch
+                {
+                    // Fallback to local IP if public is unreachable
+                    ResolvedIp = ep.Address.ToString();
+                }
             }
         }
     }

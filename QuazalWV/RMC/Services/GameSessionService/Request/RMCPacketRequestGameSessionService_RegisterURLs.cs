@@ -19,33 +19,15 @@ namespace QuazalWV
                 // Create StationUrl of the string
                 var url = new StationUrl(b);
 
-                // Check if the IP is local (private IP ranges)
-                if (IsLocalIp(url.Address))
-                {
-                    // Replace with the UDP endpoint IP of the client (public IP / NAT IP)
-                    url.Address = client.ep.Address.ToString();
-                }
+                // Determine which IP address the client should use (local or public)
+                client.DetermineConnectionAddress();
+                // Set the determined IP as the address
+                url.Address = client.ResolvedIp;
 
                 Urls.Add(url);
 
                 Log.WriteRmcLine(1, $"RegisterURLs - host URL: {url}", RMCP.PROTOCOL.GameSession, LogSource.RMC);
             }
-        }
-
-        private bool IsLocalIp(string ip)
-        {
-            return ip.StartsWith("192.168.") || ip.StartsWith("10.") ||
-                   (ip.StartsWith("172.") && IsInRange172(ip));
-        }
-
-        private bool IsInRange172(string ip)
-        {
-            // 172.16.0.0 – 172.31.255.255
-            string[] parts = ip.Split('.');
-            if (parts.Length != 4) return false;
-            if (int.TryParse(parts[1], out int secondOctet))
-                return secondOctet >= 16 && secondOctet <= 31;
-            return false;
         }
 
         public override string ToString()
@@ -63,11 +45,13 @@ namespace QuazalWV
 
         public override byte[] ToBuffer()
         {
-            MemoryStream m = new MemoryStream();
-            Helper.WriteU32(m, (uint)Urls.Count);
-            foreach (StationUrl url in Urls)
-                Helper.WriteString(m, url.ToString());
-            return m.ToArray();
+            using (MemoryStream m = new MemoryStream())
+            {
+                Helper.WriteU32(m, (uint)Urls.Count);
+                foreach (StationUrl url in Urls)
+                    Helper.WriteString(m, url.ToString());
+                return m.ToArray();
+            }
         }
 
         public void RegisterUrls(ClientInfo client, Session ses)

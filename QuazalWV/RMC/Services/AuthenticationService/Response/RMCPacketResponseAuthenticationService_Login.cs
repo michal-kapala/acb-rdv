@@ -38,30 +38,11 @@ namespace QuazalWV
         public RMCPacketResponseAuthenticationService_Login(ClientInfo client)
         {
             resultCode = 0x10001;
-            // Address for the secure server is configurable in TTLBackend.exe.config
-            string localhost = "127.0.0.1";
 
-            if (client.ep.Address.ToString() == localhost)
-            {
-                // If client is local -> use localhost
-                address = localhost;
-            }
-            else
-            {
-                try
-                {
-                    // Get public IP of external service
-                    using (var web = new System.Net.WebClient())
-                    {
-                        address = web.DownloadString("https://api.ipify.org").Trim();
-                    }
-                }
-                catch
-                {
-                    // Fallback to config if the request fails
-                    address = GetConfigAddress();
-                }
-            }
+            // Determine which IP address the client should use (local or public)
+            client.DetermineConnectionAddress();
+            // Set the determined IP as the address
+            string address = client.ResolvedIp;
 
             // Only Tracking user calls Login
             PID = client.TrackingUser.Pid;
