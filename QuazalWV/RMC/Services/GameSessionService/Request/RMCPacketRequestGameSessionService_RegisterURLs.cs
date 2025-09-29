@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
 namespace QuazalWV
 {
     public class RMCPacketRequestGameSessionService_RegisterURLs : RMCPRequest
     {
         public List<StationUrl> Urls { get; set; }
-
         public RMCPacketRequestGameSessionService_RegisterURLs(Stream s, ClientInfo client)
         {
             Urls = new List<StationUrl>();
@@ -15,14 +13,15 @@ namespace QuazalWV
             for (uint i = 0; i < count; i++)
             {
                 string b = Helper.ReadString(s);
-
                 // Create StationUrl of the string
                 var url = new StationUrl(b);
 
-                // Determine which IP address the client should use (local or public)
-                client.DetermineConnectionAddress();
-                // Set the determined IP as the address
-                url.Address = client.ResolvedIp;
+                // Check if the IP is local (private IP ranges)
+                if (IsLocalIp(url.Address))
+                {
+                    // Replace with the UDP endpoint IP of the client (public IP / NAT IP)
+                    url.Address = client.ep.Address.ToString();
+                }
 
                 Urls.Add(url);
 
@@ -30,11 +29,26 @@ namespace QuazalWV
             }
         }
 
+        private bool IsLocalIp(string ip)
+        {
+            return ip.StartsWith("192.168.") || ip.StartsWith("10.") ||
+                   (ip.StartsWith("172.") && IsInRange172(ip));
+        }
+
+        private bool IsInRange172(string ip)
+        {
+            // 172.16.0.0 – 172.31.255.255
+            string[] parts = ip.Split('.');
+            if (parts.Length != 4) return false;
+            if (int.TryParse(parts[1], out int secondOctet))
+                return secondOctet >= 16 && secondOctet <= 31;
+            return false;
+        }
+
         public override string ToString()
         {
             return "[RegisterURLs Request]";
         }
-
         public override string PayloadToString()
         {
             var sb = new StringBuilder();
@@ -45,13 +59,11 @@ namespace QuazalWV
 
         public override byte[] ToBuffer()
         {
-            using (MemoryStream m = new MemoryStream())
-            {
-                Helper.WriteU32(m, (uint)Urls.Count);
-                foreach (StationUrl url in Urls)
-                    Helper.WriteString(m, url.ToString());
-                return m.ToArray();
-            }
+            MemoryStream m = new MemoryStream();
+            Helper.WriteU32(m, (uint)Urls.Count);
+            foreach (StationUrl url in Urls)
+                Helper.WriteString(m, url.ToString());
+            return m.ToArray();
         }
 
         public void RegisterUrls(ClientInfo client, Session ses)

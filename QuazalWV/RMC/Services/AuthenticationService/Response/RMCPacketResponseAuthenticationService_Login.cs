@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Runtime.InteropServices.Expando;
 using System.Text;
-
 namespace QuazalWV
 {
     /// <summary>
@@ -14,7 +14,6 @@ namespace QuazalWV
         public List<byte> m_lstSpecialProtocols = new List<byte>();
         public string m_urlSpecialProtocols = "";
     }
-
     public class RMCPacketResponseAuthenticationService_Login : RMCPResponse
     {
         public uint resultCode;
@@ -34,15 +33,33 @@ namespace QuazalWV
         /// MP ticket dumped from the original traffic.
         /// </summary>
         public byte[] mpTrackingUserTgt = { 0xB6, 0xE1, 0xA2, 0xED, 0xD8, 0x7E, 0xCB, 0x5F, 0xEA, 0x36, 0xFF, 0x97, 0x75, 0xB3, 0xD8, 0xCB, 0xB8, 0x57, 0xD0, 0x15, 0xA7, 0xA1, 0xAB, 0x03, 0x57, 0x3F, 0xC1, 0x69, 0xD9, 0x56, 0xB8, 0x73, 0x41, 0xCE, 0xE9, 0xB2, 0x60, 0x03, 0xD6, 0xF0, 0x6C, 0x5B, 0xEE, 0x67, 0xFA, 0x6F, 0x7E, 0x5B, 0xEF, 0xB7, 0xBB, 0x62, 0x69, 0xAF, 0x69, 0x7A, 0xD8, 0x69, 0x58, 0x9A, 0x60, 0x4B, 0xA4, 0xA7, 0x4F, 0x41, 0xBF, 0x80, 0xC7, 0x14, 0x1A, 0x5F, 0x35, 0x0F, 0xFD, 0x96 };
-
         public RMCPacketResponseAuthenticationService_Login(ClientInfo client)
         {
             resultCode = 0x10001;
+            // Address for the secure server is configurable in TTLBackend.exe.config
+            string localhost = "127.0.0.1";
 
-            // Determine which IP address the client should use (local or public)
-            client.DetermineConnectionAddress();
-            // Set the determined IP as the address
-            string address = client.ResolvedIp;
+            if (client.ep.Address.ToString() == localhost)
+            {
+                // If client is local -> use localhost
+                address = localhost;
+            }
+            else
+            {
+                try
+                {
+                    // Get public IP of external service
+                    using (var web = new System.Net.WebClient())
+                    {
+                        address = web.DownloadString("https://api.ipify.org").Trim();
+                    }
+                }
+                catch
+                {
+                    // Fallback to config if the request fails
+                    address = GetConfigAddress();
+                }
+            }
 
             // Only Tracking user calls Login
             PID = client.TrackingUser.Pid;
@@ -72,7 +89,6 @@ namespace QuazalWV
                 .Replace("#PORT#", port.ToString())
                 .Replace("#SERVERID#", serverID.ToString());
         }
-
         public override byte[] ToBuffer()
         {
             MemoryStream m = new MemoryStream();
@@ -93,12 +109,10 @@ namespace QuazalWV
             Helper.WriteString(m, returnMsgServerBuild);
             return m.ToArray();
         }
-
         public override string ToString()
         {
             return "[Authentication Service Login Response]";
         }
-
         public override string PayloadToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -109,7 +123,6 @@ namespace QuazalWV
             sb.AppendLine("\t[Secure Server URL : " + secServerUrl + "]");
             return sb.ToString();
         }
-
         /// <summary>
         /// Returns SecureServerAddress setting defined in 'TTLBackend.exe.config'.
         /// </summary>

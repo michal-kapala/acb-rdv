@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-
+using System.Runtime.InteropServices.Expando;
 namespace QuazalWV
 {
     public class StationUrl
@@ -41,7 +41,6 @@ namespace QuazalWV
         /// Stream type attribute.
         /// </summary>
         public byte Type { get; set; }
-
         /// <summary>
         /// Constructor of ClientInfo
         /// </summary>
@@ -49,10 +48,8 @@ namespace QuazalWV
         {
             Protocol = "prudp";
 
-            // Determine which IP address the client should use (local or public)
-            client.DetermineConnectionAddress();
-            // Set the determined IP as the address
-            Address = client.ResolvedIp ?? client.ep.Address.ToString();
+            // Use the determined public IP of the client
+            Address = client.PublicIp ?? client.ep.Address.ToString();
 
             Port = (ushort)client.ep.Port;
             CID = 1;
@@ -62,7 +59,6 @@ namespace QuazalWV
             Stream = 3;
             Type = 2;
         }
-
         /// <summary>
         /// Parses a PRUDP URL string.
         /// </summary>
@@ -106,9 +102,7 @@ namespace QuazalWV
                         break;
                 }
             }
-
         }
-
         /// <summary>
         /// Builds a prudp URL string.
         /// </summary>
@@ -124,10 +118,8 @@ namespace QuazalWV
             if (RVCID > 0) result += $";RVCID={RVCID}";
             if (Stream > 0) result += $";stream={Stream}";
             if (Type > 0) result += $";type={Type}";
-
             return result;
         }
-
         private string ConsumeProtocol(string url)
         {
             int endIndex = url.IndexOf(":/");
@@ -136,13 +128,11 @@ namespace QuazalWV
             Protocol = url.Substring(0, endIndex);
             return url.Remove(0, Protocol.Length + 2);
         }
-
         private KeyValuePair<string, string> ReadAttr(string attr)
         {
             string[] keyValue = attr.Split('=');
             KeyValuePair<string, string> attribute = new KeyValuePair<string, string>(keyValue[0], keyValue[1]);
             return attribute;
-
         }
     }
 }
