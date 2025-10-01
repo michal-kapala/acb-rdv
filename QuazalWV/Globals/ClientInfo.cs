@@ -56,28 +56,34 @@ namespace QuazalWV
         public bool InGameSession { get; set; } = false;
         public uint AbandonedSessionID { get; set; } = 0;
         public bool AbandoningSession { get; set; } = false;
-        /// <summary>
-        /// Public IP address of the client (determined once)
-        /// </summary>
         public List<PresenceProperty> PresenceProps { get; set; } = new List<PresenceProperty>();
-        public string PublicIp { get; set; }
         /// <summary>
-        /// Public IP initialiazation
+        /// String of the address to communicate between the server and the client (LAN IP or WAN IP)
         /// </summary>
-        public void InitPublicIp()
-        {
-            try
-            {
-                using (var web = new System.Net.WebClient())
+        public string CommunicationIp { get; set; }
+        /// <summary>
+        /// IP initialization of the communication to use
+        /// </summary>
+        public void InitCommunicationIp()
+        {   
+            if (Global.IsPrivate )
+            { 
+                CommunicationIp = ep.Address.ToString();
+            }
+            else
+                try
                 {
-                    PublicIp = web.DownloadString("https://api.ipify.org").Trim();
+                    using (var web = new System.Net.WebClient())
+                    {
+                        // Fetch public IP from external service
+                        CommunicationIp = web.DownloadString("https://api.ipify.org").Trim();
+                    }
                 }
-            }
-            catch
-            {
-                // Fallback to local IP if public is not reachable
-                PublicIp = ep.Address.ToString();
-            }
+                catch
+                {
+                    // Fallback to local IP if public is not reachable
+                    CommunicationIp = ep.Address.ToString();
+                }
         }
     }
 }

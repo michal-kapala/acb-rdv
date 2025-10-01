@@ -48,8 +48,8 @@ namespace QuazalWV
         {
             Protocol = "prudp";
 
-            // Use the determined public IP of the client
-            Address = client.PublicIp ?? client.ep.Address.ToString();
+            // Use the determined communication IP of the client
+            Address = client.CommunicationIp ?? client.ep.Address.ToString();
 
             Port = (ushort)client.ep.Port;
             CID = 1;

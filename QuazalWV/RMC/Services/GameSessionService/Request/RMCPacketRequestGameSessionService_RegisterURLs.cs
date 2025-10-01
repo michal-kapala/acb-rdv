@@ -16,10 +16,10 @@ namespace QuazalWV
                 // Create StationUrl of the string
                 var url = new StationUrl(b);
 
-                // Check if the IP is local (private IP ranges)
-                if (IsLocalIp(url.Address))
+                // Double check if the IP is local (private, loopback, or link-local)
+                if (Global.CheckIfPrivate(url.Address) & !Global.IsPrivate)
                 {
-                    // Replace with the UDP endpoint IP of the client (public IP / NAT IP)
+                    // Replace with the public UDP endpoint IP of the client (else just use the local UDP endpoint IP)
                     url.Address = client.ep.Address.ToString();
                 }
 
@@ -27,22 +27,6 @@ namespace QuazalWV
 
                 Log.WriteRmcLine(1, $"RegisterURLs - host URL: {url}", RMCP.PROTOCOL.GameSession, LogSource.RMC);
             }
-        }
-
-        private bool IsLocalIp(string ip)
-        {
-            return ip.StartsWith("192.168.") || ip.StartsWith("10.") ||
-                   (ip.StartsWith("172.") && IsInRange172(ip));
-        }
-
-        private bool IsInRange172(string ip)
-        {
-            // 172.16.0.0 – 172.31.255.255
-            string[] parts = ip.Split('.');
-            if (parts.Length != 4) return false;
-            if (int.TryParse(parts[1], out int secondOctet))
-                return secondOctet >= 16 && secondOctet <= 31;
-            return false;
         }
 
         public override string ToString()

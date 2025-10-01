@@ -13,6 +13,7 @@ namespace QuazalWV
         public static readonly byte[] Rc4KeyP2p = Helper.P2pKey();
         private static string _serverBindAddressConfig = ConfigurationManager.AppSettings["SecureServerAddress"];
         public static string ServerBindAddress { get; private set; }
+        public static bool IsPrivate { get; private set; }
         public static uint IdCounter { get; set; } = 0x12345678;
         public static uint PidCounter { get; set; } = 0x1234;
         public static uint GathIdCounter { get; set; } = 0x34;
@@ -26,15 +27,24 @@ namespace QuazalWV
             try
             {
                 ServerBindAddress = ResolveAddress(_serverBindAddressConfig);
-            }
+                IsPrivate = CheckIfPrivate(ServerBindAddress);
+                if (IsPrivate)
+                {
+                    WriteHostLog(1, $"ACB Server is PRIVATE and running on LAN.", Color.DarkOrange);
+                }
+                else
+                {
+                    WriteHostLog(1, $"ACB Server is PUBLIC and running on WAN.", Color.DarkCyan);
+                }
+            }   
             catch (ConfigurationErrorsException ex)
-            {
-                ShowConfigError(ex);
-            }
-            catch (Exception ex)
-            {
-                ShowGeneralError(ex);
-            }
+                {
+                    ShowConfigError(ex);
+                }
+                catch (Exception ex)
+                {
+                    ShowGeneralError(ex);
+                }
         }
 
         // Resolves an IP or hostname to an IPv4 string for server binding
@@ -63,7 +73,7 @@ namespace QuazalWV
                         throw new ConfigurationErrorsException("The IP address '0.0.0.0' is not supported. Please specify a different IPv4 address.");
                     }
 
-                    WriteHostLog(1, $"SecureServerAddress is a valid IPv4: '{addressOrHost}'");
+                    WriteHostLog(1, $"SecureServerAddress is a valid IPv4: '{addressOrHost}'", Color.Blue);
                     return addressOrHost;
                 }
             }
@@ -81,7 +91,7 @@ namespace QuazalWV
                             throw new ConfigurationErrorsException("The resolved IP '0.0.0.0' is not supported. Please configure a different IPv4 address.");
                         }
 
-                        WriteHostLog(1, $"Hostname '{addressOrHost}' resolved to IPv4 '{resolvedIp}'");
+                        WriteHostLog(1, $"Hostname '{addressOrHost}' resolved to IPv4 '{resolvedIp}'", Color.Blue);
                         return resolvedIp.ToString();
                     }
                 }
@@ -91,6 +101,36 @@ namespace QuazalWV
             {
                 throw new ConfigurationErrorsException($"Failed to resolve hostname '{addressOrHost}': {ex.Message}");
             }
+        }
+
+        // Check if IP is private/local
+        public static bool CheckIfPrivate(string ipString)
+        {
+            if (IPAddress.TryParse(ipString, out IPAddress ip))
+            {
+                byte[] bytes = ip.GetAddressBytes();
+
+                // 10.0.0.0/8
+                if (bytes[0] == 10)
+                    return true;
+
+                // 172.16.0.0 – 172.31.255.255
+                if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31)
+                    return true;
+
+                // 192.168.0.0/16
+                if (bytes[0] == 192 && bytes[1] == 168)
+                    return true;
+
+                // Loopback 127.0.0.0/8
+                if (bytes[0] == 127)
+                    return true;
+
+                // Link-local 169.254.0.0/16
+                if (bytes[0] == 169 && bytes[1] == 254)
+                    return true;
+            }
+            return false;
         }
 
         public static ClientInfo GetClientByEndPoint(IPEndPoint ep)
@@ -117,9 +157,9 @@ namespace QuazalWV
             Log.WriteLine(priority, content, LogSource.Global, Color.Orange);
         }
 
-        private static void WriteHostLog(int priority, string content)
+        private static void WriteHostLog(int priority, string content, Color color)
         {
-            Log.WriteLine(priority, content, LogSource.Global, Color.Blue);
+            Log.WriteLine(priority, content, LogSource.Global, color);
         }
 
         internal static void RemoveSessionsOnLogin(ClientInfo client)
