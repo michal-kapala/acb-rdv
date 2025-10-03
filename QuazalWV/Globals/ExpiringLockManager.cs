@@ -42,14 +42,13 @@ namespace QuazalWV
                     if (client != null)
                     {
                         try
-                        { Log.WriteLine(1, $"TIMEOUT", LogSource.PRUDP, Color.Gray, client);
+                        { 
+                            Log.WriteLine(1, $"TIMEOUT", LogSource.PRUDP, Color.Gray, client);
                             var rels = DbHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
-                            uint friendPid;
-                            ClientInfo friend;
                             foreach (var relationship in rels)
                             {
-                                friendPid = relationship.RequesterPid == client.User.Pid ? relationship.RequesteePid : relationship.RequesterPid;
-                                friend = Global.Clients.Find(c => c.User.Pid == friendPid);
+                                uint friendPid = relationship.RequesterPid == client.User.Pid ? relationship.RequesteePid : relationship.RequesterPid;
+                                ClientInfo friend = Global.Clients.Find(c => c.User.Pid == friendPid);
                                 if (friend != null)
                                     NotificationManager.FriendStatusChanged(friend, client.User.Pid, client.User.Name, false);
                             }
