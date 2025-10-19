@@ -38,6 +38,8 @@ namespace QuazalWV
             switch (rmc.methodID)
             {
                 case 2:
+                    var reqSendStats = (RMCPacketRequestHermesPlayerStatisticsService_SendPlayerStats)rmc.request;
+                    Log.WriteRmcLine(1, $"PlayerStats: {reqSendStats.PayloadToString()}", protocol, LogSource.RMC, Color.Black, client);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

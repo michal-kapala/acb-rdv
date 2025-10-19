@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace QuazalWV
 {
@@ -8,7 +9,11 @@ namespace QuazalWV
 
         public RMCPacketRequestHermesPlayerStatisticsService_SendPlayerStats(Stream s)
         {
-            this.s = s;
+            UInt32 count = Helper.ReadU32(s);
+            for (int i = 0; i < count; i++)
+            {
+                PlayerStatistic playerStats = new PlayerStatistic(s);
+            }
         }
         public override string PayloadToString()
         {

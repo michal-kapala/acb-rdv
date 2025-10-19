@@ -2,7 +2,39 @@
 
 namespace QuazalWV
 {
-	public class PlayerStatisticValues : IData
+    public enum PlayerStatValue
+    {
+        ExperiencePointsX1AndTimeX2 = 1,
+        AllTimeScoreX2 = 2,
+        Unk3 = 3,
+        BestSessionScore = 4,
+        SessionsPlayedX2 = 5,
+        CurrentTemplarScore = 6,
+        Unk7 = 7,
+        Unk8 = 8,
+        SessionsWonX2 = 9,
+        AllTimeWonPlayedRatioDiv50 = 10,
+        KillScoreX2 = 11,
+        AllTimeKillDeathRatioDiv50 = 12,
+        AllTimeKillsX2 = 13,
+        AllTimeDeathsX2 = 14,
+        BestKillDeathRatioDiv100 = 15,
+        AverageKillsPerSessionX2 = 16,
+        AllTimeStunsX2 = 17,
+        AllTimeStunsInARowX2 = 18,
+        MaxStunsInARow = 19,
+        MaxKillStreak = 20,
+        Unk21 = 21,
+        Unk22 = 22,
+        AllTimeChasesAndEscapesWonX2 = 23,
+        AllTimeChasesAndEscapesTriggeredX2 = 24,
+        Unk25 = 25,
+        EscapesWonX2 = 26,
+        EscapesTriggeredX2 = 27,
+        Unk28 = 28
+    }
+
+    public class PlayerStatisticValues : IData
 	{
 		public uint UnkInt { get; set; }
 		public ulong UnkLong1 { get; set; }
@@ -41,5 +73,11 @@ namespace QuazalWV
 			Helper.WriteString(s, UnkStr);
 			Helper.WriteU8(s, UnkByte);
 		}
-	}
+
+        public override string ToString()
+        {
+            return $"UnkInt: {UnkInt}, UnkLong1: {UnkLong1}, UnkLong2: {UnkLong2}, UnkStr: \"{UnkStr}\", UnkByte: {UnkByte}";
+        }
+
+    }
 }
