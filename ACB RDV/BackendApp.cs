@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Windows.Forms;
 using QuazalWV;
 
@@ -13,6 +14,26 @@ namespace AcbRdv
             Log.box = richTextBox1;
             DbHelper.Init();
             toolStripComboBox1.SelectedIndex = 0;
+            // Register the Load event handler
+            this.Load += BackendApp_Load;
+        }
+
+        private void BackendApp_Load(object sender, EventArgs e)
+        {
+            // Parse the autostart value from App.config
+            bool autostart = false;
+            string autostartStr = ConfigurationManager.AppSettings["Autostart"];
+            if (!string.IsNullOrEmpty(autostartStr))
+            {
+                bool.TryParse(autostartStr, out autostart);
+            }
+
+            // If autostart is enabled, start the servers after the form has loaded
+            if (autostart)
+            {
+                // Call the button click handler to start services
+                toolStripButton1_Click(this, EventArgs.Empty);
+            }
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e)

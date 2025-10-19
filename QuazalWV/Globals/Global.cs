@@ -30,11 +30,11 @@ namespace QuazalWV
                 IsPrivate = CheckIfPrivate(ServerBindAddress);
                 if (IsPrivate)
                 {
-                    WriteHostLog(1, $"ACB Server is PRIVATE and running on LAN.", Color.DarkOrange);
+                    WriteHostLog(1, $"ACB Server is PRIVATE. Clients will communicate via LAN.", Color.DarkOrange);
                 }
                 else
                 {
-                    WriteHostLog(1, $"ACB Server is PUBLIC and running on WAN.", Color.DarkCyan);
+                    WriteHostLog(1, $"ACB Server is PUBLIC. Clients will communicate via WAN.", Color.DarkCyan);
                 }
             }   
             catch (ConfigurationErrorsException ex)
@@ -151,7 +151,7 @@ namespace QuazalWV
             return null;
         }
 
-        // Logging helpers
+        #region Logging helpers
         private static void WriteLog(int priority, string content)
         {
             Log.WriteLine(priority, content, LogSource.Global, Color.Orange);
@@ -162,6 +162,7 @@ namespace QuazalWV
             Log.WriteLine(priority, content, LogSource.Global, color);
         }
 
+        #endregion
         internal static void RemoveSessionsOnLogin(ClientInfo client)
         {
             client.RegisteredUrls.Clear();
@@ -169,9 +170,7 @@ namespace QuazalWV
             Sessions.RemoveAll(s => s.HostPid == client.User.Pid);
         }
 
-        // ----------------------
-        // Error display helpers
-        // ----------------------
+        #region Error display helpers
         private static void ShowConfigError(ConfigurationErrorsException ex)
         {
             MessageBox.Show(
@@ -193,5 +192,6 @@ namespace QuazalWV
             );
             Environment.Exit(1);
         }
+        #endregion
     }
 }

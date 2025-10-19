@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Runtime.InteropServices.Expando;
 namespace QuazalWV
 {
     public class StationUrl
@@ -48,8 +47,7 @@ namespace QuazalWV
         {
             Protocol = "prudp";
 
-            // Use the determined communication IP of the client
-            Address = client.CommunicationIp ?? client.ep.Address.ToString();
+            Address = client.ep.Address.ToString();
 
             Port = (ushort)client.ep.Port;
             CID = 1;

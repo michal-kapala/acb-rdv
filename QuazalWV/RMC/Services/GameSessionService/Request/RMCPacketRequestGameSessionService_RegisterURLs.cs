@@ -16,12 +16,7 @@ namespace QuazalWV
                 // Create StationUrl of the string
                 var url = new StationUrl(b);
 
-                // Double check if the IP is local (private, loopback, or link-local)
-                if (Global.CheckIfPrivate(url.Address) & !Global.IsPrivate)
-                {
-                    // Replace with the public UDP endpoint IP of the client (else just use the local UDP endpoint IP)
-                    url.Address = client.ep.Address.ToString();
-                }
+                url.Address = client.ep.Address.ToString();
 
                 Urls.Add(url);
 

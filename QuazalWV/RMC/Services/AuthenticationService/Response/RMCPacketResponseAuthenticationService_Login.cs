@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Runtime.InteropServices.Expando;
 using System.Text;
 namespace QuazalWV
 {
@@ -37,27 +36,7 @@ namespace QuazalWV
         {
             resultCode = 0x10001;
 
-            if (Global.IsPrivate)
-            {
-                // Use local IP for the private server
-                address = GetConfigAddress();
-            }
-            else
-            {
-                try
-                {
-                    // Get public IP of external service
-                    using (var web = new System.Net.WebClient())
-                    {
-                        address = web.DownloadString("https://api.ipify.org").Trim();
-                    }
-                }
-                catch
-                {
-                    // Fallback to config IP if the request fails
-                    address = GetConfigAddress();
-                }
-            }
+            address = GetConfigAddress();
 
             // Only Tracking user calls Login
             PID = client.TrackingUser.Pid;
