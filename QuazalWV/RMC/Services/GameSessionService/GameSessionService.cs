@@ -56,7 +56,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestGameSessionService_CancelInvitation(s);
                     break;
                 case 21:
-                    rmc.request = new RMCPacketRequestGameSessionService_RegisterURLs(s);
+                    rmc.request = new RMCPacketRequestGameSessionService_RegisterURLs(s, client);
                     break;
                 case 23:
                     rmc.request = new RMCPacketRequestGameSessionService_AbandonSession(s);
@@ -78,6 +78,23 @@ namespace QuazalWV
             {
                 case 1:
                     var reqCreateSes = (RMCPacketRequestGameSessionService_CreateSession)rmc.request;
+                    // Check if private sessions are allowed (excluding intro sessions)
+                    var gameModeProp = reqCreateSes.Session.Attributes.Find(param => param.Id == (uint)SessionParam.GameMode);
+                    var gameTypeProp = reqCreateSes.Session.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
+                    if ((GameMode)gameModeProp.Value != GameMode.Intro && (GameType)gameTypeProp.Value == GameType.PRIVATE && !Global.AllowPrivateSessions)
+                    {
+                        Log.WriteLine(1, $"Private sessions are permitted - creation denied for client {client.User.Pid}", LogSource.Session, Color.OrangeRed, client);
+                        reply = new RMCPResponseEmpty();
+                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_Unknown);
+                        break;
+                    }
+                    // Check if the client already has a session and remove it
+                    var oldSession = Global.Sessions.FirstOrDefault(s => s.HostPid == client.User.Pid);
+                    if (oldSession != null)
+                    {
+                        Log.WriteLine(1, $"Removing old session {oldSession.Key.SessionId} for host {client.User.Pid}", LogSource.Session, Color.Orange);
+                        Global.Sessions.Remove(oldSession);
+                    }
                     sesId = Global.NextGameSessionId++;
                     client.GameSessionID = sesId;
                     newSes = new Session(sesId, reqCreateSes.Session, client);
@@ -104,17 +121,33 @@ namespace QuazalWV
                     var reqUpdateSes = (RMCPacketRequestGameSessionService_UpdateSession)rmc.request;
                     newSes = Global.Sessions.Find(session => session.Key.SessionId == reqUpdateSes.SessionUpdate.Key.SessionId);
                     if (newSes == null)
-                        Log.WriteRmcLine(1, $"Update for deleted session {reqUpdateSes.SessionUpdate.Key.SessionId}", protocol, LogSource.RMC, Color.Red, client);
-                    foreach (var newParam in reqUpdateSes.SessionUpdate.Attributes)
                     {
-                        var existing = newSes.GameSession.Attributes.FirstOrDefault(attr => attr.Id == newParam.Id);
-                        if (existing != null)
-                            existing.Value = newParam.Value;
-                        else
-                            newSes.GameSession.Attributes.Add(newParam);
+                        Log.WriteRmcLine(1,
+                            $"UpdateSession requested for deleted/non-existent session {reqUpdateSes.SessionUpdate.Key.SessionId}", protocol, LogSource.RMC, Color.Red, client);
+                        reply = new RMCPResponseEmpty();
+                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_InvalidSessionKey);
+                        break;
                     }
-                    reply = new RMCPResponseEmpty();
-                    RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    try
+                    {
+                        foreach (var newParam in reqUpdateSes.SessionUpdate.Attributes)
+                        {
+                            var existing = newSes.GameSession.Attributes.FirstOrDefault(attr => attr.Id == newParam.Id);
+                            if (existing != null)
+                                existing.Value = newParam.Value;
+                            else
+                                newSes.GameSession.Attributes.Add(newParam);
+                        }
+                        reply = new RMCPResponseEmpty();
+                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteRmcLine(1, $"UpdateSession exception: {ex}", protocol, LogSource.RMC, Color.Red, client);
+
+                        reply = new RMCPResponseEmpty();
+                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_Unknown);
+                    }
                     break;
                 case 4:
                     var reqMigrate = (RMCPacketRequestGameSessionService_MigrateSession)rmc.request;
@@ -130,7 +163,16 @@ namespace QuazalWV
                         }
                         else
                         {
+                            // Mark session as migrating
                             migrateFromSes.Migrating = true;
+
+                            // Set client to the session immediately
+                            client.GameSessionID = migrateFromSes.Key.SessionId;
+                            client.InGameSession = true;
+
+                            // If this client becomes the new host, update HostPid
+                            migrateFromSes.HostPid = client.User.Pid;
+
                             reply = new RMCPacketResponseGameSessionService_MigrateSession(reqMigrate.Key);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                         }
@@ -146,6 +188,8 @@ namespace QuazalWV
                     reply = new RMCPResponseEmpty();
                     client.GameSessionID = 0;
                     client.InGameSession = false;
+                    client.PreSessionSearchCount = 0;
+                    client.PlayNowQuery = false;
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 6:
@@ -194,6 +238,10 @@ namespace QuazalWV
                     break;
                 case 7:
                     var reqSearchSes = (RMCPacketRequestGameSessionService_SearchSessions)rmc.request;
+                    if (!client.InGameSession)
+                        client.PreSessionSearchCount++;
+                    if (client.PreSessionSearchCount > 2)
+                        client.PlayNowQuery = true;
                     Log.WriteRmcLine(2, $"SearchSessions query: {reqSearchSes.Query}", protocol, LogSource.RMC, Color.Green, client);
                     reply = new RMCPacketResponseGameSessionService_SearchSessions(reqSearchSes.Query, client);
                     Log.WriteRmcLine(2, $"SearchSessions results: {((RMCPacketResponseGameSessionService_SearchSessions)reply).Results.Count}", protocol, LogSource.RMC, Color.Green, client);
@@ -295,35 +343,54 @@ namespace QuazalWV
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 21:
-                    var reqRegUrls = (RMCPacketRequestGameSessionService_RegisterURLs)rmc.request;
-                    reply = new RMCPResponseEmpty();
-                    if (client.GameSessionID == 0)
                     {
-                        Log.WriteRmcLine(1, $"RegisterURLs: {client.User.Name} is not in a session", protocol, LogSource.RMC, Color.Red, client);
-                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_PlayerIsNotSessionParticipant);
-                    }
-                    else
-                    {
-                        var ses = Global.Sessions.Find(s => s.Key.SessionId == client.GameSessionID);
-                        if (ses == null)
+                        var reqRegUrls = (RMCPacketRequestGameSessionService_RegisterURLs)rmc.request;
+                        reply = new RMCPResponseEmpty();
+
+                        if (client.GameSessionID == 0)
                         {
-                            Log.WriteRmcLine(1, $"RegisterURLs: session {client.GameSessionID} was deleted", protocol, LogSource.RMC, Color.Red, client);
-                            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_Unknown);
+                            Log.WriteRmcLine(1, $"RegisterURLs: {client.User.Name} is not in a session", protocol, LogSource.RMC, Color.Red, client);
+                            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_PlayerIsNotSessionParticipant);
                         }
                         else
                         {
-                            var newHostPid = reqRegUrls.Urls.First().PID;
-                            ses.HostPid = newHostPid;
-                            reqRegUrls.RegisterUrls(client, ses);
-                            if (ses.Migrating)
+                            var ses = Global.Sessions.Find(s => s.Key.SessionId == client.GameSessionID);
+                            if (ses == null)
                             {
-                                Log.WriteRmcLine(1, $"RegisterURLs: Host migration for session {ses.Key.SessionId}, new host {newHostPid}", protocol, LogSource.RMC, Color.Blue, client);
-                                ses.Migrating = false;
+                                Log.WriteRmcLine(1, $"RegisterURLs: session {client.GameSessionID} was deleted", protocol, LogSource.RMC, Color.Red, client);
+                                client.GameSessionID = 0;
+                                client.InGameSession = false;
+                                RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_Unknown);
                             }
-                            RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                            else
+                            {
+                                // Original host PID
+                                var newHostPid = reqRegUrls.Urls.First().PID;
+                                ses.HostPid = newHostPid;
+
+                                // For WAN communication add a separate NAT URL
+                                if (!Global.IsPrivate)
+                                {
+                                    var NATUrl = new StationUrl(client);
+                                    NATUrl.Address = client.ep.Address.ToString();
+                                    reqRegUrls.Urls.Add(NATUrl);
+                                    Log.WriteRmcLine(1, $"RegisterURLs - NAT URL added: {NATUrl}", protocol, LogSource.RMC, Color.Brown, client);
+                                }
+
+                                // Register URLs
+                                reqRegUrls.RegisterUrls(client, ses);
+
+                                if (ses.Migrating)
+                                {
+                                    Log.WriteRmcLine(1, $"RegisterURLs: Host migration for session {ses.Key.SessionId}, new host {newHostPid}", protocol, LogSource.RMC, Color.Blue, client);
+                                    ses.Migrating = false;
+                                }
+
+                                RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
+                            }
                         }
+                        break;
                     }
-                    break;
                 case 23:
                     var reqAbandon = (RMCPacketRequestGameSessionService_AbandonSession)rmc.request;
                     Session abandonedSes;

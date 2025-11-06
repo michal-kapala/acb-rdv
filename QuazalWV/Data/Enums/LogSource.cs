@@ -16,6 +16,7 @@
         PresenceProperty,
         PresenceParser,
         PresenceSerializer,
+        BackendApp,
         Undefined
     }
 }

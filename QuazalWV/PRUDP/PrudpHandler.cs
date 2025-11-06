@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Drawing;
+using System.Linq;
 
 namespace QuazalWV
 {
@@ -198,6 +199,18 @@ namespace QuazalWV
                                     friend = Global.Clients.Find(c => c.User.Pid == friendPid);
                                     if (friend != null)
                                         NotificationManager.FriendStatusChanged(friend, client.User.Pid, client.User.Name, false);
+                                }
+                                // Remove the client's PID from all sessions
+                                foreach (var session in Global.Sessions.ToList())
+                                {
+                                    session.PublicPids.RemoveAll(pid => pid == client.User.Pid);
+                                    session.PrivatePids.RemoveAll(pid => pid == client.User.Pid);
+                                    // If no participants remain, delete the session
+                                    if (session.NbParticipants() == 0)
+                                    {
+                                        Global.Sessions.Remove(session);
+                                        Log.WriteLine(1, $"Session {session.Key.SessionId} deleted due to DISCONNECT from player {client.User.Pid}", LogSource.PRUDP, Color.Gray, client);
+                                    }
                                 }
                                 Global.Clients.Remove(client);
                                 Log.WriteLine(1, "DISCONNECT", LogSource.PRUDP, Color.Gray, client);

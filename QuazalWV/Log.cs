@@ -20,6 +20,37 @@ namespace QuazalWV
         public static List<byte[]> logPackets = new List<byte[]>();
         public static bool enablePacketLogging = true;
 
+        // GUI limit:
+        public static int LogLimit = 0; // default: unlimited
+
+        private class GuiLogEntry
+        {
+            public string Text;
+            public Color Color;
+
+            public GuiLogEntry(string text, Color color)
+            {
+                Text = text;
+                Color = color;
+            }
+        }
+
+        private static List<GuiLogEntry> guiLogEntries = new List<GuiLogEntry>();
+
+        static Log()
+        {
+            try
+            {
+                string val = System.Configuration.ConfigurationManager.AppSettings["LogLimit"];
+                if (!string.IsNullOrEmpty(val) && bool.TryParse(val, out bool mode))
+                    LogLimit = 200;
+            }
+            catch
+            {
+                LogLimit = 0;
+            }
+        }
+
         public static void ClearLog()
         {
             if (File.Exists(logFileName))
@@ -30,6 +61,16 @@ namespace QuazalWV
             {
                 logBuffer = new StringBuilder();
                 logPackets = new List<byte[]>();
+            }
+
+            lock (guiLogEntries)
+            {
+                guiLogEntries.Clear();
+            }
+
+            if (box != null)
+            {
+                box.Invoke(new Action(() => box.Clear()));
             }
         }
 
@@ -56,12 +97,26 @@ namespace QuazalWV
                             c = Color.Black;
                         if (content.ToLower().Contains("error"))
                             c = Color.Red;
-                        box.SelectionStart = box.TextLength;
-                        box.SelectionLength = 0;
-                        box.SelectionColor = c;
-                        box.AppendText(line + content + "\n");
-                        box.SelectionColor = box.ForeColor;
-                        box.ScrollToCaret();                        
+                        lock (guiLogEntries)
+                        {
+                            GuiLogEntry newEntry = new GuiLogEntry(line + content, c);
+                            guiLogEntries.Add(newEntry);
+
+                            // Append only the new entry
+                            box.SelectionStart = box.TextLength;
+                            box.SelectionLength = 0;
+                            box.SelectionColor = newEntry.Color;
+                            box.AppendText(newEntry.Text + "\n");
+                            box.SelectionColor = box.ForeColor;
+                            box.ScrollToCaret();
+
+                            // If log limit is exceeded, clear the log
+                            if (LogLimit > 0 && guiLogEntries.Count > LogLimit)
+                            {
+                                guiLogEntries.Clear();
+                                box.Invoke(new Action(() => box.Clear()));
+                            }
+                        }
                     }
                     lock (_sync)
                     {
@@ -94,12 +149,26 @@ namespace QuazalWV
                             c = Color.Black;
                         if (content.ToLower().Contains("error"))
                             c = Color.Red;
-                        box.SelectionStart = box.TextLength;
-                        box.SelectionLength = 0;
-                        box.SelectionColor = c;
-                        box.AppendText(line + content + "\n");
-                        box.SelectionColor = box.ForeColor;
-                        box.ScrollToCaret();
+                        lock (guiLogEntries)
+                        {
+                            GuiLogEntry newEntry = new GuiLogEntry(line + content, c);
+                            guiLogEntries.Add(newEntry);
+
+                            // Append only the new entry
+                            box.SelectionStart = box.TextLength;
+                            box.SelectionLength = 0;
+                            box.SelectionColor = newEntry.Color;
+                            box.AppendText(newEntry.Text + "\n");
+                            box.SelectionColor = box.ForeColor;
+                            box.ScrollToCaret();
+
+                            // Remove old entries if limit is exceeded
+                            if (LogLimit > 0 && guiLogEntries.Count > LogLimit)
+                            {
+                                guiLogEntries.Clear();
+                                box.Invoke(new Action(() => box.Clear()));
+                            }
+                        }
                     }
                     lock (_sync)
                     {

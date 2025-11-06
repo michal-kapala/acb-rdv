@@ -36,7 +36,7 @@ namespace AcbRdv
 
         public static void tMainThread(object obj)
         {
-            listener = new TcpListener(IPAddress.Parse(ip), listenPort);
+            listener = new TcpListener(IPAddress.Any, listenPort);
             listener.Start();
             Log.WriteLine(1, "Server started", LogSource.OnlineConfigSvc);
             while (true)
@@ -130,10 +130,24 @@ namespace AcbRdv
 
         private static void Send(NetworkStream ns, StringBuilder sb)
         {
-            byte[] buff = Encoding.ASCII.GetBytes(sb.ToString());
-            ns.Write(buff, 0, buff.Length);
-            ns.Flush();
-            ns.Close();
+            try
+            {
+                byte[] buff = Encoding.ASCII.GetBytes(sb.ToString());
+                ns.Write(buff, 0, buff.Length);
+                ns.Flush();
+            }
+            catch (IOException ex)
+            {
+                Log.WriteLine(1, $"IOException when sending to client: {ex.Message}", LogSource.OnlineConfigSvc, Color.Red);
+            }
+            catch (SocketException ex)
+            {
+                Log.WriteLine(1, $"SocketException when sending to client: {ex.Message}", LogSource.OnlineConfigSvc, Color.Red);
+            }
+            finally
+            {
+                try { ns?.Close(); } catch { }
+            }
         }
 
         private static Dictionary<string, string> responseData = new Dictionary<string, string>()

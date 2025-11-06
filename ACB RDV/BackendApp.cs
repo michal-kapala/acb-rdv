@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Configuration;
 using System.Windows.Forms;
 using QuazalWV;
+using System.Drawing;
 
 namespace AcbRdv
 {
@@ -13,6 +15,26 @@ namespace AcbRdv
             Log.box = richTextBox1;
             DbHelper.Init();
             toolStripComboBox1.SelectedIndex = 0;
+            // Register the Load event handler
+            this.Load += BackendApp_Load;
+        }
+
+        private void BackendApp_Load(object sender, EventArgs e)
+        {
+            // Parse the autostart value from App.config
+            bool autostart = false;
+            string autostartStr = ConfigurationManager.AppSettings["Autostart"];
+            if (!string.IsNullOrEmpty(autostartStr))
+            {
+                bool.TryParse(autostartStr, out autostart);
+            }
+
+            // If autostart is enabled, start the servers after the form has loaded
+            if (autostart)
+            {
+                // Call the button click handler to start services
+                toolStripButton1_Click(this, EventArgs.Empty);
+            }
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e)
@@ -100,6 +122,40 @@ namespace AcbRdv
         private void toolStripButton9_Click(object sender, EventArgs e)
         {
             Log.enablePacketLogging = toolStripButton9.Checked;
+        }
+
+        private void toolStripButton10_Click(object sender, EventArgs e)
+        {
+            var sessions = Global.Sessions;
+            if (sessions.Count == 0)
+            {
+                WriteLog(1, "No active sessions found.", Color.Gray);
+                return;
+            }
+            WriteLog(1, $"Active sessions ({sessions.Count}):", Color.Black);
+            foreach (var session in sessions)
+            {
+                WriteLog(1, session.ToString(), Color.DarkBlue);
+            }
+        }
+
+        private void toolStripButton11_Click(object sender, EventArgs e)
+        {
+            if (Global.AllowPrivateSessions)
+            {
+                Global.AllowPrivateSessions = false;
+                WriteLog(1, "Private sessions are now PERMITTED.", Color.OrangeRed);
+            }
+            else
+            {
+                Global.AllowPrivateSessions = true;
+                WriteLog(1, "Private sessions are now ALLOWED.", Color.Gray);
+            }
+        }
+
+        private static void WriteLog(int priority, string content, Color color)
+        {
+            Log.WriteLine(priority, content, LogSource.BackendApp, color);
         }
     }
 }

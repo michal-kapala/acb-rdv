@@ -1,22 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
+using System.Threading.Tasks;
 namespace QuazalWV
 {
     public class RMCPacketRequestGameSessionService_RegisterURLs : RMCPRequest
     {
-        public List<StationUrl> Urls {  get; set; }
-
-        public RMCPacketRequestGameSessionService_RegisterURLs(Stream s)
+        public List<StationUrl> Urls { get; set; }
+        public RMCPacketRequestGameSessionService_RegisterURLs(Stream s, ClientInfo client)
         {
             Urls = new List<StationUrl>();
             uint count = Helper.ReadU32(s);
             for (uint i = 0; i < count; i++)
             {
                 string b = Helper.ReadString(s);
-                Urls.Add(new StationUrl(b));
-                Log.WriteRmcLine(1, $"RegisterURLs - host URL: {b}", RMCP.PROTOCOL.GameSession, LogSource.RMC);
+                // Create StationUrl of the string
+                var url = new StationUrl(b);
+
+                url.Address = client.ep.Address.ToString();
+
+                Urls.Add(url);
+            }
+            // Log all URLs asynchronously in one go (reduces I/O blocking)
+            if (Urls.Count > 0)
+            {
+                Task.Run(() =>
+                {
+                    Log.WriteRmcLine(1, $"RegisterURLs - host URLs:\n{string.Join("\n", Urls)}", RMCP.PROTOCOL.GameSession, LogSource.RMC);
+                });
             }
         }
 
@@ -24,7 +35,6 @@ namespace QuazalWV
         {
             return "[RegisterURLs Request]";
         }
-
         public override string PayloadToString()
         {
             var sb = new StringBuilder();

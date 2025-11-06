@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -55,6 +56,12 @@ namespace QuazalWV
 
         public static void HandleRequest(ClientInfo client, PrudpPacket p, RMCP rmc)
         {
+            if (client.User == null && rmc.proto != RMCP.PROTOCOL.Authentication)
+            {
+                Log.WriteLine(1, $"Dropped Request from NULL client : [RMC Packet : Proto = {rmc.proto} CallID={rmc.callID} MethodID={rmc.methodID}]", LogSource.RMC, Color.Red, client);
+                SendACK(client.udp, p, client); // Send ACK, to prevent connection issues
+                return;
+            }
             ProcessRequest(client, p, rmc);
             if (rmc.callID > client.callCounterRMC)
                 client.callCounterRMC = rmc.callID;

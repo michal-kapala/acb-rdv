@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Linq;
 
 namespace QuazalWV
 {
@@ -58,13 +59,6 @@ namespace QuazalWV
                 return false;
             }
 
-            // ignore queries with level limits or without slots
-            if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
-            {
-                Log.WriteLine(1, $"Session ignored due to level ranges/lack of slots", LogSource.Session, Color.Gray, client);
-                return false;
-            }
-
             var gameMode = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameMode);
             var gameType = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
 
@@ -77,8 +71,16 @@ namespace QuazalWV
             // game mode/type mismatch
             if (gameMode.Value != qGameMode.Value || gameType.Value != qGameType.Value)
             {
-                Log.WriteLine(1, $"Session ignored due to game mode/type mismatch", LogSource.Session, Color.Gray, client);
-                return false;
+                // allow cross game mode joining for `PLAY NOW` matchmaking
+                if (client.PlayNowQuery && gameType.Value == qGameType.Value)
+                {
+                    Log.WriteLine(1, $"PLAY NOW query: allowing cross game mode session", LogSource.Session, Color.Orange, client);
+                }
+                else
+                {
+                    Log.WriteLine(1, $"Session ignored due to game mode/type mismatch", LogSource.Session, Color.Gray, client);
+                    return false;
+                }
             }
 
             uint slotsParam = gameType.Value == (uint)GameType.PRIVATE ? (uint)SessionParam.CurrentPrivateSlots : (uint)SessionParam.CurrentPublicSlots;
@@ -88,7 +90,42 @@ namespace QuazalWV
                 Log.WriteLine(1, $"Inconsistent session state (id={Key.SessionId}), missing current slots", LogSource.Session, Color.Red, client);
                 return false;
             }
-            
+
+            // Handle level range and slot parameter cases
+            if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
+            {
+                // First matchmaking case — QueryMaxSlotsTaken is missing
+                if (qMaxSlotsTaken == null)
+                {
+                    // Check if the client already has a session and remove it
+                    var oldSession = Global.Sessions.FirstOrDefault(s => s.HostPid == client.User.Pid);
+                    if (oldSession != null)
+                    {
+                        Log.WriteLine(1, $"Removing old session {oldSession.Key.SessionId} for host {client.User.Pid}", LogSource.Session, Color.Orange);
+                        Global.Sessions.Remove(oldSession);
+                    }
+
+                    uint maxSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.MaxPublicSlots)?.Value ?? 0;
+                    uint currSlots = currentSlots.Value;
+
+                    // Ensure there is room and all critical parameters match
+                    if (currSlots < maxSlots)
+                    {
+                        Log.WriteLine(1, $"First matchmaking query: allowed joining session {Key.SessionId}", LogSource.Session, Color.Orange, client);
+                        client.GameSessionID = Key.SessionId;
+                        client.InGameSession = true;
+                        return true;
+                    }
+
+                    Log.WriteLine(1, $"First matchmaking query: denied session {Key.SessionId} is full", LogSource.Session, Color.Gray, client);
+                    return false;
+                }
+
+                // Level range invalid → reject query
+                Log.WriteLine(1, $"Session ignored due to level range restriction", LogSource.Session, Color.Gray, client);
+                return false;
+            }
+
             if (qMaxSlotsTaken == null)
             {
                 Log.WriteLine(1, $"Session query missing QueryMaxSlotsTaken parameter", LogSource.Session, Color.Red, client);
