@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 namespace QuazalWV
 {
     public class RMCPacketRequestGameSessionService_RegisterURLs : RMCPRequest
@@ -19,8 +20,14 @@ namespace QuazalWV
                 url.Address = client.ep.Address.ToString();
 
                 Urls.Add(url);
-
-                Log.WriteRmcLine(1, $"RegisterURLs - host URL: {url}", RMCP.PROTOCOL.GameSession, LogSource.RMC);
+            }
+            // Log all URLs asynchronously in one go (reduces I/O blocking)
+            if (Urls.Count > 0)
+            {
+                Task.Run(() =>
+                {
+                    Log.WriteRmcLine(1, $"RegisterURLs - host URLs:\n{string.Join("\n", Urls)}", RMCP.PROTOCOL.GameSession, LogSource.RMC);
+                });
             }
         }
 

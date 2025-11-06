@@ -78,6 +78,23 @@ namespace QuazalWV
             {
                 case 1:
                     var reqCreateSes = (RMCPacketRequestGameSessionService_CreateSession)rmc.request;
+                    // Check if private sessions are allowed (excluding intro sessions)
+                    var gameModeProp = reqCreateSes.Session.Attributes.Find(param => param.Id == (uint)SessionParam.GameMode);
+                    var gameTypeProp = reqCreateSes.Session.Attributes.Find(param => param.Id == (uint)SessionParam.GameType);
+                    if ((GameMode)gameModeProp.Value != GameMode.Intro && (GameType)gameTypeProp.Value == GameType.PRIVATE && !Global.AllowPrivateSessions)
+                    {
+                        Log.WriteLine(1, $"Private sessions are permitted - creation denied for client {client.User.Pid}", LogSource.Session, Color.OrangeRed, client);
+                        reply = new RMCPResponseEmpty();
+                        RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.GameSession_Unknown);
+                        break;
+                    }
+                    // Check if the client already has a session and remove it
+                    var oldSession = Global.Sessions.FirstOrDefault(s => s.HostPid == client.User.Pid);
+                    if (oldSession != null)
+                    {
+                        Log.WriteLine(1, $"Removing old session {oldSession.Key.SessionId} for host {client.User.Pid}", LogSource.Session, Color.Orange);
+                        Global.Sessions.Remove(oldSession);
+                    }
                     sesId = Global.NextGameSessionId++;
                     client.GameSessionID = sesId;
                     newSes = new Session(sesId, reqCreateSes.Session, client);
@@ -171,6 +188,8 @@ namespace QuazalWV
                     reply = new RMCPResponseEmpty();
                     client.GameSessionID = 0;
                     client.InGameSession = false;
+                    client.PreSessionSearchCount = 0;
+                    client.PlayNowQuery = false;
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
                 case 6:
@@ -219,6 +238,10 @@ namespace QuazalWV
                     break;
                 case 7:
                     var reqSearchSes = (RMCPacketRequestGameSessionService_SearchSessions)rmc.request;
+                    if (!client.InGameSession)
+                        client.PreSessionSearchCount++;
+                    if (client.PreSessionSearchCount > 2)
+                        client.PlayNowQuery = true;
                     Log.WriteRmcLine(2, $"SearchSessions query: {reqSearchSes.Query}", protocol, LogSource.RMC, Color.Green, client);
                     reply = new RMCPacketResponseGameSessionService_SearchSessions(reqSearchSes.Query, client);
                     Log.WriteRmcLine(2, $"SearchSessions results: {((RMCPacketResponseGameSessionService_SearchSessions)reply).Results.Count}", protocol, LogSource.RMC, Color.Green, client);

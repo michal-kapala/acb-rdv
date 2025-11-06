@@ -20,6 +20,7 @@ namespace QuazalWV
         public static List<ClientInfo> Clients { get; set; } = new List<ClientInfo>();
         public static uint NextGameSessionId { get; set; } = 1;
         public static List<Session> Sessions { get; set; } = new List<Session>();
+        public static bool AllowPrivateSessions { get; set; } = true;
 
         // Static constructor: resolve server address on startup
         static Global()

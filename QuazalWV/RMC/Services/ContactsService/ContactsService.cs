@@ -68,6 +68,9 @@ namespace QuazalWV
                             Log.WriteRmcLine(1, $"RetrieveGameSessionFromContact: for {name} found session {session.Key.SessionId} but it's not joinable.", protocol, LogSource.RMC, Color.Red, client);
                             continue;
                         }
+                        Log.WriteRmcLine(1, $"RetrieveGameSessionFromContact: joining session {friend.GameSessionID}", protocol, LogSource.RMC, Color.Orange, client);
+                        client.GameSessionID = session.Key.SessionId;
+                        client.InGameSession = true;
                         // Determine the host for the session URLs
                         ClientInfo host = Global.Clients.Find(c => c.User.Pid == session.HostPid);
                         if (host == null)

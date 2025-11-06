@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Drawing;
 using System.Threading;
+using System.Linq;
 
 namespace QuazalWV
 {
@@ -46,10 +47,22 @@ namespace QuazalWV
                         {
                             // Check if client is valid
                             bool isValid = client.User != null && client.ep != null;
-                            Log.WriteLine(1, $"TIMEOUT for {(isValid ? client.User.Name : "invalid client")}", LogSource.PRUDP, Color.Gray, client);
+                            Log.WriteLine(1, $"TIMEOUT{(isValid ? "" : " for invalid client")}", LogSource.PRUDP, Color.Gray, client);
 
                             if (isValid)
                             {
+                                // Remove the client's PID from all sessions
+                                foreach (var session in Global.Sessions.ToList())
+                                {
+                                    session.PublicPids.RemoveAll(pid => pid == client.User.Pid);
+                                    session.PrivatePids.RemoveAll(pid => pid == client.User.Pid);
+                                    // Remove session if no participants remain
+                                    if (session.NbParticipants() == 0)
+                                    {
+                                        Global.Sessions.Remove(session);
+                                        Log.WriteLine(1, $"Session {session.Key.SessionId} deleted due to TIMEOUT from player {client.User.Pid}", LogSource.PRUDP, Color.Gray, client);
+                                    }
+                                }
                                 // Notify friends if the client is valid
                                 var rels = DbHelper.GetRelationships(client.User.Pid, (byte)PlayerRelationship.Friend);
                                 foreach (var relationship in rels)

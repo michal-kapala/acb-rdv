@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Windows.Forms;
 using QuazalWV;
+using System.Drawing;
 
 namespace AcbRdv
 {
@@ -121,6 +122,40 @@ namespace AcbRdv
         private void toolStripButton9_Click(object sender, EventArgs e)
         {
             Log.enablePacketLogging = toolStripButton9.Checked;
+        }
+
+        private void toolStripButton10_Click(object sender, EventArgs e)
+        {
+            var sessions = Global.Sessions;
+            if (sessions.Count == 0)
+            {
+                WriteLog(1, "No active sessions found.", Color.Gray);
+                return;
+            }
+            WriteLog(1, $"Active sessions ({sessions.Count}):", Color.Black);
+            foreach (var session in sessions)
+            {
+                WriteLog(1, session.ToString(), Color.DarkBlue);
+            }
+        }
+
+        private void toolStripButton11_Click(object sender, EventArgs e)
+        {
+            if (Global.AllowPrivateSessions)
+            {
+                Global.AllowPrivateSessions = false;
+                WriteLog(1, "Private sessions are now PERMITTED.", Color.OrangeRed);
+            }
+            else
+            {
+                Global.AllowPrivateSessions = true;
+                WriteLog(1, "Private sessions are now ALLOWED.", Color.Gray);
+            }
+        }
+
+        private static void WriteLog(int priority, string content, Color color)
+        {
+            Log.WriteLine(priority, content, LogSource.BackendApp, color);
         }
     }
 }

@@ -56,6 +56,11 @@ namespace QuazalWV
         public uint AbandonedSessionID { get; set; } = 0;
         public bool AbandoningSession { get; set; } = false;
         /// <summary>
+        /// Pre-session search counter and "PLAY NOW" matchmaking query.
+        /// </summary>
+        public uint PreSessionSearchCount { get; set; } = 0;
+        public bool PlayNowQuery = false;
+        /// <summary>
         /// Rich presence info.
         /// </summary>
         public List<PresenceProperty> PresenceProps { get; set; } = new List<PresenceProperty>();
