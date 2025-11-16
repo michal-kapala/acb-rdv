@@ -38,7 +38,7 @@ namespace QuazalWV
         public RMCPacketResponseAuthenticationService_Login(ClientInfo client)
         {
             resultCode = 0x10001;
-            // Address for the secure server is configurable in TTLBackend.exe.config
+            // Address for the secure server is configurable in App.config
             string localhost = "127.0.0.1";
             address = client.ep.Address.ToString() == localhost ? localhost : GetConfigAddress();
             // Only Tracking user calls Login
