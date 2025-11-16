@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
 using QuazalWV;
+using System.Drawing;
+using static AcbRdv.BackendApp;
 
 namespace AcbRdv
 {
@@ -9,6 +11,12 @@ namespace AcbRdv
         public SendNotification()
         {
             InitializeComponent();
+            // Apply design overrides
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (Global.DarkTheme)
+            {
+                DarkThemeManager.ApplyDarkTheme(this);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

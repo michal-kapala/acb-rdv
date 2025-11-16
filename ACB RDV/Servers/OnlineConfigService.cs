@@ -85,8 +85,8 @@ namespace AcbRdv
                 return;
             }
             // 200
-            Log.WriteLine(1, "Client connected", LogSource.OnlineConfigSvc, Color.Green);
-            Log.WriteLine(2, httpRequest, LogSource.OnlineConfigSvc, Color.Green);
+            Log.WriteLine(1, "Client connected", LogSource.OnlineConfigSvc, Global.DarkTheme ? Color.LimeGreen : Color.Green);
+            Log.WriteLine(2, httpRequest, LogSource.OnlineConfigSvc, Global.DarkTheme ? Color.LimeGreen : Color.Green);
             sb.Append("[");
             int count = 0;
             foreach (KeyValuePair<string, string> pair in responseData)

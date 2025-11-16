@@ -27,7 +27,7 @@ namespace QuazalWV
             PrivatePids = new List<uint>();
             HostPid = host.User.Pid;
             foreach (var url in host.Urls)
-                Log.WriteLine(2, $"Host URL added: ${url}", LogSource.Session, Color.Green);
+                Log.WriteLine(2, $"Host URL added: ${url}", LogSource.Session, Global.DarkTheme ? Color.LimeGreen : Color.Green);
             HostUrls = host.Urls;
         }
 
@@ -91,6 +91,8 @@ namespace QuazalWV
                 return false;
             }
 
+            // Reconcile PID lists and slot counts
+            UpdateCurrentSlots();
             // Handle level range and slot parameter cases
             if (qMinLevelRange.Value == qMaxLevelRange.Value || qMaxSlotsTaken == null)
             {
@@ -181,7 +183,7 @@ namespace QuazalWV
                     HostPid = PrivatePids[0];
                 // this flow should never happen as host migrations use MigrateSession->RegisterURLs->AbandonSession flow
                 Log.WriteLine(1, $"On-leave host migration from {client.User.Pid} to {HostPid}", LogSource.Session, Color.Orange);
-                var newHost = Global.Clients.Find(c => client.User.Pid == HostPid);
+                var newHost = Global.Clients.Find(c => c.User.Pid == HostPid);
                 if (newHost == null)
                 {
                     Log.WriteLine(1, $"On-leave host migration elected non-existent host {HostPid}", LogSource.Session, Color.Red);
@@ -198,6 +200,10 @@ namespace QuazalWV
 
         private void UpdateCurrentSlots()
         {
+            // Remove duplicate PIDs before counting
+            PublicPids = PublicPids.Distinct().ToList();
+            PrivatePids = PrivatePids.Distinct().ToList();
+
             var currPublicSlots = GameSession.Attributes.Find(param => param.Id == (uint)SessionParam.CurrentPublicSlots);
             if (currPublicSlots == null)
             {
@@ -215,6 +221,13 @@ namespace QuazalWV
             }
             else
                 currPrivateSlots.Value = (uint)PrivatePids.Count;
+
+            // Log a warning if attribute counts and lists were out of sync
+            if ((currPublicSlots != null && currPublicSlots.Value != PublicPids.Count) ||
+                (currPrivateSlots != null && currPrivateSlots.Value != PrivatePids.Count))
+            {
+                Log.WriteLine(1, $"Session {Key.SessionId} slot counts reconciled. Public: {PublicPids.Count}, Private: {PrivatePids.Count}", LogSource.Session, Color.Orange);
+            }
         }
 
         public Property FindProp(SessionParam id)

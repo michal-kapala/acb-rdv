@@ -21,10 +21,17 @@ namespace QuazalWV
         public static uint NextGameSessionId { get; set; } = 1;
         public static List<Session> Sessions { get; set; } = new List<Session>();
         public static bool AllowPrivateSessions { get; set; } = true;
+        public static bool DarkTheme { get; set; } = false;
 
         // Static constructor: resolve server address on startup
         static Global()
         {
+            string darkThemeStr = ConfigurationManager.AppSettings["DarkTheme"];
+            if (!string.IsNullOrEmpty(darkThemeStr))
+            {
+                bool.TryParse(darkThemeStr, out bool darkTheme);
+                DarkTheme = darkTheme;
+            }
             try
             {
                 ServerBindAddress = ResolveAddress(_serverBindAddressConfig);
@@ -74,7 +81,7 @@ namespace QuazalWV
                         throw new ConfigurationErrorsException("The IP address '0.0.0.0' is not supported. Please specify a different IPv4 address.");
                     }
 
-                    WriteHostLog(1, $"SecureServerAddress is a valid IPv4: '{addressOrHost}'", Color.Blue);
+                    WriteHostLog(1, $"SecureServerAddress is a valid IPv4: '{addressOrHost}'", Global.DarkTheme ? Color.RoyalBlue : Color.Blue);
                     return addressOrHost;
                 }
             }
@@ -92,7 +99,7 @@ namespace QuazalWV
                             throw new ConfigurationErrorsException("The resolved IP '0.0.0.0' is not supported. Please configure a different IPv4 address.");
                         }
 
-                        WriteHostLog(1, $"Hostname '{addressOrHost}' resolved to IPv4 '{resolvedIp}'", Color.Blue);
+                        WriteHostLog(1, $"Hostname '{addressOrHost}' resolved to IPv4 '{resolvedIp}'", Global.DarkTheme ? Color.RoyalBlue : Color.Blue);
                         return resolvedIp.ToString();
                     }
                 }

@@ -27,7 +27,7 @@ namespace QuazalWV
             {
                 case 1:
                     var reqSendVinfo = (RMCPacketRequestVirginService_SendVirginInfo)rmc.request;
-                    Log.WriteRmcLine(1, $"VirginInfo: {reqSendVinfo.PayloadToString()}", protocol, LogSource.RMC, Color.Black, client);
+                    Log.WriteRmcLine(1, $"VirginInfo: {reqSendVinfo.PayloadToString()}", protocol, LogSource.RMC, Global.DarkTheme ? Color.White : Color.Black, client);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;

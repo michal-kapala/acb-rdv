@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using System.Drawing;
+using QuazalWV;
+using static AcbRdv.BackendApp;
 
 namespace AcbRdv
 {
@@ -10,6 +13,13 @@ namespace AcbRdv
         public LogFilter()
         {
             InitializeComponent();
+            // Apply design overrides
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (Global.DarkTheme)
+            {
+                DarkThemeManager.ApplyDarkTheme(this);
+                richTextBox1.ForeColor = Color.White;
+            }
         }
 
         private void label1_DragEnter(object sender, DragEventArgs e)

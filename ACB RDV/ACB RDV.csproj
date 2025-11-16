@@ -71,6 +71,9 @@
     <Prefer32Bit>false</Prefer32Bit>
 	<DocumentationFile></DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>App.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />

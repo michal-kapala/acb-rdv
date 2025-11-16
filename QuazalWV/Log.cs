@@ -94,7 +94,7 @@ namespace QuazalWV
                         if (color != null)
                             c = (Color)color;
                         else
-                            c = Color.Black;
+                            c = Global.DarkTheme ? Color.White : Color.Black;
                         if (content.ToLower().Contains("error"))
                             c = Color.Red;
                         lock (guiLogEntries)
@@ -146,7 +146,7 @@ namespace QuazalWV
                         if (color != null)
                             c = (Color)color;
                         else
-                            c = Color.Black;
+                            c = Global.DarkTheme ? Color.White : Color.Black;
                         if (content.ToLower().Contains("error"))
                             c = Color.Red;
                         lock (guiLogEntries)

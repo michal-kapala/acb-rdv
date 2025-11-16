@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using QuazalWV;
 using Be.Windows.Forms;
+using static AcbRdv.BackendApp;
 
 namespace AcbRdv
 {
@@ -21,6 +22,13 @@ namespace AcbRdv
         public PacketGenerator()
         {
             InitializeComponent();
+            // Apply design overrides
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (Global.DarkTheme)
+            {
+                DarkThemeManager.ApplyDarkTheme(this);
+                toolStripButton1.ForeColor = Color.Black;
+            }
         }
 
         private void PacketGenerator_Load(object sender, EventArgs e)

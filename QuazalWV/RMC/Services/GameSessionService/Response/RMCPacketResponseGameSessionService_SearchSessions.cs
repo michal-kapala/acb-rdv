@@ -50,7 +50,7 @@ namespace QuazalWV
                     Attributes = ses.FilterAttributes()
                 };
                 Log.WriteRmcLine(1, $"GameSessionSearchResult: {result}",
-                    RMCP.PROTOCOL.GameSession, LogSource.RMC, Color.Black, client);
+                    RMCP.PROTOCOL.GameSession, LogSource.RMC, Global.DarkTheme ? Color.White : Color.Black, client);
                 Results.Add(result);
             }
         }

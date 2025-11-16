@@ -36,7 +36,7 @@ namespace QuazalWV
                     var props = reqSetPresence.Props;
                     client.PresenceProps = props;
                     if (props != null && props.Count > 0)
-                        Log.WriteRmcLine(2, string.Join("\n", props), protocol, LogSource.RMC, Color.Blue, client);
+                        Log.WriteRmcLine(2, string.Join("\n", props), protocol, LogSource.RMC, Global.DarkTheme ? Color.RoyalBlue : Color.Blue, client);
                     reply = new RMCPResponseEmpty();
                     RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                     break;
@@ -72,7 +72,7 @@ namespace QuazalWV
                                     {
                                         // Log once to achieve minimal I/O for better performance
                                         var fProps = friend.PresenceProps;
-                                        Log.WriteRmcLine(1, string.Join("\n", fProps), protocol, LogSource.RMC, Color.Blue, client);
+                                        Log.WriteRmcLine(1, string.Join("\n", fProps), protocol, LogSource.RMC, Global.DarkTheme ? Color.RoyalBlue : Color.Blue, client);
                                         var serializedProps = new PresencePropertyListSerializer(fProps).Serialize();
                                         var element = new PresenceElement
                                         {

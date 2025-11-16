@@ -3,6 +3,8 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using QuazalWV;
+using System.Drawing;
+using static AcbRdv.BackendApp;
 
 namespace AcbRdv
 {
@@ -15,6 +17,14 @@ namespace AcbRdv
         public DecryptTool()
         {
             InitializeComponent();
+            // Apply design overrides
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (Global.DarkTheme)
+            {
+                DarkThemeManager.ApplyDarkTheme(this);
+                richTextBox1.ForeColor = Color.White;
+                richTextBox2.ForeColor = Color.White;
+            }
             radioButton1.Checked = true;
             radioButton2.Checked = false;
         }

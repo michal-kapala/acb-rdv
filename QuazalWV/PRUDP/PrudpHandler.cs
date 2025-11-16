@@ -85,20 +85,22 @@ namespace QuazalWV
             uint cid = Helper.ReadU32(m); // connection id
             uint challenge = Helper.ReadU32(m);
 
+            string remoteaddress = client.ep.Address.ToString();
+            int remoteport = client.ep.Port;
             // Tracking user connection
             if (p.m_oSourceVPort.port == 0xE)
             {
                 // challenge dumped from the original traffic
                 challenge = 0xF94C56FB;
                 client.TrackingUser = DbHelper.GetUserByName("Tracking");
-                Log.WriteLine(1, $"[Tracking] CONNECT for Tracking, challenge: 0x{challenge:X8}", LogSource.PRUDP, Color.Black, null, true);
+                Log.WriteLine(1, $"[Tracking] CONNECT for Tracking, challenge: 0x{challenge:X8}, IP: {remoteaddress}, PORT: {remoteport}", LogSource.PRUDP, Global.DarkTheme ? Color.White : Color.Black, null, true);
                 m = new MemoryStream();
                 Helper.WriteU32(m, 4);
                 Helper.WriteU32(m, challenge);
                 return m.ToArray();
             }
             client.User = DbHelper.GetUserByID(pid);
-            Log.WriteLine(1, $"CONNECT: PID: {pid}, CID: {cid}, challenge: 0x{challenge:X8}", LogSource.PRUDP, Color.Green);
+            Log.WriteLine(1, $"CONNECT: PID: {pid}, CID: {cid}, challenge: 0x{challenge:X8}, IP: {remoteaddress}, PORT: {remoteport}", LogSource.PRUDP, Global.DarkTheme ? Color.LimeGreen : Color.Green, client);
             m = new MemoryStream();
             Helper.WriteU32(m, 4);
             Helper.WriteU32(m, challenge + 1);
@@ -153,9 +155,9 @@ namespace QuazalWV
                 m.Seek(0, 0);
                 m.Read(buff, 0, buff.Length);
                 Log.LogPacket(false, buff);
-                Log.WriteLine(5, $"[{source}] received : {p.ToStringShort()}", LogSource.PRUDP, Color.Black, null, true);
-                Log.WriteLine(10, $"[{source}] received : {sb}", LogSource.PRUDP, Color.Black, null, true);
-                Log.WriteLine(10, $"[{source}] received : {p.ToStringDetailed()}", LogSource.PRUDP, Color.Black, null, true);
+                Log.WriteLine(5, $"[{source}] received : {p.ToStringShort()}", LogSource.PRUDP, Global.DarkTheme ? Color.White : Color.Black, null, true);
+                Log.WriteLine(10, $"[{source}] received : {sb}", LogSource.PRUDP, Global.DarkTheme ? Color.White : Color.Black, null, true);
+                Log.WriteLine(10, $"[{source}] received : {p.ToStringDetailed()}", LogSource.PRUDP, Global.DarkTheme ? Color.White : Color.Black, null, true);
                 PrudpPacket reply = null;
                 ClientInfo client = null;
                 if (p.type != PrudpPacket.PACKETTYPE.SYN && p.type != PrudpPacket.PACKETTYPE.NATPING)
@@ -271,9 +273,9 @@ namespace QuazalWV
             StringBuilder sb = new StringBuilder();
             foreach (byte b in data)
                 sb.Append($"{b:X2} ");
-            Log.WriteLine(5, $"[{source}] send : {p.ToStringShort()}", LogSource.PRUDP, Color.Black, null, true);
-            Log.WriteLine(10, $"[{source}] send : {sb}", LogSource.PRUDP, Color.Black, null, true);
-            Log.WriteLine(10, $"[{source}] send : {p.ToStringDetailed()}", LogSource.PRUDP, Color.Black, null, true);
+            Log.WriteLine(5, $"[{source}] send : {p.ToStringShort()}", LogSource.PRUDP, Global.DarkTheme ? Color.White : Color.Black, null, true);
+            Log.WriteLine(10, $"[{source}] send : {sb}", LogSource.PRUDP, Global.DarkTheme ? Color.White : Color.Black, null, true);
+            Log.WriteLine(10, $"[{source}] send : {p.ToStringDetailed()}", LogSource.PRUDP, Global.DarkTheme ? Color.White : Color.Black, null, true);
             listener.Send(data, data.Length, ep);
             Log.LogPacket(true, data);
         }
