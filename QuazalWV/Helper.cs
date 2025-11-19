@@ -14,7 +14,8 @@ namespace QuazalWV
 
         public static ulong MakeTimestamp()
         {
-            return (ulong)new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks;
+            // Use current UTC time so NAT pings get unique timestamps.
+            return (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
         public static bool ReadBool(Stream s)
