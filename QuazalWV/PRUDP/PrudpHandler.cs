@@ -228,9 +228,9 @@ namespace QuazalWV
                                 b = (byte)(b == 1 ? 0 : 1);
                                 m.WriteByte(b);
                                 Helper.WriteU32(m, rvcid); //RVCID
-                                time = Helper.MakeTimestamp();
-                                timeToIgnore.Add(time);
-                                Helper.WriteU64(m, Helper.MakeTimestamp());
+                                ulong newTime = Helper.MakeTimestamp();
+                                timeToIgnore.Add(newTime);
+                                Helper.WriteU64(m, newTime);
                                 reply.payload = m.ToArray();
                             }
                             break;
