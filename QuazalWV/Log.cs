@@ -8,7 +8,7 @@ namespace QuazalWV
         /// <summary>
         /// Subscribe to this to show the logs.
         /// </summary>
-        public static Action<(string, Color)>? Write = null;
+        public static Action<(string, Color)> Write = null;
         public static int MinPriority = 10; //1..10 1=less, 10=all
         public static string logFileName = "log.txt";
         public static string logPacketsFileName = "packetLog.bin";
@@ -169,7 +169,7 @@ namespace QuazalWV
             }
         }
 
-        public static void tSaveLog(object? obj)
+        public static void tSaveLog(object obj)
         {
             lock (_filesync)
             {

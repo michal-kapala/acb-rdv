@@ -59,14 +59,14 @@ namespace QuazalWV
         public static float ReadFloat(Stream s)
         {
             byte[] b = new byte[4];
-            s.Read(b, 0, 4);
+            s.ReadExactly(b, 0, 4);
             return BitConverter.ToSingle(b, 0);
         }
 
         public static double ReadDouble(Stream s)
         {
             byte[] b = new byte[8];
-            s.Read(b, 0, 8);
+            s.ReadExactly(b, 0, 8);
             return BitConverter.ToDouble(b, 0);
         }
 
