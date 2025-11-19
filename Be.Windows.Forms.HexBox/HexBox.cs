@@ -1155,7 +1155,7 @@ namespace Be.Windows.Forms
         /// <summary>
         /// Contains a timer for thumbtrack scrolling
         /// </summary>
-        Timer _thumbTrackTimer = new Timer();
+        System.Windows.Forms.Timer _thumbTrackTimer = new();
         /// <summary>
         /// Contains the thumbtrack scrolling position
         /// </summary>
@@ -3198,12 +3198,13 @@ namespace Be.Windows.Forms
 		/// A alpha component must be given! 
 		/// Default alpha = 100
 		/// </remarks>
-		[Category("Hex"), Description("Gets or sets the color of the shadow selection.")]
+		[Category("Hex"), Description("Gets or sets the color of the shadow selection."), DefaultValue(typeof(Color), "100, 60, 188, 255")]
 		public Color ShadowSelectionColor
 		{
 			get { return _shadowSelectionColor; }
 			set { _shadowSelectionColor = value; Invalidate(); }
-		} Color _shadowSelectionColor = Color.FromArgb(100, 60, 188, 255);
+		}
+		Color _shadowSelectionColor = Color.FromArgb(100, 60, 188, 255);
 
 		/// <summary>
 		/// Gets the number bytes drawn horizontally.
@@ -3696,8 +3697,9 @@ namespace Be.Windows.Forms
 		{
 			UpdateScrollSize();
 		}
-		#endregion
+        #endregion
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public System.Drawing.Font BoldFont { get; set; }
     }
 }

@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO.Compression;
 using System.Text;  
 using System.Security.Cryptography;
-using Ionic.Zlib;
 
 namespace QuazalWV
 {
@@ -190,7 +186,7 @@ namespace QuazalWV
 
         public static byte[] Decompress(byte[] data)
         {
-            ZlibStream s = new ZlibStream(new MemoryStream(data), Ionic.Zlib.CompressionMode.Decompress);
+            ZLibStream s = new ZLibStream(new MemoryStream(data), CompressionMode.Decompress);
             MemoryStream result = new MemoryStream();
             s.CopyTo(result);
             return result.ToArray();
@@ -198,7 +194,7 @@ namespace QuazalWV
 
         public static byte[] Compress(byte[] data)
         {
-            ZlibStream s = new ZlibStream(new MemoryStream(data), Ionic.Zlib.CompressionMode.Compress);
+            ZLibStream s = new ZLibStream(new MemoryStream(data), CompressionMode.Compress);
             MemoryStream result = new MemoryStream();
             s.CopyTo(result);
             return result.ToArray();

@@ -3,15 +3,25 @@ using System;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace DDLParserWV
 {
     public partial class DDLParserForm : Form
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public BPTFile BPTFile { get; set; }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Ok { get; set; } = true;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Json { get; set; }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Markdown { get; set; }
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public StringBuilder DebugOutput { get; set; }
 
         public DDLParserForm()
