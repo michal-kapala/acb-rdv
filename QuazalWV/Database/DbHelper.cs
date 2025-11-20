@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Drawing;
@@ -8,192 +8,218 @@ namespace QuazalWV
 {
     public static class DbHelper
     {
-        public static SQLiteConnection connection;
+        private const string ConnectionString = "Data Source=database.sqlite";
 
         public static void Init()
         {
-            connection = new SQLiteConnection
+            try
             {
-                ConnectionString = "Data Source=database.sqlite"
+                using (var connection = CreateConnection())
+                {
+                    // open/close to validate connectivity
+                }
+                Log.WriteLine(1, "DB loaded...", LogSource.DB);
+            }
+            catch (Exception ex)
+            {
+                Log.WriteLine(1, $"DB init failed: {ex.Message}", LogSource.DB, Color.Red);
+                throw;
+            }
+        }
+
+        private static SQLiteConnection CreateConnection()
+        {
+            var connection = new SQLiteConnection
+            {
+                ConnectionString = ConnectionString
             };
             connection.Open();
-            Log.WriteLine(1, "DB loaded...", LogSource.DB);
+            return connection;
         }
 
         public static List<List<string>> GetQueryResults(string query)
         {
-            List<List<string>> result = new List<List<string>>();
-            SQLiteCommand command = new SQLiteCommand(query, connection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
+            var result = new List<List<string>>();
+            using (var connection = CreateConnection())
+            using (var command = new SQLiteCommand(query, connection))
+            using (var reader = command.ExecuteReader())
             {
-                List<string> entry = new List<string>();
-                for (int i = 0; i < reader.FieldCount; i++)
-                    entry.Add(reader[i].ToString());
-                result.Add(entry);
+                while (reader.Read())
+                {
+                    List<string> entry = new List<string>();
+                    for (int i = 0; i < reader.FieldCount; i++)
+                        entry.Add(reader[i].ToString());
+                    result.Add(entry);
+                }
             }
-            reader.Close();
-            reader.Dispose();
-            command.Dispose();
             return result;
         }
 
         public static DbRelationshipResult AddFriendRequest(uint requester, uint requestee, uint details)
         {
-            // verify users exist beforehand
-            string query = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-            List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Pending, PlayerRelationship.Blocked };
-            List<Relationship> relations = new List<Relationship>();
-            using (var command = new SQLiteCommand(query, connection))
+            using (var connection = CreateConnection())
             {
-                command.Parameters.AddWithValue("@requester", requester);
-                command.Parameters.AddWithValue("@requestee", requestee);
-                using (var reader = command.ExecuteReader())
+                // verify users exist beforehand
+                string query = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
+                List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Pending, PlayerRelationship.Blocked };
+                List<Relationship> relations = new List<Relationship>();
+                using (var command = new SQLiteCommand(query, connection))
                 {
-                    while (reader.Read())
+                    command.Parameters.AddWithValue("@requester", requester);
+                    command.Parameters.AddWithValue("@requestee", requestee);
+                    using (var reader = command.ExecuteReader())
                     {
-                        var relationship = new Relationship
+                        while (reader.Read())
                         {
-                            RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
-                            RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
-                            Type = (PlayerRelationship)reader.GetByte(2),
-                            Details = Convert.ToUInt32(reader.GetInt32(3))
-                        };
-                        relations.Add(relationship);
-                        if (forbidden.Contains(relationship.Type))
-                        {
-                            if (relationship.Type == PlayerRelationship.Blocked)
-                                return DbRelationshipResult.UserBlocked;
-                            return DbRelationshipResult.Failed;
+                            var relationship = new Relationship
+                            {
+                                RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
+                                RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
+                                Type = (PlayerRelationship)reader.GetByte(2),
+                                Details = Convert.ToUInt32(reader.GetInt32(3))
+                            };
+                            relations.Add(relationship);
+                            if (forbidden.Contains(relationship.Type))
+                            {
+                                if (relationship.Type == PlayerRelationship.Blocked)
+                                    return DbRelationshipResult.UserBlocked;
+                                return DbRelationshipResult.Failed;
+                            }
                         }
                     }
-                }
 
-                if (relations.Count == 0)
-                {
-                    string insertQuery = "INSERT INTO relationships (requester, requestee, type, details) VALUES (@requester, @requestee, @type, @details)";
-                    using (var insertCommand = new SQLiteCommand(insertQuery, connection))
+                    if (relations.Count == 0)
                     {
-                        insertCommand.Parameters.AddWithValue("@requester", requester);
-                        insertCommand.Parameters.AddWithValue("@requestee", requestee);
-                        insertCommand.Parameters.AddWithValue("@type", PlayerRelationship.Pending);
-                        insertCommand.Parameters.AddWithValue("@details", details);
-                        int rowsAffected = insertCommand.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                            return DbRelationshipResult.Succeeded;
+                        string insertQuery = "INSERT INTO relationships (requester, requestee, type, details) VALUES (@requester, @requestee, @type, @details)";
+                        using (var insertCommand = new SQLiteCommand(insertQuery, connection))
+                        {
+                            insertCommand.Parameters.AddWithValue("@requester", requester);
+                            insertCommand.Parameters.AddWithValue("@requestee", requestee);
+                            insertCommand.Parameters.AddWithValue("@type", PlayerRelationship.Pending);
+                            insertCommand.Parameters.AddWithValue("@details", details);
+                            int rowsAffected = insertCommand.ExecuteNonQuery();
+                            if (rowsAffected > 0)
+                                return DbRelationshipResult.Succeeded;
+                        }
+                        return DbRelationshipResult.Failed;
                     }
-                    return DbRelationshipResult.Failed;
-                }
-                else
-                {
-                    Log.WriteLine(1, $"The players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
-                    return DbRelationshipResult.AlreadyPresent;
+                    else
+                    {
+                        Log.WriteLine(1, $"The players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
+                        return DbRelationshipResult.AlreadyPresent;
+                    }
                 }
             }
         }
 
         public static DbRelationshipResult AddBlacklistRequest(uint requester, uint requestee, uint details)
         {
-            // verify users exist beforehand
-            string query = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-            List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Blocked };
-            List<Relationship> relations = new List<Relationship>();
-            using (var command = new SQLiteCommand(query, connection))
+            using (var connection = CreateConnection())
             {
-                command.Parameters.AddWithValue("@requester", requester);
-                command.Parameters.AddWithValue("@requestee", requestee);
-                using (var reader = command.ExecuteReader())
+                // verify users exist beforehand
+                string query = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
+                List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Blocked };
+                List<Relationship> relations = new List<Relationship>();
+                using (var command = new SQLiteCommand(query, connection))
                 {
-                    while (reader.Read())
+                    command.Parameters.AddWithValue("@requester", requester);
+                    command.Parameters.AddWithValue("@requestee", requestee);
+                    using (var reader = command.ExecuteReader())
                     {
-                        var relationship = new Relationship
+                        while (reader.Read())
                         {
-                            RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
-                            RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
-                            Type = (PlayerRelationship)Convert.ToByte(reader.GetInt32(2)),
-                            Details = Convert.ToUInt32(reader.GetInt32(3))
-                        };
-                        relations.Add(relationship);
-                        if (forbidden.Contains(relationship.Type))
-                        {
-                            Log.WriteLine(1, "Blacklisting failed, an entry already exists", LogSource.DB, Color.Orange);
-                            return DbRelationshipResult.UserBlocked;
+                            var relationship = new Relationship
+                            {
+                                RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
+                                RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
+                                Type = (PlayerRelationship)Convert.ToByte(reader.GetInt32(2)),
+                                Details = Convert.ToUInt32(reader.GetInt32(3))
+                            };
+                            relations.Add(relationship);
+                            if (forbidden.Contains(relationship.Type))
+                            {
+                                Log.WriteLine(1, "Blacklisting failed, an entry already exists", LogSource.DB, Color.Orange);
+                                return DbRelationshipResult.UserBlocked;
+                            }
                         }
                     }
-                }
 
-                if (relations.Count == 1 && relations.First().Type != PlayerRelationship.Blocked)
-                {
-                    string sql = "UPDATE relationships SET requester = @requester, requestee = @requestee, type = @type, details = @details WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-                    using (var cmd = new SQLiteCommand(sql, connection))
+                    if (relations.Count == 1 && relations.First().Type != PlayerRelationship.Blocked)
                     {
-                        cmd.Parameters.AddWithValue("@type", PlayerRelationship.Blocked);
-                        cmd.Parameters.AddWithValue("@details", details);
-                        cmd.Parameters.AddWithValue("@requester", requester);
-                        cmd.Parameters.AddWithValue("@requestee", requestee);
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
+                        string sql = "UPDATE relationships SET requester = @requester, requestee = @requestee, type = @type, details = @details WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
+                        using (var cmd = new SQLiteCommand(sql, connection))
                         {
-                            Log.WriteLine(1, $"Player {requester} blacklisted {requestee}", LogSource.DB, Color.Orange);
-                            return DbRelationshipResult.Succeeded;
+                            cmd.Parameters.AddWithValue("@type", PlayerRelationship.Blocked);
+                            cmd.Parameters.AddWithValue("@details", details);
+                            cmd.Parameters.AddWithValue("@requester", requester);
+                            cmd.Parameters.AddWithValue("@requestee", requestee);
+                            int rowsAffected = cmd.ExecuteNonQuery();
+                            if (rowsAffected > 0)
+                            {
+                                Log.WriteLine(1, $"Player {requester} blacklisted {requestee}", LogSource.DB, Color.Orange);
+                                return DbRelationshipResult.Succeeded;
+                            }
+                            return DbRelationshipResult.Failed;
                         }
-                        return DbRelationshipResult.Failed;
                     }
-                }
-                else
-                {
-                    Log.WriteLine(1, "One player already blacklisted the other or they dont have any relationship", LogSource.DB, Color.Orange);
-                    return DbRelationshipResult.UserBlocked;
+                    else
+                    {
+                        Log.WriteLine(1, "One player already blacklisted the other or they dont have any relationship", LogSource.DB, Color.Orange);
+                        return DbRelationshipResult.UserBlocked;
+                    }
                 }
             }
         }
 
         public static DbRelationshipResult AddFriend(uint requester, uint requestee, uint details)
         {
-            string querySql = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-            List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Friend };
-            List<Relationship> relations = new List<Relationship>();
-            using (var query = new SQLiteCommand(querySql, connection))
+            using (var connection = CreateConnection())
             {
-                query.Parameters.AddWithValue("@requester", requester);
-                query.Parameters.AddWithValue("@requestee", requestee);
-                using (var reader = query.ExecuteReader())
+                string querySql = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
+                List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Friend };
+                List<Relationship> relations = new List<Relationship>();
+                using (var query = new SQLiteCommand(querySql, connection))
                 {
-                    while (reader.Read())
+                    query.Parameters.AddWithValue("@requester", requester);
+                    query.Parameters.AddWithValue("@requestee", requestee);
+                    using (var reader = query.ExecuteReader())
                     {
-                        var relationship = new Relationship
+                        while (reader.Read())
                         {
-                            RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
-                            RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
-                            Type = (PlayerRelationship)reader.GetByte(2),
-                            Details = Convert.ToUInt32(reader.GetInt32(3))
-                        };
-                        relations.Add(relationship);
-                        if (forbidden.Contains(relationship.Type))
-                        {
-                            Log.WriteLine(1, $"Players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
-                            return DbRelationshipResult.AlreadyPresent;
+                            var relationship = new Relationship
+                            {
+                                RequesterPid = Convert.ToUInt32(reader.GetInt32(0)),
+                                RequesteePid = Convert.ToUInt32(reader.GetInt32(1)),
+                                Type = (PlayerRelationship)reader.GetByte(2),
+                                Details = Convert.ToUInt32(reader.GetInt32(3))
+                            };
+                            relations.Add(relationship);
+                            if (forbidden.Contains(relationship.Type))
+                            {
+                                Log.WriteLine(1, $"Players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
+                                return DbRelationshipResult.AlreadyPresent;
+                            }
                         }
                     }
-                }
 
-                if (relations.Count == 1 && relations.First().Type == PlayerRelationship.Pending)
-                {
-                    string sql = "UPDATE relationships SET type = @type, details = @details WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-                    using (var cmd = new SQLiteCommand(sql, connection))
+                    if (relations.Count == 1 && relations.First().Type == PlayerRelationship.Pending)
                     {
-                        cmd.Parameters.AddWithValue("@type", PlayerRelationship.Friend);
-                        cmd.Parameters.AddWithValue("@details", details);
-                        cmd.Parameters.AddWithValue("@requester", requester);
-                        cmd.Parameters.AddWithValue("@requestee", requestee);
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        return rowsAffected > 0 ? DbRelationshipResult.Succeeded : DbRelationshipResult.Failed;
+                        string sql = "UPDATE relationships SET type = @type, details = @details WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
+                        using (var cmd = new SQLiteCommand(sql, connection))
+                        {
+                            cmd.Parameters.AddWithValue("@type", PlayerRelationship.Friend);
+                            cmd.Parameters.AddWithValue("@details", details);
+                            cmd.Parameters.AddWithValue("@requester", requester);
+                            cmd.Parameters.AddWithValue("@requestee", requestee);
+                            int rowsAffected = cmd.ExecuteNonQuery();
+                            return rowsAffected > 0 ? DbRelationshipResult.Succeeded : DbRelationshipResult.Failed;
+                        }
                     }
-                }
-                else
-                {
-                    Log.WriteLine(1, $"Players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
-                    return DbRelationshipResult.AlreadyPresent;
+                    else
+                    {
+                        Log.WriteLine(1, $"Players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
+                        return DbRelationshipResult.AlreadyPresent;
+                    }
                 }
             }
         }
@@ -238,6 +264,7 @@ namespace QuazalWV
         {
             string query = $"SELECT * FROM relationships WHERE (requester = @pid OR requestee = @pid) AND type = {(uint)PlayerRelationship.Pending}";
             List<Relationship> relations = new List<Relationship>();
+            using (var connection = CreateConnection())
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@pid", pid);
@@ -267,6 +294,7 @@ namespace QuazalWV
             else
                 query = $"SELECT * FROM relationships WHERE requester = @pid AND type = @type";
             List<Relationship> relations = new List<Relationship>();
+            using (var connection = CreateConnection())
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@pid", pid);
@@ -292,6 +320,7 @@ namespace QuazalWV
         public static bool RemoveRelationship(uint requester, uint requestee)
         {
             string query = "DELETE FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
+            using (var connection = CreateConnection())
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@requester", requester);
@@ -305,6 +334,7 @@ namespace QuazalWV
         {
             User result = null;
             string query = @"SELECT * FROM users WHERE name = @name";
+            using (var connection = CreateConnection())
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@name", name);
@@ -317,7 +347,7 @@ namespace QuazalWV
                             Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             Password = reader.GetString(reader.GetOrdinal("password")),
-                            UbiId = reader.GetString(reader.GetOrdinal("password")),
+                            UbiId = reader.GetString(reader.GetOrdinal("ubi_id")),
                             Email = reader.GetString(reader.GetOrdinal("email")),
                             CountryCode = reader.GetString(reader.GetOrdinal("country_code")),
                             PrefLang = reader.GetString(reader.GetOrdinal("pref_lang"))
@@ -333,6 +363,7 @@ namespace QuazalWV
         {
             User result = null;
             string query = @"SELECT * FROM users WHERE pid=@pid";
+            using (var connection = CreateConnection())
             using (var command = new SQLiteCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@pid", pid);
@@ -345,7 +376,7 @@ namespace QuazalWV
                             Pid = Convert.ToUInt32(reader.GetInt32(reader.GetOrdinal("pid"))),
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             Password = reader.GetString(reader.GetOrdinal("password")),
-                            UbiId = reader.GetString(reader.GetOrdinal("password")),
+                            UbiId = reader.GetString(reader.GetOrdinal("ubi_id")),
                             Email = reader.GetString(reader.GetOrdinal("email")),
                             CountryCode = reader.GetString(reader.GetOrdinal("country_code")),
                             PrefLang = reader.GetString(reader.GetOrdinal("pref_lang"))
@@ -359,21 +390,27 @@ namespace QuazalWV
 
         public static List<Privilege> GetPrivileges(string locale)
         {
-            List<Privilege> privileges = new List<Privilege>();
-            List<List<string>> results = GetQueryResults($"SELECT * FROM privileges WHERE locale='{locale}'");
-            if (results.Count == 0)
+            var privileges = new List<Privilege>();
+            using (var connection = CreateConnection())
+            using (var command = new SQLiteCommand("SELECT * FROM privileges WHERE locale = @locale", connection))
+            {
+                command.Parameters.AddWithValue("@locale", locale);
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        privileges.Add(new Privilege
+                        {
+                            Id = Convert.ToUInt32(reader.GetInt32(0)),
+                            Description = reader.GetString(1)
+                        });
+                    }
+                }
+            }
+
+            if (privileges.Count == 0)
                 Log.WriteLine(1, $"Unknown locale: {locale}", LogSource.DB, Color.Red);
 
-            foreach (List<string> entry in results)
-            {
-                privileges.Add(
-                    new Privilege()
-                    {
-                        Id = Convert.ToUInt32(entry[0]),
-                        Description = entry[1]
-                    }
-                );
-            }
             return privileges;
         }
 
@@ -415,18 +452,23 @@ namespace QuazalWV
 
         public static bool SaveTag(TelemetryTag tag)
         {
-            string sql = $"INSERT INTO telemetry_tags (tracking_id, tag, attr, dtime)" +
-                         $"VALUES ({tag.TrackingId},'{tag.Tag}','{tag.Attributes}',{tag.DeltaTime})";
-
-            SQLiteCommand cmd = new SQLiteCommand(sql, connection);
-            try
+            const string sql = "INSERT INTO telemetry_tags (tracking_id, tag, attr, dtime) VALUES (@tracking_id, @tag, @attr, @dtime)";
+            using (var connection = CreateConnection())
+            using (var cmd = new SQLiteCommand(sql, connection))
             {
-                return cmd.ExecuteNonQuery() > 0;
-            }
-            catch (Exception e)
-            {
-                Log.WriteLine(1, $"{e}", LogSource.DB, Color.Red);
-                return false;
+                cmd.Parameters.AddWithValue("@tracking_id", tag.TrackingId);
+                cmd.Parameters.AddWithValue("@tag", tag.Tag);
+                cmd.Parameters.AddWithValue("@attr", tag.Attributes);
+                cmd.Parameters.AddWithValue("@dtime", tag.DeltaTime);
+                try
+                {
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+                catch (Exception e)
+                {
+                    Log.WriteLine(1, $"{e}", LogSource.DB, Color.Red);
+                    return false;
+                }
             }
         }
 
@@ -434,6 +476,7 @@ namespace QuazalWV
         {
             int rowsAffected;
             string sql = $"INSERT INTO messages (recipient_pid, recipient_type, parent_id, sender_pid, reception_time, lifetime, flags, subject, sender_name, body, delivered) VALUES (@recipient_pid, @recipient_type, @parent_id, @sender_pid, @reception_time, @lifetime, @flags, @subject, @sender_name, @body, @delivered)";
+            using (var connection = CreateConnection())
             using (var insertCommand = new SQLiteCommand(sql, connection))
             {
                 insertCommand.Parameters.AddWithValue("@id", msg.Id);
@@ -469,6 +512,7 @@ namespace QuazalWV
                 placeholders.Add($"@id{i}");
             
             string sql = $"SELECT * FROM messages WHERE id IN ({string.Join(", ", placeholders)})";
+            using (var connection = CreateConnection())
             using (var cmd = new SQLiteCommand(sql, connection))
             {
                 for (int i = 0; i < ids.Count; i++)
@@ -503,6 +547,7 @@ namespace QuazalWV
         {
             List<TextMessage> result = new List<TextMessage>();
             string sql = "SELECT * FROM messages WHERE recipient_pid = @recipient_pid AND delivered = 0";
+            using (var connection = CreateConnection())
             using (var cmd = new SQLiteCommand(sql, connection))
             {
                 cmd.Parameters.AddWithValue("@recipient_pid", recipient.Pid);
@@ -539,6 +584,7 @@ namespace QuazalWV
                 placeholders.Add($"@id{i}");
 
             string sql = $"UPDATE messages SET delivered = 1 WHERE id IN ({string.Join(", ", placeholders)})";
+            using (var connection = CreateConnection())
             using (var cmd = new SQLiteCommand(sql, connection))
             {
                 for (int i = 0; i < ids.Count; i++)
@@ -560,6 +606,7 @@ namespace QuazalWV
         {
             int rowsAffected;
             string sql = "INSERT INTO game_invites (inviter, invitee, session_type, session_id, message) VALUES (@inviter, @invitee, @session_type, @session_id, @message)";
+            using (var connection = CreateConnection())
             using (var cmd = new SQLiteCommand(sql, connection))
             {
                 cmd.Parameters.AddWithValue("@inviter", inviterPid);
@@ -584,6 +631,7 @@ namespace QuazalWV
         {
             List<GameInvite> invites = new List<GameInvite>();
             string sql = "SELECT * FROM game_invites WHERE invitee = @invitee";
+            using (var connection = CreateConnection())
             using (var cmd = new SQLiteCommand(sql, connection))
             {
                 cmd.Parameters.AddWithValue("@invitee", inviteePid);
@@ -621,6 +669,7 @@ namespace QuazalWV
         {
             int rowsAffected;
             string sql = "DELETE FROM game_invites WHERE invitee = @invitee";
+            using (var connection = CreateConnection())
             using (var cmd = new SQLiteCommand(sql, connection))
             {
                 cmd.Parameters.AddWithValue("@invitee", inviteePid);
