@@ -105,7 +105,14 @@ namespace QuazalWV
                         else
                         {
                             dbResult = DbHelper.AddFriend(inviter.Pid, client.User.Pid, reqAcceptFriendship.Details);
-                            reply = new RMCPacketResponseFriendsService_AcceptFriendship(dbResult == DbRelationshipResult.Succeeded);
+                            if (dbResult != DbRelationshipResult.Succeeded)
+                            {
+                                reply = new RMCPacketResponseFriendsService_AcceptFriendship(false);
+                                RMC.SendResponseWithACK(client.udp, p, rmc, client, reply, true, (uint)QError.Friends_UserNotFound);
+                                break;
+                            }
+
+                            reply = new RMCPacketResponseFriendsService_AcceptFriendship(true);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
                             // send friend list update notifs
                             var inviterClient = Global.Clients.Find(c => c.User.Pid == inviter.Pid);

@@ -175,9 +175,8 @@ namespace QuazalWV
         {
             using (var connection = CreateConnection())
             {
-                string querySql = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-                List<PlayerRelationship> forbidden = new List<PlayerRelationship> { PlayerRelationship.Friend };
-                List<Relationship> relations = new List<Relationship>();
+                const string querySql = "SELECT * FROM relationships WHERE requester = @requester AND requestee = @requestee";
+                Relationship pending = null;
                 using (var query = new SQLiteCommand(querySql, connection))
                 {
                     query.Parameters.AddWithValue("@requester", requester);
@@ -193,33 +192,34 @@ namespace QuazalWV
                                 Type = (PlayerRelationship)reader.GetByte(2),
                                 Details = Convert.ToUInt32(reader.GetInt32(3))
                             };
-                            relations.Add(relationship);
-                            if (forbidden.Contains(relationship.Type))
+                            if (relationship.Type == PlayerRelationship.Pending)
+                                pending = relationship;
+                            else if (relationship.Type == PlayerRelationship.Friend)
                             {
                                 Log.WriteLine(1, $"Players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
                                 return DbRelationshipResult.AlreadyPresent;
                             }
                         }
                     }
+                }
 
-                    if (relations.Count == 1 && relations.First().Type == PlayerRelationship.Pending)
-                    {
-                        string sql = "UPDATE relationships SET type = @type, details = @details WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-                        using (var cmd = new SQLiteCommand(sql, connection))
-                        {
-                            cmd.Parameters.AddWithValue("@type", PlayerRelationship.Friend);
-                            cmd.Parameters.AddWithValue("@details", details);
-                            cmd.Parameters.AddWithValue("@requester", requester);
-                            cmd.Parameters.AddWithValue("@requestee", requestee);
-                            int rowsAffected = cmd.ExecuteNonQuery();
-                            return rowsAffected > 0 ? DbRelationshipResult.Succeeded : DbRelationshipResult.Failed;
-                        }
-                    }
-                    else
-                    {
-                        Log.WriteLine(1, $"Players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
-                        return DbRelationshipResult.AlreadyPresent;
-                    }
+                if (pending == null)
+                {
+                    Log.WriteLine(1, $"No pending invitation between {requester} and {requestee}", LogSource.DB, Color.Orange);
+                    return DbRelationshipResult.Failed;
+                }
+
+                uint newDetails = details != 0 ? details : pending.Details;
+                const string sql = "UPDATE relationships SET type = @type, details = @details WHERE requester = @requester AND requestee = @requestee AND type = @pendingType";
+                using (var cmd = new SQLiteCommand(sql, connection))
+                {
+                    cmd.Parameters.AddWithValue("@type", PlayerRelationship.Friend);
+                    cmd.Parameters.AddWithValue("@details", newDetails);
+                    cmd.Parameters.AddWithValue("@requester", requester);
+                    cmd.Parameters.AddWithValue("@requestee", requestee);
+                    cmd.Parameters.AddWithValue("@pendingType", PlayerRelationship.Pending);
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0 ? DbRelationshipResult.Succeeded : DbRelationshipResult.Failed;
                 }
             }
         }
