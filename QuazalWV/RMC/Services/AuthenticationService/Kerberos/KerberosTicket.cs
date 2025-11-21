@@ -17,7 +17,7 @@ namespace QuazalWV
 
         public byte[] ToBuffer()
         {
-            MemoryStream m = new MemoryStream();
+            MemoryStream m = new();
             m.Write(sessionKey, 0, 16);
             Helper.WriteU32(m, serverPID);
             Helper.WriteU32(m, (uint)ticket.Length);
@@ -34,7 +34,7 @@ namespace QuazalWV
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine("\t[Kerberos Ticket]");
             sb.Append("\t\t[Session Key : { ");
             foreach (byte b in sessionKey)
