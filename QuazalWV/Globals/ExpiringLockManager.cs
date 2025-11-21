@@ -13,7 +13,7 @@ namespace QuazalWV
             public DateTime LastUsed { get; set; } = DateTime.UtcNow;
         }
 
-        private readonly ConcurrentDictionary<TKey, LockWrapper> _locks = new ConcurrentDictionary<TKey, LockWrapper>();
+        private readonly ConcurrentDictionary<TKey, LockWrapper> _locks = new();
         private readonly TimeSpan _expiration;
         private readonly Timer _cleanupTimer;
 

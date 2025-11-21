@@ -1,23 +1,21 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Drawing;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace QuazalWV
 {
     public static class Log
     {
-        public static RichTextBox box = null;
+        /// <summary>
+        /// Subscribe to this to show the logs.
+        /// </summary>
+        public static Action<(string, Color)> Write = null;
         public static int MinPriority = 10; //1..10 1=less, 10=all
         public static string logFileName = "log.txt";
         public static string logPacketsFileName = "packetLog.bin";
-        public static readonly object _sync = new object();
-        public static readonly object _filesync = new object();
-        public static StringBuilder logBuffer = new StringBuilder();
-        public static List<byte[]> logPackets = new List<byte[]>();
+        public static readonly object _sync = new();
+        public static readonly object _filesync = new();
+        public static StringBuilder logBuffer = new();
+        public static List<byte[]> logPackets = [];
         public static bool enablePacketLogging = true;
 
         public static void ClearLog()
@@ -28,95 +26,74 @@ namespace QuazalWV
                 File.Delete(logPacketsFileName);
             lock (_sync)
             {
-                logBuffer = new StringBuilder();
-                logPackets = new List<byte[]>();
+                logBuffer = new();
+                logPackets = [];
             }
         }
 
         public static void WriteLine(int priority, string content, LogSource source = LogSource.Undefined, object color = null, ClientInfo client = null, bool skipSpace = false)
         {
-            if (box == null) return;
-            try
+            if (Write == null)
+                return; 
+            string line = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + " : [" + priority.ToString("D2") + "]";
+            if (source != LogSource.Undefined)
+                line += $"[{source}]";
+            if (client != null && client.User != null && client.User.Name != null)
+                line += $"[{client.User.Name}]";
+            if (line.Length > 0 && line[line.Length - 1] != ' ' && !skipSpace)
+                line += " ";
+            if (priority <= MinPriority)
             {
-                box.Invoke(new Action(delegate
-                {
-                    string line = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + " : [" + priority.ToString("D2") + "]";
-                    if (source != LogSource.Undefined)
-                        line += $"[{source}]";
-                    if (client != null && client.User != null && client.User.Name != null)
-                        line += $"[{client.User.Name}]";
-                    if (line.Length > 0 && line[line.Length - 1] != ' ' && !skipSpace)
-                        line += " ";
-                    if (priority <= MinPriority)
-                    {
-                        Color c;
-                        if (color != null)
-                            c = (Color)color;
-                        else
-                            c = Color.Black;
-                        if (content.ToLower().Contains("error"))
-                            c = Color.Red;
-                        box.SelectionStart = box.TextLength;
-                        box.SelectionLength = 0;
-                        box.SelectionColor = c;
-                        box.AppendText(line + content + "\n");
-                        box.SelectionColor = box.ForeColor;
-                        box.ScrollToCaret();                        
-                    }
-                    lock (_sync)
-                    {
-                        logBuffer.Append(line + content + "\n");
-                        new Thread(tSaveLog).Start();
-                    }
-                }));
+                Color c;
+                if (color != null)
+                    c = (Color)color;
+                else
+                    c = Color.Black;
+                if (content.ToLower().Contains("error"))
+                    c = Color.Red;
+                Write.Invoke((line + content + "\n", c));
             }
-            catch { }
+            lock (_sync)
+            {
+                logBuffer.Append(line + content + "\n");
+                new Thread(tSaveLog).Start();
+            }
         }
 
         public static void WriteRmcLine(int priority, string content, RMCP.PROTOCOL protocol, LogSource source = LogSource.RMC, object color = null, ClientInfo client = null)
         {
-            if (box == null) return;
-            try
+            if (Write == null)
+                return;
+
+            string line = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + " : [" + priority.ToString("D2") + "]";
+            line += $"[{source} {protocol}]";
+            if (client != null && client.User != null && client.User.Name != null)
+                line += $"[{client.User.Name}]";
+            line += " ";
+            if (priority <= MinPriority)
             {
-                box.Invoke(new Action(delegate
-                {
-                    string line = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + " : [" + priority.ToString("D2") + "]";
-                    line += $"[{source} {protocol}]";
-                    if (client != null && client.User != null && client.User.Name != null)
-                        line += $"[{client.User.Name}]";
-                    line += " ";
-                    if (priority <= MinPriority)
-                    {
-                        Color c;
-                        if (color != null)
-                            c = (Color)color;
-                        else
-                            c = Color.Black;
-                        if (content.ToLower().Contains("error"))
-                            c = Color.Red;
-                        box.SelectionStart = box.TextLength;
-                        box.SelectionLength = 0;
-                        box.SelectionColor = c;
-                        box.AppendText(line + content + "\n");
-                        box.SelectionColor = box.ForeColor;
-                        box.ScrollToCaret();
-                    }
-                    lock (_sync)
-                    {
-                        logBuffer.Append(line + content + "\n");
-                        new Thread(tSaveLog).Start();
-                    }
-                }));
+                Color c;
+                if (color != null)
+                    c = (Color)color;
+                else
+                    c = Color.Black;
+                if (content.ToLower().Contains("error"))
+                    c = Color.Red;
+                Write.Invoke((line + content + "\n", c));
             }
-            catch { }
+            lock (_sync)
+            {
+                logBuffer.Append(line + content + "\n");
+                new Thread(tSaveLog).Start();
+            }
         }
 
         public static string MakeDetailedPacketLog(byte[] data, bool isSinglePacket = false)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             while (true)
             {
-                PrudpPacket qp = new PrudpPacket(data);
+                PrudpPacket qp = new(data);
                 sb.AppendLine("##########################################################");
                 sb.AppendLine(qp.ToStringDetailed());
                 if (qp.type == PrudpPacket.PACKETTYPE.DATA && qp.m_byPartNumber == 0)
@@ -166,7 +143,7 @@ namespace QuazalWV
                 int size2 = qp.ToBuffer().Length;
                 if (size2 == data.Length || isSinglePacket)
                     break;
-                MemoryStream m2 = new MemoryStream(data);
+                MemoryStream m2 = new(data);
                 m2.Seek(size2, 0);
                 size2 = (int)(m2.Length - m2.Position);
                 if (size2 <= 8)
@@ -181,7 +158,7 @@ namespace QuazalWV
         {
             if (!enablePacketLogging)
                 return;
-            MemoryStream m = new MemoryStream();
+            MemoryStream m = new();
             m.WriteByte(1); // version
             m.WriteByte((byte)(sent ? 1 : 0));
             Helper.WriteU32(m, (uint)data.Length);
@@ -215,7 +192,7 @@ namespace QuazalWV
                 }
                 if (packet != null)
                 {
-                    FileStream fs = new FileStream(logPacketsFileName, FileMode.Append, FileAccess.Write);
+                    FileStream fs = new(logPacketsFileName, FileMode.Append, FileAccess.Write);
                     fs.Write(packet, 0, packet.Length);
                     fs.Flush();
                     fs.Close();

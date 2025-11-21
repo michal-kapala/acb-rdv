@@ -1,17 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Ionic.Zlib;
 using System.Text;  
 using System.Security.Cryptography;
-using Ionic.Zlib;
 
 namespace QuazalWV
 {
     public static class Helper
     {
-        public static Random rnd = new Random();
-
         public static ulong MakeTimestamp()
         {
             // Use current UTC time so NAT pings get unique timestamps.
@@ -39,7 +33,7 @@ namespace QuazalWV
 
         public static uint ReadU32(Stream s)
         {
-            BinaryReader reader = new BinaryReader(s);
+            BinaryReader reader = new(s);
             return reader.ReadUInt32();
         }
 
@@ -57,21 +51,21 @@ namespace QuazalWV
 
         public static ulong ReadU64DateTime(Stream s)
         {
-            BinaryReader reader = new BinaryReader(s);
+            BinaryReader reader = new(s);
             return reader.ReadUInt64();
         }
 
         public static float ReadFloat(Stream s)
         {
             byte[] b = new byte[4];
-            s.Read(b, 0, 4);
+            s.ReadExactly(b, 0, 4);
             return BitConverter.ToSingle(b, 0);
         }
 
         public static double ReadDouble(Stream s)
         {
             byte[] b = new byte[8];
-            s.Read(b, 0, 8);
+            s.ReadExactly(b, 0, 8);
             return BitConverter.ToDouble(b, 0);
         }
 
@@ -88,7 +82,7 @@ namespace QuazalWV
         public static List<string> ReadStringList(Stream s)
         {
             uint count = ReadU32(s);
-            List<string> list = new List<string>();
+            List<string> list = [];
             for (int i = 0; i < count; i++)
                 list.Add(ReadString(s));
             return list;
@@ -184,23 +178,23 @@ namespace QuazalWV
 
         public static void WriteStringList(Stream s, List<string> v)
         {
-            WriteU32(s, (uint)v.Count());
+            WriteU32(s, (uint)v.Count);
             foreach(var entry in v)
                 WriteString(s, entry);
         }
 
         public static byte[] Decompress(byte[] data)
         {
-            ZlibStream s = new ZlibStream(new MemoryStream(data), Ionic.Zlib.CompressionMode.Decompress);
-            MemoryStream result = new MemoryStream();
+            using ZlibStream s = new(new MemoryStream(data), CompressionMode.Decompress);
+            using MemoryStream result = new();
             s.CopyTo(result);
             return result.ToArray();
         }
 
         public static byte[] Compress(byte[] data)
         {
-            ZlibStream s = new ZlibStream(new MemoryStream(data), Ionic.Zlib.CompressionMode.Compress);
-            MemoryStream result = new MemoryStream();
+            using ZlibStream s = new(new MemoryStream(data), CompressionMode.Compress);
+            using MemoryStream result = new();
             s.CopyTo(result);
             return result.ToArray();
         }
@@ -217,19 +211,17 @@ namespace QuazalWV
 
         public static byte[] Encrypt(byte[] key, byte[] data)
         {
-            return EncryptOutput(key, data).ToArray();
+            return [.. EncryptOutput(key, data)];
         }
 
         public static byte[] Decrypt(byte[] key, byte[] data)
         {
-            return EncryptOutput(key, data).ToArray();
+            return [.. EncryptOutput(key, data)];
         }
 
         private static byte[] EncryptInitalize(byte[] key)
         {
-            byte[] s = Enumerable.Range(0, 256)
-              .Select(i => (byte)i)
-              .ToArray();
+            byte[] s = [.. Enumerable.Range(0, 256).Select(i => (byte)i)];
             for (int i = 0, j = 0; i < 256; i++)
             {
                 j = (j + key[i % key.Length] + s[i]) & 255;
@@ -255,41 +247,35 @@ namespace QuazalWV
 
         private static void Swap(byte[] s, int i, int j)
         {
-            byte c = s[i];
-            s[i] = s[j];
-            s[j] = c;
+            (s[j], s[i]) = (s[i], s[j]);
         }
 
         public static byte[] DeriveKey(uint pid, string input = "UbiDummyPwd")
         {
             uint count = 65000 + (pid % 1024);
-            MD5 md5 = MD5.Create();
             byte[] buff = Encoding.ASCII.GetBytes(input);
             for (uint i = 0; i < count; i++)
-                buff = md5.ComputeHash(buff);
+                buff = MD5.HashData(buff);
             return buff;
         }
 
         /// <summary>
         /// RC4 key dumped from ACB.
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="iters"></param>
         /// <returns></returns>
         public static byte[] P2pKey()
         {
-            byte[] key = {
+            return
+            [
                 0x37, 0x1E, 0x29, 0xAD, 0xFA, 0xAB, 0xF0, 0x8D, 0xCA, 0xBA, 0x9D, 0xD8, 0x63, 0xBC, 0x0A, 0x8E,
                 0x79, 0x5E, 0xC7, 0xBB, 0x9D, 0x90, 0x05, 0x9C, 0xDA, 0x8F, 0x82, 0xCD, 0xFE, 0x55, 0xCC, 0xDC,
                 0x0F, 0xBC, 0xA0, 0x8F, 0x4F, 0x9B, 0x67, 0x9D, 0xDE, 0x9E, 0x90, 0xCE, 0xF9, 0xAF, 0xFA, 0xFD
-            };
-            return key;
+            ];
         }
 
         public static byte[] MakeHMAC(byte[] key, byte[] data)
         {
-            HMACMD5 hmac = new HMACMD5(key);
-            return hmac.ComputeHash(data);
+            return HMACMD5.HashData(key, data);
         }
 
         public static byte[] MakeFilledArray(int len)

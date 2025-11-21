@@ -57,7 +57,7 @@ namespace QuazalWV
                 return "VPort[port=" + port.ToString("D2") + " type=" + type + "]";
             }
 
-            public byte toByte()
+            public byte ToByte()
             {
                 byte result = port;
                 result |= (byte)((byte)type << 4);
@@ -87,12 +87,12 @@ namespace QuazalWV
 
         public PrudpPacket(byte[] data)
         {
-            MemoryStream m = new MemoryStream(data);
-            m_oSourceVPort = new VPort(Helper.ReadU8(m));
-            m_oDestinationVPort = new VPort(Helper.ReadU8(m));
+            MemoryStream m = new(data);
+            m_oSourceVPort = new(Helper.ReadU8(m));
+            m_oDestinationVPort = new(Helper.ReadU8(m));
             m_byPacketTypeFlags = Helper.ReadU8(m);
             type = (PACKETTYPE)(m_byPacketTypeFlags & 0x7);
-            flags = new List<PACKETFLAG>();
+            flags = [];
             ExtractFlags();
             m_bySessionID = Helper.ReadU8(m);
             m_uiSignature = Helper.ReadU32(m);
@@ -105,7 +105,7 @@ namespace QuazalWV
                 payloadSize = Helper.ReadU16(m);
             else
                 payloadSize = (ushort)(m.Length - m.Position - 1);
-            MemoryStream pl = new MemoryStream();
+            MemoryStream pl = new();
             if (payloadSize != 0)
                 for (int i = 0; i < payloadSize; i++)
                     pl.WriteByte(Helper.ReadU8(m));
@@ -117,13 +117,13 @@ namespace QuazalWV
                 usesCompression = payload[0] != 0;
                 if (usesCompression)
                 {
-                    MemoryStream m2 = new MemoryStream();
+                    MemoryStream m2 = new();
                     m2.Write(payload, 1, payload.Length - 1);
                     payload = Helper.Decompress(m2.ToArray());
                 }
                 else
                 {
-                    MemoryStream m2 = new MemoryStream();
+                    MemoryStream m2 = new();
                     m2.Write(payload, 1, payload.Length - 1);
                     payload = m2.ToArray();
                 }
@@ -135,9 +135,9 @@ namespace QuazalWV
 
         public byte[] ToBuffer()
         {
-            MemoryStream m = new MemoryStream();
-            Helper.WriteU8(m, m_oSourceVPort.toByte());
-            Helper.WriteU8(m, m_oDestinationVPort.toByte());
+            MemoryStream m = new();
+            Helper.WriteU8(m, m_oSourceVPort.ToByte());
+            Helper.WriteU8(m, m_oDestinationVPort.ToByte());
             byte typeFlag = (byte)type;
             foreach (PACKETFLAG flag in flags)
                 typeFlag |= (byte)((byte)flag << 3);
@@ -168,7 +168,7 @@ namespace QuazalWV
                     byte count = (byte)(sizeBefore / buff.Length);
                     if ((sizeBefore % buff.Length) != 0)
                         count++;
-                    MemoryStream m2 = new MemoryStream();
+                    MemoryStream m2 = new();
                     m2.WriteByte(count);
                     m2.Write(buff, 0, buff.Length);
                     tmpPayload = m2.ToArray();
@@ -176,7 +176,7 @@ namespace QuazalWV
                 }
                 else
                 {
-                    MemoryStream m2 = new MemoryStream();
+                    MemoryStream m2 = new();
                     m2.WriteByte(0);
                     m2.Write(tmpPayload, 0, tmpPayload.Length);
                     tmpPayload = m2.ToArray();
@@ -201,16 +201,12 @@ namespace QuazalWV
 
         private static byte GetProtocolSetting(byte proto)
         {
-            switch (proto)
+            return proto switch
             {
-                case 3:
-                    return 0xB5;
-                    //return 0xE3;
-                case 1:
-                case 5:
-                default:
-                    return 0x00;
-            }
+                3 => 0xB5,
+                // 3 => 0xE3;
+                _ => 0x00,
+            };
         }
 
         public static byte MakeChecksum(byte[] data, byte setting = 0xFF)
@@ -254,7 +250,7 @@ namespace QuazalWV
 
         public string GetFlagsString()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new ();
             foreach (PACKETFLAG flag in flags)
                 sb.Append("[" + flag.ToString().Replace("FLAG_", "") + "]");
             return sb.ToString();
@@ -262,7 +258,7 @@ namespace QuazalWV
 
         public string ToStringDetailed()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.AppendLine("UDPPacket {");
             sb.AppendLine("\tFrom         : " + m_oSourceVPort);
             sb.AppendLine("\tTo           : " + m_oDestinationVPort);
