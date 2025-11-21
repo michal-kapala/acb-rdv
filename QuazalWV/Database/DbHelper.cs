@@ -175,11 +175,8 @@ namespace QuazalWV
         {
             using (var connection = CreateConnection())
             {
-                const string querySql = "SELECT * FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
+                const string querySql = "SELECT * FROM relationships WHERE requester = @requester AND requestee = @requestee";
                 Relationship pending = null;
-                Relationship mirroredPending = null;
-                Relationship existingFriend = null;
-                var relationships = new List<Relationship>();
                 using (var query = new SQLiteCommand(querySql, connection))
                 {
                     query.Parameters.AddWithValue("@requester", requester);
@@ -195,16 +192,13 @@ namespace QuazalWV
                                 Type = (PlayerRelationship)reader.GetByte(2),
                                 Details = Convert.ToUInt32(reader.GetInt32(3))
                             };
-                            relationships.Add(relationship);
                             if (relationship.Type == PlayerRelationship.Pending)
+                                pending = relationship;
+                            else if (relationship.Type == PlayerRelationship.Friend)
                             {
-                                if (relationship.RequesterPid == requester && relationship.RequesteePid == requestee)
-                                    pending = relationship;
-                                else
-                                    mirroredPending ??= relationship;
+                                Log.WriteLine(1, $"Players {requester} and {requestee} are already friends", LogSource.DB, Color.Orange);
+                                return DbRelationshipResult.AlreadyPresent;
                             }
-                            else if (relationship.Type == PlayerRelationship.Friend && existingFriend == null)
-                                existingFriend = relationship;
                         }
                     }
                 }
@@ -215,47 +209,17 @@ namespace QuazalWV
                     return DbRelationshipResult.Failed;
                 }
 
-                uint newDetails = details;
-                if (newDetails == 0 && pending.Details != 0)
-                    newDetails = pending.Details;
-                if (newDetails == 0 && existingFriend?.Details > 0)
-                    newDetails = existingFriend.Details;
-                if (newDetails == 0 && mirroredPending?.Details > 0)
-                    newDetails = mirroredPending.Details;
-
-                try
+                uint newDetails = details != 0 ? details : pending.Details;
+                const string sql = "UPDATE relationships SET type = @type, details = @details WHERE requester = @requester AND requestee = @requestee AND type = @pendingType";
+                using (var cmd = new SQLiteCommand(sql, connection))
                 {
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        const string cleanupSql = "DELETE FROM relationships WHERE (requester = @requester AND requestee = @requestee) OR (requester = @requestee AND requestee = @requester)";
-                        using (var cleanup = new SQLiteCommand(cleanupSql, connection, transaction))
-                        {
-                            cleanup.Parameters.AddWithValue("@requester", requester);
-                            cleanup.Parameters.AddWithValue("@requestee", requestee);
-                            cleanup.ExecuteNonQuery();
-                        }
-
-                        const string insertSql = "INSERT INTO relationships (requester, requestee, type, details) VALUES (@requester, @requestee, @type, @details)";
-                        using (var insert = new SQLiteCommand(insertSql, connection, transaction))
-                        {
-                            insert.Parameters.AddWithValue("@requester", pending.RequesterPid);
-                            insert.Parameters.AddWithValue("@requestee", pending.RequesteePid);
-                            insert.Parameters.AddWithValue("@type", PlayerRelationship.Friend);
-                            insert.Parameters.AddWithValue("@details", newDetails);
-                            int rowsInserted = insert.ExecuteNonQuery();
-                            transaction.Commit();
-
-                            if (relationships.Count > 1)
-                                Log.WriteLine(1, $"Consolidated {relationships.Count} relationship rows between {requester} and {requestee}", LogSource.DB, Color.Orange);
-
-                            return rowsInserted > 0 ? DbRelationshipResult.Succeeded : DbRelationshipResult.Failed;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.WriteLine(1, $"Failed to accept friend request for {requester}/{requestee}: {ex.Message}", LogSource.DB, Color.Red);
-                    return DbRelationshipResult.Failed;
+                    cmd.Parameters.AddWithValue("@type", PlayerRelationship.Friend);
+                    cmd.Parameters.AddWithValue("@details", newDetails);
+                    cmd.Parameters.AddWithValue("@requester", requester);
+                    cmd.Parameters.AddWithValue("@requestee", requestee);
+                    cmd.Parameters.AddWithValue("@pendingType", PlayerRelationship.Pending);
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0 ? DbRelationshipResult.Succeeded : DbRelationshipResult.Failed;
                 }
             }
         }
