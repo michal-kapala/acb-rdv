@@ -72,7 +72,7 @@ namespace QuazalWV
             if (gameMode.Value != qGameMode.Value || gameType.Value != qGameType.Value)
             {
                 // allow cross game mode joining for `PLAY NOW` matchmaking
-                if (client.PlayNowQuery && gameType.Value == qGameType.Value)
+                if (client.PlayNowQuery && (GameMode)gameMode.Value != GameMode.Menu && gameType.Value == qGameType.Value)
                 {
                     Log.WriteLine(1, $"PLAY NOW query: allowing cross game mode session", LogSource.Session, Color.Orange, client);
                 }
