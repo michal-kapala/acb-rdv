@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Text;
 using System.Drawing;
 using System.Threading;
@@ -16,8 +17,8 @@ namespace QuazalWV
         public static string logPacketsFileName = "packetLog.bin";
         public static readonly object _sync = new object();
         public static readonly object _filesync = new object();
-        public static StringBuilder logBuffer = new StringBuilder();
-        public static List<byte[]> logPackets = new List<byte[]>();
+        private static readonly BlockingCollection<LogWorkItem> logQueue = new BlockingCollection<LogWorkItem>();
+        private static Thread logWorker;
         public static bool enablePacketLogging = true;
 
         public static void ClearLog()
@@ -28,8 +29,7 @@ namespace QuazalWV
                 File.Delete(logPacketsFileName);
             lock (_sync)
             {
-                logBuffer = new StringBuilder();
-                logPackets = new List<byte[]>();
+                while (logQueue.TryTake(out _)) { }
             }
         }
 
@@ -63,11 +63,7 @@ namespace QuazalWV
                         box.SelectionColor = box.ForeColor;
                         box.ScrollToCaret();                        
                     }
-                    lock (_sync)
-                    {
-                        logBuffer.Append(line + content + "\n");
-                        new Thread(tSaveLog).Start();
-                    }
+                    EnqueueLog(line + content + "\n", null);
                 }));
             }
             catch { }
@@ -101,11 +97,7 @@ namespace QuazalWV
                         box.SelectionColor = box.ForeColor;
                         box.ScrollToCaret();
                     }
-                    lock (_sync)
-                    {
-                        logBuffer.Append(line + content + "\n");
-                        new Thread(tSaveLog).Start();
-                    }
+                    EnqueueLog(line + content + "\n", null);
                 }));
             }
             catch { }
@@ -186,42 +178,69 @@ namespace QuazalWV
             m.WriteByte((byte)(sent ? 1 : 0));
             Helper.WriteU32(m, (uint)data.Length);
             m.Write(data, 0, data.Length);
+            EnqueueLog(null, m.ToArray());
+        }
+
+        private static void EnsureLogWorker()
+        {
+            if (logWorker != null)
+                return;
             lock (_sync)
             {
-                logPackets.Add(m.ToArray());
+                if (logWorker != null)
+                    return;
+                logWorker = new Thread(ProcessLogQueue)
+                {
+                    IsBackground = true,
+                    Name = "LogWriter"
+                };
+                logWorker.Start();
             }
         }
 
-        public static void tSaveLog(object obj)
+        private static void EnqueueLog(string text, byte[] packet)
         {
-            lock (_filesync)
+            EnsureLogWorker();
+            logQueue.Add(new LogWorkItem { Text = text, Packet = packet });
+        }
+
+        private static void ProcessLogQueue()
+        {
+            foreach (var item in logQueue.GetConsumingEnumerable())
             {
-                string buffer = null;
-                lock (_sync)
+                try
                 {
-                    buffer = logBuffer.ToString();
-                    logBuffer.Clear();
-                }
-                if(buffer != null && buffer.Length > 0)
-                    File.AppendAllText(logFileName, buffer);
-                byte[] packet = null;
-                lock (_sync)
-                {
-                    if (logPackets.Count != 0)
+                    if (!string.IsNullOrEmpty(item.Text))
                     {
-                        packet = logPackets[0];
-                        logPackets.RemoveAt(0);
+                        lock (_filesync)
+                        {
+                            File.AppendAllText(logFileName, item.Text);
+                        }
+                    }
+
+                    if (item.Packet != null)
+                    {
+                        lock (_filesync)
+                        {
+                            using (FileStream fs = new FileStream(logPacketsFileName, FileMode.Append, FileAccess.Write, FileShare.Read))
+                            {
+                                fs.Write(item.Packet, 0, item.Packet.Length);
+                                fs.Flush();
+                            }
+                        }
                     }
                 }
-                if (packet != null)
+                catch
                 {
-                    FileStream fs = new FileStream(logPacketsFileName, FileMode.Append, FileAccess.Write);
-                    fs.Write(packet, 0, packet.Length);
-                    fs.Flush();
-                    fs.Close();
+                    // swallow logging errors to avoid crashing callers
                 }
-                Thread.Sleep(1);
             }
+        }
+
+        private class LogWorkItem
+        {
+            public string Text { get; set; }
+            public byte[] Packet { get; set; }
         }
     }
 }
