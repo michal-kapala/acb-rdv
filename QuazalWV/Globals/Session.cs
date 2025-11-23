@@ -27,7 +27,8 @@ namespace QuazalWV
             HostPid = host.User.Pid;
             foreach (var url in host.Urls)
                 Log.WriteLine(2, $"Host URL added: ${url}", LogSource.Session, Color.Green);
-            HostUrls = host.Urls;
+            // Take a copy so later host URL mutations don't silently change this session.
+            HostUrls = new List<StationUrl>(host.Urls);
         }
 
         public void AddParticipants(List<uint> publicPids, List<uint> privatePids)
