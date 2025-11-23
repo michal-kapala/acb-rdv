@@ -9,7 +9,7 @@ namespace QuazalWV
     {
         public const string Rc4KeyRdv = "CD&ML";
         public static readonly byte[] Rc4KeyP2p = Helper.P2pKey();
-        public static string ServerBindAddress { get; set; } = ConfigurationManager.AppSettings["SecureServerAddress"];
+        public static string ServerBindAddress { get; set; } = ConfigurationManager.AppSettings["SecureServerAddress"]; // Migrate this to actual better thing? (json?)
         public static uint IdCounter { get; set; } = 0x12345678;
         public static uint PidCounter { get; set; } = 0x1234;
         public static uint GathIdCounter { get; set; } = 0x34;

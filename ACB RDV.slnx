@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ACB RDV/ACB RDV.csproj" />
+  <Project Path="Be.Windows.Forms.HexBox/Be.Windows.Forms.HexBox.csproj" />
+  <Project Path="DDLParserWV/DDLParserWV.csproj"/>
+  <Project Path="QuazalWV/QuazalWV.csproj"/>
+</Solution>

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using QuazalWV;
+using System;
+using System.Reflection.Metadata;
 using System.Windows.Forms;
-using QuazalWV;
+using static System.Windows.Forms.LinkLabel;
 
 namespace AcbRdv
 {
@@ -10,9 +12,19 @@ namespace AcbRdv
         {
             InitializeComponent();
             Log.ClearLog();
-            Log.box = richTextBox1;
+            Log.Write = WriteLogBox;
             DbHelper.Init();
             toolStripComboBox1.SelectedIndex = 0;
+        }
+
+        private void WriteLogBox((string, Color) tuple)
+        {
+            richTextBox1.SelectionStart = richTextBox1.TextLength;
+            richTextBox1.SelectionLength = 0;
+            richTextBox1.SelectionColor = tuple.Item2;
+            richTextBox1.AppendText(tuple.Item1);
+            richTextBox1.SelectionColor = richTextBox1.ForeColor;
+            richTextBox1.ScrollToCaret();
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e)
