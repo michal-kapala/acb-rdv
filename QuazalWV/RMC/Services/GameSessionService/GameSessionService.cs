@@ -167,55 +167,12 @@ namespace QuazalWV
                             // Mark session as migrating
                             migrateFromSes.Migrating = true;
 
-                            // Remember the previous host PID / client
-                            var prevHostPid = migrateFromSes.HostPid;
-
                             // Set client to the session immediately
                             client.GameSessionID = migrateFromSes.Key.SessionId;
                             client.InGameSession = true;
 
-                            // Determine new host
-                            if (client.ep?.Port == 7917)
-                            {
-                                // Client has a reliable connection, make them host
-                                migrateFromSes.HostPid = client.User.Pid;
-                                Log.WriteRmcLine(1, $"Client {client.User.Pid} has a reliable connection and became the new host", protocol, LogSource.RMC, Color.Orange, client);
-                            }
-                            else
-                            {
-                                // Try to find another valid host in the session (exclude previous host)
-                                var newHostCandidate = Global.Clients
-                                    .FirstOrDefault(c =>
-                                        c.User != null &&
-                                        c.ep?.Port == 7917 &&
-                                        c.User.Pid != prevHostPid &&
-                                        (migrateFromSes.PublicPids.Contains(c.User.Pid) || migrateFromSes.PrivatePids.Contains(c.User.Pid)));
-
-                                if (newHostCandidate != null)
-                                {
-                                    migrateFromSes.HostPid = newHostCandidate.User.Pid;
-                                    Log.WriteRmcLine(1, $"Client {client.User.Pid} shouldn't be host, elected a more reliable client {newHostCandidate.User.Pid} instead", protocol, LogSource.RMC, Color.Orange, client);
-                                }
-                                else
-                                {
-                                    // Fallback: pick any client in the session (exclude previous host)
-                                    var fallbackHost = Global.Clients
-                                        .FirstOrDefault(c =>
-                                            c.User != null &&
-                                            c.User.Pid != prevHostPid &&
-                                            (migrateFromSes.PublicPids.Contains(c.User.Pid) || migrateFromSes.PrivatePids.Contains(c.User.Pid)));
-
-                                    if (fallbackHost != null)
-                                    {
-                                        migrateFromSes.HostPid = fallbackHost.User.Pid;
-                                        Log.WriteRmcLine(1, $"No other reliable host found, client {fallbackHost.User.Pid} will become the new host as a fallback", protocol, LogSource.RMC, Color.Orange, client);
-                                    }
-                                    else
-                                    {
-                                        Log.WriteRmcLine(1, $"No clients available to host session {migrateFromSes.Key.SessionId}, session remains in migrating state", protocol, LogSource.RMC, Color.Red, client);
-                                    }
-                                }
-                            }
+                            // If this client becomes the new host, update HostPid
+                            migrateFromSes.HostPid = client.User.Pid;
 
                             reply = new RMCPacketResponseGameSessionService_MigrateSession(reqMigrate.Key);
                             RMC.SendResponseWithACK(client.udp, p, rmc, client, reply);
@@ -414,14 +371,11 @@ namespace QuazalWV
                                     // Update host URLs from client
                                     ses.HostUrls = new List<StationUrl>(reqRegUrls.Urls);
 
-                                    // For WAN communication add a separate NAT URL
-                                    if (!Global.IsPrivate)
-                                    {
-                                        var NATUrl = new StationUrl(client);
-                                        NATUrl.Address = client.ep.Address.ToString();
-                                        reqRegUrls.Urls.Add(NATUrl);
-                                        Log.WriteRmcLine(1, $"RegisterURLs - NAT URL added: {NATUrl}", protocol, LogSource.RMC, Color.Brown, client);
-                                    }
+                                    // Add a separate NAT URL - makes it easier for clients to join on their first try
+                                    var NATUrl = new StationUrl(client);
+                                    NATUrl.Address = client.ep.Address.ToString();
+                                    reqRegUrls.Urls.Add(NATUrl);
+                                    Log.WriteRmcLine(1, $"RegisterURLs: added NAT URL {NATUrl}", protocol, LogSource.RMC, Color.HotPink, client);
                                 }
 
                                 // Register URLs

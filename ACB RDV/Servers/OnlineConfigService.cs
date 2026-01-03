@@ -153,6 +153,7 @@ namespace AcbRdv
         private static Dictionary<string, string> responseData = new Dictionary<string, string>()
         {
             {"SandboxUrl", @"prudp:\/address=#IP#;port=#PORT#"},
+            {"SandboxUrlPS3", @"prudp:\/address=#IP#;port=#PORT#;serviceid=UP0001-NPUB90483_00"},
             {"SandboxUrlWS", @"#IP#:#PORT#"},
             {"uplay_DownloadServiceUrl", @"#IP#\/UplayServices\/UplayFacade\/DownloadServicesRESTXML.svc\/REST\/XML\/?url="},
             {"uplay_DynContentBaseUrl", @"#IP#\/u\/Uplay\/"},

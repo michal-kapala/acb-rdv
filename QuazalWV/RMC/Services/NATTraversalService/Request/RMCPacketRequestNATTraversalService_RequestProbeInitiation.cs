@@ -10,10 +10,41 @@ namespace QuazalWV
 
         public RMCPacketRequestNATTraversalService_RequestProbeInitiation(Stream s)
         {
+            HashSet<string> uniqueUrls = new HashSet<string>();
             TargetUrls = new List<StationUrl>();
             var urls = Helper.ReadStringList(s);
             foreach (var url in urls)
-                TargetUrls.Add(new StationUrl(url));
+            {
+                StationUrl parsed = new StationUrl(url);
+                ClientInfo owner = null;
+
+                // Prefer PID if present
+                if (parsed.PID != 0)
+                {
+                    owner = Global.Clients.Find(c => c.User.Pid == parsed.PID);
+                }
+
+                // Fallback to RVCID
+                if (owner == null && parsed.RVCID != 0)
+                {
+                    owner = Global.Clients.Find(c => c.rvCID == parsed.RVCID);
+                }
+
+                // Rewrite endpoint if authoritative owner found
+                if (owner != null)
+                {
+                    parsed.Address = owner.ep.Address.ToString();
+                    parsed.Port = (ushort)owner.ep.Port;
+                }
+
+                string rewrittenUrl = parsed.ToString();
+
+                // Only add if unique after rewrite
+                if (uniqueUrls.Add(rewrittenUrl))
+                {
+                    TargetUrls.Add(parsed);
+                }
+            }
         }
 
         public override string PayloadToString()

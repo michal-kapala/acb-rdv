@@ -17,6 +17,7 @@
         PresenceParser,
         PresenceSerializer,
         BackendApp,
+        StatusAPI,
         Undefined
     }
 }

@@ -50,6 +50,7 @@ namespace AcbRdv
             OnlineConfigService.Start();
             RdvServer.Start();
             AuthServer.Start();           
+            StatusAPI.Start();
             toolStripButton1.Enabled = false;
             toolStripButton2.Enabled = true;
         }
@@ -60,6 +61,7 @@ namespace AcbRdv
             OnlineConfigService.Stop();
             RdvServer.Stop();
             AuthServer.Stop();
+            StatusAPI.Stop();
             toolStripButton1.Enabled = true;
             toolStripButton2.Enabled = false;
         }
@@ -69,6 +71,7 @@ namespace AcbRdv
             OnlineConfigService.Stop();
             RdvServer.Stop();
             AuthServer.Stop();
+            StatusAPI.Stop();
         }
 
         private void toolStripButton3_Click(object sender, EventArgs e)

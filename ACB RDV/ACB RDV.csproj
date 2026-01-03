@@ -144,6 +144,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Servers\OnlineConfigService.cs" />
     <Compile Include="Servers\AuthServer.cs" />
+    <Compile Include="Servers\StatusAPI.cs" />
     <Compile Include="UDPProcessor.cs">
       <SubType>Form</SubType>
     </Compile>
