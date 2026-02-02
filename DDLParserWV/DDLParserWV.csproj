@@ -114,6 +114,7 @@
     <Compile Include="Tree\Elements\DeclarationUse.cs" />
     <Compile Include="Tree\Elements\DOClassDeclaration.cs" />
     <Compile Include="Tree\Elements\DupSpaceDeclaration.cs" />
+    <Compile Include="Tree\Elements\V2\MethodVariant.cs" />
     <Compile Include="Tree\Enums\EParseTreeElement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

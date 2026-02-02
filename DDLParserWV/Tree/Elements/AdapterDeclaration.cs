@@ -11,11 +11,11 @@ namespace DDLParserWV
         [JsonProperty("decl")]
         public Declaration Declaration { get; set; } = new Declaration();
 
-        protected override AdapterDeclaration ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override AdapterDeclaration ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[AdapterDeclaration]");
-            Declaration.Parse(s, log, depth + 1);
+            Declaration.Parse(s, log, depth + 1, majorVersion);
             return this;
         }
     }

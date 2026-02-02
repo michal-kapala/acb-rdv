@@ -13,18 +13,18 @@ namespace DDLParserWV
         [JsonProperty("typeParams")]
         public List<string> TypeParams {  get; set; } = new List<string>();
 
-        public TemplateType Parse(Stream s, StringBuilder log, uint depth)
+        public TemplateType Parse(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
-            log.AppendLine($"{tabs}[TemplateType");
+            log.AppendLine($"{tabs}[TemplateType]");
             GenericType = Utils.ReadString(s);
-            log.AppendLine($"{tabs}\t[genericType: {GenericType}");
+            log.AppendLine($"{tabs}\t[genericType: {GenericType}]");
             uint count = Utils.ReadU32(s);
             for (uint i = 0; i < count; i++)
                 TypeParams.Add(Utils.ReadString(s));
             log.AppendLine($"{tabs}\t[TypeParams]");
             foreach (string param in TypeParams)
-                log.AppendLine($"{tabs}\t\t[TypeParam: {param}");
+                log.AppendLine($"{tabs}\t\t[TypeParam: {param}]");
             return this;
         }
     }

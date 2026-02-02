@@ -15,11 +15,11 @@ namespace DDLParserWV
         [JsonProperty("targetFlags")]
         public uint TargetFlags { get; set; }
 
-        protected override PropertyDeclaration ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override PropertyDeclaration ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[PropertyDeclaration]");
-            Declaration.Parse(s, log, depth + 1);
+            Declaration.Parse(s, log, depth + 1, majorVersion);
             CategoryFlags = Utils.ReadU32(s);
             log.AppendLine($"{tabs}\t[categoryFlags: {CategoryFlags}]");
             TargetFlags = Utils.ReadU32(s);

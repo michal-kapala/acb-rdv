@@ -13,12 +13,13 @@ namespace DDLParserWV
         [JsonProperty("namespace")]
         public NameSpace NameSpace { get; set; }
 
-        protected override RMC ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override RMC ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[RMC]");
-            MethodDeclaration.Parse(s, log, depth + 1);
-            NameSpace = new NameSpace(s, log, depth + 1);
+            MethodDeclaration.Parse(s, log, depth + 1, majorVersion);
+            if (majorVersion < 2)
+                NameSpace = new NameSpace(s, log, depth + 1, majorVersion);
             return this;
         }
 

@@ -10,12 +10,12 @@ namespace DDLParserWV
         [JsonProperty("type")]
         public string TypeName { get; set; }
 
-        public DeclarationUse(Stream s, EParseTreeElement type, StringBuilder log, uint depth)
+        public DeclarationUse(Stream s, EParseTreeElement type, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[DeclarationUse]");
             if (type == EParseTreeElement.TemplateInstance)
-                TypeName = new TemplateDeclarationUse().Parse(s, log, depth + 1).NsItem.TreeItemName;
+                TypeName = new TemplateDeclarationUse().Parse(s, log, depth + 1, majorVersion).NsItem.TreeItemName;
             // SimpleTypeDeclaration
             else
                 TypeName = Utils.ReadString(s);
