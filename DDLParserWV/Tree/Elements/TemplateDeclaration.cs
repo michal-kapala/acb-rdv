@@ -13,11 +13,11 @@ namespace DDLParserWV
         [JsonProperty("unknown")]
         public uint Unknown {  get; set; }
 
-        protected override TemplateDeclaration ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override TemplateDeclaration ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[TemplateDeclaration]");
-            TypeDeclaration.Parse(s, log, depth + 1);
+            TypeDeclaration.Parse(s, log, depth + 1, majorVersion);
             Unknown = Utils.ReadU32(s);
             log.AppendLine($"{tabs}\t[unknown: {Unknown}]");
             return this;

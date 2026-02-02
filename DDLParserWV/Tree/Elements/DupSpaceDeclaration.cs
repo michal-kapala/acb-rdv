@@ -11,11 +11,11 @@ namespace DDLParserWV
         [JsonProperty("decl")]
         public Declaration Declaration { get; set; } = new Declaration();
 
-        protected override DupSpaceDeclaration ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override DupSpaceDeclaration ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[DupSpaceDeclaration]");
-            Declaration.Parse(s, log, depth + 1);
+            Declaration.Parse(s, log, depth + 1, majorVersion);
             return this;
         }
     }

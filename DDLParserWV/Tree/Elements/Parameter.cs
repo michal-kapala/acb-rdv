@@ -14,20 +14,30 @@ namespace DDLParserWV
         public DeclarationUse DeclarationUse {  get; set; }
         [JsonProperty("arraySize")]
         public uint ArraySize { get; set; }
+        [JsonProperty("unknown_v2")]
+        public uint V2_Unk { get; set; }
         [JsonIgnore]
         public byte Flags { get; set; }
         [JsonProperty("direction")]
         public string Direction { get; set; }
+        private uint Version { get; set; }
 
-        protected override Parameter ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override Parameter ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
+            Version = majorVersion;
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[Parameter]");
-            Variable.Parse(s, log, depth + 1);
+            Variable.Parse(s, log, depth + 1, Version);
             byte type = (byte)s.ReadByte();
-            DeclarationUse = new DeclarationUse(s, (EParseTreeElement)type, log, depth + 1);
+            DeclarationUse = new DeclarationUse(s, (EParseTreeElement)type, log, depth + 1, Version);
             ArraySize = Utils.ReadU32(s);
             log.AppendLine($"{tabs}\t[arraySize: {ArraySize}]");
+            // only present in v2
+            if (Version == 2)
+            {
+                V2_Unk = Utils.ReadU32(s);
+                log.AppendLine($"{tabs}\t[V2_Unk: {V2_Unk}]");
+            }
             Flags = (byte)s.ReadByte();
             switch (Flags & 3)
             {
@@ -63,6 +73,11 @@ namespace DDLParserWV
         public string GetFullType()
         {
             return DeclarationUse.TypeName;
+        }
+
+        public bool ShouldSerializeV2_Unk()
+        {
+            return Version == 2;
         }
     }
 }

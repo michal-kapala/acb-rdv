@@ -53,7 +53,7 @@ namespace DDLParserWV
                 }
 
                 foreach (var protocol in protocols)
-                    md += MarkdownRenderer.RenderProtocol(protocol);
+                    md += MarkdownRenderer.RenderProtocol(protocol, tree.MajorVersion);
 
                 if (protocols.Count == 0)
                     md += $"# {ddlUnit.UnitName}\n";

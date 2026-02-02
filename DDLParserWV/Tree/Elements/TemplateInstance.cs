@@ -13,12 +13,12 @@ namespace DDLParserWV
         [JsonProperty("templateType")]
         public TemplateType TemplateType { get; set; } = new TemplateType();
 
-        protected override TemplateInstance ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override TemplateInstance ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[TemplateInstance]");
-            Declaration.Parse(s, log, depth + 1);
-            TemplateType.Parse(s, log, depth + 1);
+            Declaration.Parse(s, log, depth + 1, majorVersion);
+            TemplateType.Parse(s, log, depth + 1, majorVersion);
             return this;
         }
     }

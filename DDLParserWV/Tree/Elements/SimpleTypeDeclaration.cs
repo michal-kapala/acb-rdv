@@ -13,11 +13,11 @@ namespace DDLParserWV
         [JsonProperty("type")]
         public string TypeName { get; set; }
 
-        protected override SimpleTypeDeclaration ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override SimpleTypeDeclaration ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[SimpleTypeDeclaration]");
-            Declaration.Parse(s, log, depth + 1);
+            Declaration.Parse(s, log, depth + 1, majorVersion);
             TypeName = Declaration.NsItem.TreeItemName;
             log.AppendLine($"{tabs}\t[type: {TypeName}]");
             return this;

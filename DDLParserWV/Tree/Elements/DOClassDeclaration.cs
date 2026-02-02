@@ -17,16 +17,16 @@ namespace DDLParserWV
         [JsonProperty("namespace")]
         public NameSpace NameSpace { get; set; }
 
-        protected override DOClassDeclaration ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override DOClassDeclaration ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[DOClassDeclaration]");
-            Declaration.Parse(s, log, depth + 1);
+            Declaration.Parse(s, log, depth + 1, majorVersion);
             ParentDeclNamespace = Utils.ReadString(s);
             log.AppendLine($"{tabs}\t[parentDeclNamespace: {ParentDeclNamespace}]");
             Id = Utils.ReadU32(s);
             log.AppendLine($"{tabs}\t[id: {Id}]");
-            NameSpace = new NameSpace(s, log, depth + 1);
+            NameSpace = new NameSpace(s, log, depth + 1, majorVersion);
             return this;
         }
     }

@@ -13,12 +13,12 @@ namespace DDLParserWV
         [JsonProperty("namespace")]
         public NameSpace NameSpace { get; set; }
 
-        protected override Action ParseTyped(Stream s, StringBuilder log, uint depth)
+        protected override Action ParseTyped(Stream s, StringBuilder log, uint depth, uint majorVersion)
         {
             string tabs = Utils.MakeTabs(depth);
             log.AppendLine($"{tabs}[Action]");
-            MethodDeclaration.Parse(s, log, depth + 1);
-            NameSpace = new NameSpace(s, log, depth + 1);
+            MethodDeclaration.Parse(s, log, depth + 1, majorVersion);
+            NameSpace = new NameSpace(s, log, depth + 1, majorVersion);
             return this;
         }
     }

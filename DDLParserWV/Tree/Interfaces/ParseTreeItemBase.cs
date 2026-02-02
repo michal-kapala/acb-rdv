@@ -11,6 +11,6 @@ namespace DDLParserWV
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty("elemType")]
         public abstract EParseTreeElement Type { get; set; }
-        public abstract ParseTreeItemBase Parse(Stream s, StringBuilder log, uint depth);
+        public abstract ParseTreeItemBase Parse(Stream s, StringBuilder log, uint depth, uint majorVersion);
     }
 }
