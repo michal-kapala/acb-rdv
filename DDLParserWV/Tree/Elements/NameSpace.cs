@@ -89,6 +89,12 @@ namespace DDLParserWV
                     case EParseTreeElement.DupSpaceDeclaration:
                         Items.Add(new DupSpaceDeclaration().Parse(s, log, depth + 1, majorVersion));
                         break;
+                    case EParseTreeElement.EnumDeclaration:
+                        Items.Add(new EnumDeclaration().Parse(s, log, depth + 1, majorVersion));
+                        break;
+                    case EParseTreeElement.Enumerator:
+                        Items.Add(new Enumerator().Parse(s, log, depth + 1, majorVersion));
+                        break;
                     default:
                         throw new Exception($"Unknown NameSpaceItem type {type}");
                 }

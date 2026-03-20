@@ -22,6 +22,10 @@
         SimpleTypeDeclaration,
         TemplateInstance,
         DDLUnitDeclaration,
-        DupSpaceDeclaration
+        DupSpaceDeclaration,
+        NameSpaceDeclaration = 23,
+        Constant = 24,
+        EnumDeclaration = 25,
+        Enumerator = 26
     }
 }
