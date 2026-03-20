@@ -22,20 +22,22 @@ namespace DDLParserWV
         [JsonProperty("unknown_v2")]
         public uint V2_Unknown { get; set; }
         public uint MajorVersion { get; set; }
-        
+        public uint MinorVersion { get; set; }
+        public uint PatchVersion { get; set; }
+
         public ParseTree(Stream s, StringBuilder log)
         {
             log.AppendLine("[ParseTree]");
             UnusedByte = (byte)s.ReadByte();
             log.AppendLine($"\t[unusedByte: {UnusedByte}]");
             MajorVersion = Utils.ReadU32(s);
-            uint minor = Utils.ReadU32(s);
-            uint patch = Utils.ReadU32(s);
+            MinorVersion = Utils.ReadU32(s);
+            PatchVersion = Utils.ReadU32(s);
             uint build = Utils.ReadU32(s);
-            Version = $"{MajorVersion}.{minor}.{patch}.{build}";
+            Version = $"{MajorVersion}.{MinorVersion}.{PatchVersion}.{build}";
             log.AppendLine($"\t[version: {Version}]");
-            // only present in v2
-            if (MajorVersion == 2)
+            // only present in v2 < 2.5.7
+            if (MajorVersion == 2 && (MinorVersion < 5 || (MinorVersion == 5 && PatchVersion < 7)))
                 V2_Unknown = Utils.ReadU32(s);
             GlobalNamespace = new NameSpace(s, log, 1, MajorVersion);
             while ((s.Position % 4) != 0)
@@ -44,7 +46,7 @@ namespace DDLParserWV
 
         public bool ShouldSerializeV2_Unknown()
         {
-            return MajorVersion == 2;
+            return MajorVersion == 2 && (MinorVersion < 5 || (MinorVersion == 5 && PatchVersion < 7));
         }
     }
 }
