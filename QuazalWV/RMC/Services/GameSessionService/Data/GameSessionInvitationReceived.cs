@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,7 +37,11 @@ namespace QuazalWV
 
         public void ToBuffer(Stream s)
         {
-            throw new NotImplementedException();
+            SessionKey.ToBuffer(s);
+            Helper.WriteU32(s, SenderPid);
+            Helper.WriteString(s, Message);
+            CreationTime.ToBuffer(s);
         }
     }
 }
+
