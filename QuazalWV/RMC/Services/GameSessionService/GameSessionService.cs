@@ -57,7 +57,7 @@ namespace QuazalWV
                     rmc.request = new RMCPacketRequestGameSessionService_CancelInvitation(s);
                     break;
                 case 21:
-                    rmc.request = new RMCPacketRequestGameSessionService_RegisterURLs(s, client);
+                    rmc.request = new RMCPacketRequestGameSessionService_RegisterURLs(s);
                     break;
                 case 23:
                     rmc.request = new RMCPacketRequestGameSessionService_AbandonSession(s);
@@ -370,12 +370,6 @@ namespace QuazalWV
                                 {
                                     // Update host URLs from client
                                     ses.HostUrls = new List<StationUrl>(reqRegUrls.Urls);
-
-                                    // Add a separate NAT URL - makes it easier for clients to join on their first try
-                                    var NATUrl = new StationUrl(client);
-                                    NATUrl.Address = client.ep.Address.ToString();
-                                    reqRegUrls.Urls.Add(NATUrl);
-                                    Log.WriteRmcLine(1, $"RegisterURLs: added NAT URL {NATUrl}", protocol, LogSource.RMC, Color.HotPink, client);
                                 }
 
                                 // Register URLs

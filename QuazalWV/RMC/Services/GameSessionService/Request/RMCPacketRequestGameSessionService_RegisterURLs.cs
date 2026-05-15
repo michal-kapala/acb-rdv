@@ -7,40 +7,16 @@ namespace QuazalWV
     public class RMCPacketRequestGameSessionService_RegisterURLs : RMCPRequest
     {
         public List<StationUrl> Urls { get; set; }
-        public RMCPacketRequestGameSessionService_RegisterURLs(Stream s, ClientInfo client)
+
+        public RMCPacketRequestGameSessionService_RegisterURLs(Stream s)
         {
-            HashSet<string> uniqueUrls = new HashSet<string>();
             Urls = new List<StationUrl>();
             uint count = Helper.ReadU32(s);
             for (uint i = 0; i < count; i++)
             {
                 string b = Helper.ReadString(s);
-                // Create StationUrl of the string
-                var url = new StationUrl(b);
-
-                // Rewrite every endpoint for prudp (no rewrite needed for prudps)
-                if (url.Protocol.Equals("prudp", System.StringComparison.OrdinalIgnoreCase))
-                {
-                    url.Address = client.ep.Address.ToString();
-                    url.Port = (ushort)client.ep.Port;
-                }
-
-                // Deduplicate exact matches after rewrite
-                string finalUrl = url.ToString();
-
-                if (uniqueUrls.Add(finalUrl))
-                {
-                    Urls.Add(url);
-                }
-            }
-
-            // Log final URLs asynchronously in one go (reduces I/O blocking)
-            if (Urls.Count > 0)
-            {
-                Task.Run(() =>
-                {
-                    Log.WriteRmcLine(1, $"RegisterURLs - adjusted & filtered host URLs:\n{string.Join("\n", Urls)}", RMCP.PROTOCOL.GameSession, LogSource.RMC);
-                });
+                Urls.Add(new StationUrl(b));
+                Log.WriteRmcLine(1, $"RegisterURLs - host URL: {b}", RMCP.PROTOCOL.GameSession, LogSource.RMC);
             }
         }
 
